@@ -1,0 +1,24 @@
+rich
+
+# public Interface
+pydantic[dotenv]>=1.8.2,<1.9
+email-validator
+
+# SQL Source
+SQLAlchemy>=2.0.0,<2.1
+sqlalchemy-utils>=0.41.0,<0.42.0  # used for encrypted columns
+mysqlclient>=2.1.0,<2.2
+alembic
+
+# Server
+requests
+fastapi>=0.75.1,<0.76.0
+uvicorn>=0.15.0,<0.16.0
+
+
+# cli
+click
+
+authlib
+fastapi-sessions
+httpx

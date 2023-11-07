@@ -1,0 +1,10 @@
+.benchmarks
+.coverage
+.eggs
+env*
+htmlcov
+*.egg-info
+.*_cache*
+.tox
+*.db
+tests

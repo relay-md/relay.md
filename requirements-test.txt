@@ -1,0 +1,18 @@
+pytest
+pytest-mock
+pytest-benchmark
+pytest-celery
+requests-mock
+coverage
+flake8
+
+# Releases
+python-semantic-release==7.28.0
+
+# mypy
+mypy
+
+types-PyYAML
+types-python-dateutil
+types-click
+types-requests
