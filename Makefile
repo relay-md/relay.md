@@ -4,8 +4,8 @@ RELEASE_VERSION ?= $(shell git describe --always)
 RELEASE_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 PACKAGE_DIR=api
 
-IMAGE_REGISTRY := registry.chainsquad.com
-IMAGE_NAME := knowledgemd/$(PROJECT_NAME)
+IMAGE_REGISTRY := registry.infra.chainsquad.com
+IMAGE_NAME := channelmd/$(PROJECT_NAME)
 DEPLOY_KEY := $(shell [ -f ~/.ssh/id_rsa ] && cat ~/.ssh/id_rsa | base64 -w0)
 DOCKER_BUILD_ARGS := --build-arg BUILD_DATE=$(RELEASE_DATE) \
                      --build-arg VCS_REF=$(RELEASE_VERSION) \
