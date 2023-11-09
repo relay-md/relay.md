@@ -1,9 +1,8 @@
-import json
+# -*- coding: utf-8 -*-
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, EmailStr
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from starlette.responses import HTMLResponse, RedirectResponse
-from ..database import get_session, Session
-from .. import oauth, models
+
+from ..database import Session, get_session
 from ..models.landingpage import LandingPageEmail
 
 router = APIRouter(prefix="/v0")
@@ -14,7 +13,9 @@ class EmailSubmitRequest(BaseModel):
 
 
 @router.post("/mail/submit")
-async def submitmail(payload: EmailSubmitRequest, db: Session = Depends(get_session)) -> str:
+async def submitmail(
+    payload: EmailSubmitRequest, db: Session = Depends(get_session)
+) -> str:
     new = LandingPageEmail(email=payload.email)
     db.add(new)
     db.commit()

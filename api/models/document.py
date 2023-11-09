@@ -3,22 +3,11 @@
 """
 import logging
 import uuid
-from typing import List
-import enum
 
-from sqlalchemy import String, func, select
-from sqlalchemy import (
-    Column,
-    DateTime,
-    Enum,
-    ForeignKey,
-    String,
-    and_,
-    select,
-)
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column
 
-from ..database import Base, Session
+from ..database import Base
 
 log = logging.getLogger(__name__)
 

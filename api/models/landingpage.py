@@ -1,18 +1,11 @@
-import enum
-import logging
+# -*- coding: utf-8 -*-
 import uuid
 from datetime import datetime
-from sqlalchemy import (
-    Column,
-    DateTime,
-    Enum,
-    ForeignKey,
-    String,
-    and_,
-    select,
-)
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from ..database import Base, Session
+
+from sqlalchemy import Column, DateTime, String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from ..database import Base
 
 
 class LandingPageEmail(Base):
@@ -23,5 +16,5 @@ class LandingPageEmail(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
-    email : str = Column(String(256))
+    email: str = Column(String(256))
     confirm_date: datetime = Column(DateTime, default=datetime.utcnow)

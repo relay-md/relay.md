@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, Depends
-from starlette.responses import HTMLResponse, RedirectResponse
+# -*- coding: utf-8 -*-
+from fastapi import APIRouter, Depends, Request
+from starlette.responses import RedirectResponse
+
 from .. import oauth
-from ..database import get_session, Session
-from ..repos.user import User
+from ..database import Session, get_session
 from ..repos.access_token import AccessToken
+from ..repos.user import User
 
 router = APIRouter(prefix="")
 

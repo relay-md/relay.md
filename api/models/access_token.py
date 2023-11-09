@@ -3,12 +3,11 @@
 """
 import logging
 import uuid
-from typing import List
 
-from sqlalchemy import String, func, select, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
 
-from ..database import Base, Session
+from ..database import Base
 
 log = logging.getLogger(__name__)
 

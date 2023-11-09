@@ -3,11 +3,9 @@
 
 Allow to load values from environment variables.
 """
-import os
-from typing import List, Optional, Mapping
+from typing import Optional
 
 from pydantic import BaseSettings
-from pydantic.error_wrappers import ValidationError
 
 
 class SQLAlchemyEngineOptions(BaseSettings):
@@ -74,7 +72,6 @@ class Settings(BaseSettings):
     # Oauth Client data
     GITHUB_CLIENT_ID: str
     GITHUB_CLIENT_SECRET: str
-
 
     class Config:
         env_file = ".env"
