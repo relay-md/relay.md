@@ -34,4 +34,4 @@ class Document(Base):
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
-    filename: Mapped[str] = mapped_column(length=256)
+    filename: Mapped[str] = mapped_column(String(length=256))

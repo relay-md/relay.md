@@ -2,8 +2,8 @@
 from logging.config import fileConfig
 
 from alembic import context
-from gateway import models
-from gateway.database import Base, engine
+from api import models
+from api.database import Base, engine
 
 # need this so autoflake doesn't remove our model
 assert models
