@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
+from fastapi.exception import HTTPException
 from pydantic import BaseModel, EmailStr
+from starlette.responses import RedirectResponse
 
 from ..database import Session, get_session
 from ..models.landingpage import LandingPageEmail
@@ -25,3 +29,15 @@ async def submitmail(
         opt-in.
         </div>
     """
+
+
+@router.post("/mail/confirm/{id}/{confirm_code}")
+async def confirm_mail(
+    id: UUID, confirm_code: UUID, db: Session = Depends(get_session)
+) -> str:
+    mail = db.get(LandingPageEmail, id)
+    if not mail:
+        raise HTTPException(status_code=404, detail="user not found")
+    mail.confirm(confirm_code)
+    db.commit()
+    return RedirectResponse(url="https://channel.md/email/confirmed.html")

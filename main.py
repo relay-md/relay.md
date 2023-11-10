@@ -3,10 +3,13 @@ import logging
 
 import click
 import uvicorn
-from rich.console import Console
-from api import database
+
+from api import database, models
+
+assert models
 
 log = logging.getLogger(__name__)
+
 
 @click.group()
 def main():
