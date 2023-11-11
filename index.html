@@ -27,10 +27,32 @@
               <h1 class="title is-4">Stay tuned</h1>
               <p class="description">We will let you know when things get exciting!</p>
               <form hx-post="https://api.channel.md/v0/mail/submit">
+                <div class="field is-horizontal">
+                  <div class="field-body">
+                    <div class="field">
+                      <div class="control has-icons-left">
+                        <input class="input is-medium" type="text" name="first_name" placeholder="Bob">
+                        <span class="icon is-small is-left">
+                          <i class="fas fa-user"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <div class="control has-icons-left">
+                        <input class="input is-medium" type="text" name="first_name" placeholder="Smith">
+                        <span class="icon is-small is-left">
+                          <i class="fas fa-user"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div class="field">
-                  <div class="control">
-                    <input class="input is-medium" type="text" name="email"
-                      placeholder="Email">
+                  <div class="control has-icons-left has-icons-right">
+                    <input class="input is-medium" type="email" name="email" placeholder="bob@smith.com">
+                    <span class="icon is-small is-left">
+                      <i class="fas fa-envelope"></i>
+                    </span>
                   </div>
                 </div>
                 <button class="button is-block is-primary is-fullwidth is-medium">Submit</button>
