@@ -1,43 +1,40 @@
 # -*- coding: utf-8 -*-
-from uuid import UUID
 
+import requests
 from fastapi import APIRouter, Depends
-from fastapi.exception import HTTPException
 from pydantic import BaseModel, EmailStr
-from starlette.responses import RedirectResponse
 
+from ..config import config
 from ..database import Session, get_session
-from ..models.landingpage import LandingPageEmail
 
 router = APIRouter(prefix="/v0")
 
 
 class EmailSubmitRequest(BaseModel):
     email: EmailStr
+    first_name: str
+    last_name: str
 
 
 @router.post("/mail/submit")
 async def submitmail(
     payload: EmailSubmitRequest, db: Session = Depends(get_session)
 ) -> str:
-    new = LandingPageEmail(email=payload.email)
-    db.add(new)
-    db.commit()
+    req = requests.post(
+        f"https://{config.MAILCHIMP_API_SERVER}.api.mailchimp.com/3.0/lists/{config.MAILCHIMP_LIST_ID}/members",
+        auth=("key", config.MAILCHIMP_API_KEY),
+        headers={"content-type": "application/json"},
+        json={
+            "email_address": payload.email,
+            "status": "pending",
+            "merge_fields": {"FNAME": payload.first_name, "LNAME": payload.last_name},
+        },
+    )
+    req.raise_for_status()
+
     return """
         <div class="notification is-success">
         Thank you for submitting your address. Please check your mailbox to
         opt-in.
         </div>
     """
-
-
-@router.post("/mail/confirm/{id}/{confirm_code}")
-async def confirm_mail(
-    id: UUID, confirm_code: UUID, db: Session = Depends(get_session)
-) -> str:
-    mail = db.get(LandingPageEmail, id)
-    if not mail:
-        raise HTTPException(status_code=404, detail="user not found")
-    mail.confirm(confirm_code)
-    db.commit()
-    return RedirectResponse(url="https://channel.md/email/confirmed.html")

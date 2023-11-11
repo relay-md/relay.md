@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     GITHUB_CLIENT_ID: str
     GITHUB_CLIENT_SECRET: str
 
+    # Mailchimp
+    MAILCHIMP_API_SERVER: str
+    MAILCHIMP_API_KEY: str
+    MAILCHIMP_LIST_ID: str
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
