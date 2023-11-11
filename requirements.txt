@@ -22,3 +22,4 @@ click
 authlib
 fastapi-sessions
 httpx
+python-multipart

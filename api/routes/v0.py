@@ -2,6 +2,7 @@
 
 import requests
 from fastapi import APIRouter, Depends, Form
+from fastapi.exceptions import HTTPException
 from pydantic import EmailStr
 
 from ..config import config
@@ -12,11 +13,16 @@ router = APIRouter(prefix="/v0")
 
 @router.post("/mail/submit")
 async def submitmail(
-    email: EmailStr = Form(),
-    first_name: str = Form(),
-    last_name: str = Form(),
+    email: EmailStr = Form(default=None),
+    first_name: str = Form(default=None),
+    last_name: str = Form(default=None),
     db: Session = Depends(get_session),
 ) -> str:
+    if not email or not first_name or not last_name:
+        raise HTTPException(
+            status_code=400, detail="email, first_name and last_name are required"
+        )
+
     req = requests.post(
         f"https://{config.MAILCHIMP_API_SERVER}.api.mailchimp.com/3.0/lists/{config.MAILCHIMP_LIST_ID}/members",
         auth=("key", config.MAILCHIMP_API_KEY),
