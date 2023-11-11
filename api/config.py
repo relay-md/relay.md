@@ -3,7 +3,7 @@
 
 Allow to load values from environment variables.
 """
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseSettings
 
@@ -58,6 +58,9 @@ class Settings(BaseSettings):
 
     # Celery settings
     CELERY_CONF: CelerySettings = CelerySettings()
+
+    # Limit API access by means of CORS
+    API_ALLOWED_ORIGINS: List[str] = ["*"]
 
     # Email
     MAIL_USERNAME: str = ""
