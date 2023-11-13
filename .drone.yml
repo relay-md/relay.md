@@ -1,0 +1,28 @@
+---
+kind: pipeline
+type: docker
+name: semantic-version
+steps:
+  - name: semver
+    image: python:3.8
+    when:
+      branch: master
+      event: push
+    commands:
+      - pip3 install python-semantic-release==7.28.0
+      - semantic-release publish
+
+  - name: docker
+    image: plugins/docker
+    when:
+      branch: master
+      event: push
+    depends_on:
+      - semver
+    settings:
+      username:
+        from_secret: CI_REGISTRY_USER
+      password:
+        from_secret: CI_REGISTRY_PASSWORD
+      repo: registry.infra.chainsquad.com/relay.md/api
+      registry: registry.infra.chainsquad.com
