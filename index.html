@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>channel.md - simple, efficient communication using markdown</title>
+    <title>relay.md - simple, efficient communication using markdown</title>
     <link href="https://fonts.googleapis.com/css2?family=Lato:400,700" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.4/css/bulma.min.css" />
     <link rel="stylesheet" type="text/css" href="css/main.css">
@@ -18,7 +18,7 @@
         <div class="column is-8 is-offset-2 register">
           <div class="columns">
             <div class="column left">
-              <h1 class="title is-2">channel.md</h1>
+              <h1 class="title is-2">relay.md</h1>
               <h2 class="subtitle colored is-4">Simple, Efficient communications using markdown.</h2>
               <p>Condensed knowledge for efficient team work.</p>
               <p>Integrated straight into Obsidian.</p>
@@ -26,7 +26,7 @@
             <div class="column right has-text-centered">
               <h1 class="title is-4">Stay tuned</h1>
               <p class="description">We will let you know when things get exciting!</p>
-              <form hx-post="https://api.channel.md/v0/mail/submit">
+              <form hx-post="https://api.relay.md/v0/mail/submit">
                 <div class="field is-horizontal">
                   <div class="field-body">
                     <div class="field">
@@ -47,9 +47,14 @@
                     </div>
                   </div>
                 </div>
-                <div class="field">
+                <div class="field" hx-target="this" hx-swap="outerHTML">
                   <div class="control has-icons-left has-icons-right">
-                    <input class="input is-medium" type="email" name="email" placeholder="bob@smith.com">
+                    <input class="input is-medium"
+                           type="email"
+                           name="email"
+                           placeholder="bob@smith.com"
+                           hx-post="https://api.relay.md/v0/mail/validate"
+                           hx-indicator="#ind" />
                     <span class="icon is-small is-left">
                       <i class="fas fa-envelope"></i>
                     </span>
@@ -66,16 +71,16 @@
             <div class="level-left">
               <div class="level-item">
                 <span class="icon">
-                  <a target="_blank" href="https://github.com/channelmd"><i class="fab fa-github"></i></a>
+                  <a target="_blank" href="https://github.com/relay-md/relay.md"><i class="fab fa-github"></i></a>
                 </span> &emsp;
                 <span class="icon">
-                  <a target="_blank" href="mailto:info@chainsquad.com"><i class="fas fa-envelope"></i></a>
+                  <a target="_blank" href="mailto:fabian@relay.md"><i class="fas fa-envelope"></i></a>
                 </span>
               </div>
             </div>
             <div class="level-right">
               <small class="level-item" style="color: var(--textLight)">
-                &copy; Channel.md. All Rights Reserved.
+                &copy; relay.md. All Rights Reserved.
               </small>
             </div>
           </nav>
