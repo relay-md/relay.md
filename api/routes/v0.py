@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import requests
+from email_validator import EmailNotValidError, validate_email
 from fastapi import APIRouter, Depends, Form
-from fastapi.responses import HTMLResponse
 from fastapi.exceptions import HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import EmailStr, ValidationError
-from email_validator import validate_email, EmailNotValidError
 
 from ..config import config
 from ..database import Session, get_session
@@ -14,9 +14,7 @@ router = APIRouter(prefix="/v0")
 
 
 @router.post("/mail/validate")
-async def submitmail(
-    email: str = Form(default="")
-) -> str:
+async def validatemail(email: str = Form(default="")) -> str:
     danger = ""
     error = ""
     error_msg = ""
@@ -28,8 +26,9 @@ async def submitmail(
         error = """<span class="icon is-small is-right">
                     <i class="fas fa-exclamation-triangle"></i>
                    </span>"""
-        error_msg = "<p class=\"help is-danger\">This email is invalid</p>"
-    return HTMLResponse(f"""
+        error_msg = '<p class="help is-danger">This email is invalid</p>'
+    return HTMLResponse(
+        f"""
                 <div class="field" hx-target="this" hx-swap="outerHTML">
                   <div class="control has-icons-left has-icons-right">
                     <input class="input is-medium {danger}"
@@ -37,8 +36,7 @@ async def submitmail(
                            name="email"
                            value="{email}"
                            placeholder=""
-                           hx-post="http://localhost:5000/v0/mail/validate"
-                           hx-indicator="#ind" />
+                           hx-post="https://api.relay.md/v0/mail/validate" />
                     <span class="icon is-small is-left">
                       <i class="fas fa-envelope"></i>
                     </span>
@@ -46,7 +44,8 @@ async def submitmail(
                   </div>
                  {error_msg}
                 </div>
-    """)
+    """
+    )
 
 
 @router.post("/mail/submit")
@@ -80,17 +79,21 @@ async def submitmail(
     print(res)
     if not req.ok:
         if res.get("title") == "Member Exists":
-            return HTMLResponse(f"""
+            return HTMLResponse(
+                """
             <div class="notification is-warning">
             This email address has already registered
             </div>
-            """)
+            """
+            )
         else:
             return res.get("title", "An error occured!")
 
-    return HTMLResponse("""
+    return HTMLResponse(
+        """
         <div class="notification is-success">
         Thank you for submitting your address. Please check your mailbox to
         opt-in.
         </div>
-    """)
+    """
+    )
