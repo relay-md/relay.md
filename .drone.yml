@@ -16,7 +16,7 @@ steps:
     image: plugins/docker
     when:
       branch: master
-      event: push
+      event: tag
     depends_on:
       - semver
     settings:
