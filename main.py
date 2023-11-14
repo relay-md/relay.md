@@ -4,7 +4,7 @@ import logging
 import click
 import uvicorn
 
-from api import database, models
+from backend import database, models
 
 assert models
 
@@ -27,12 +27,12 @@ def db():
 @click.option("--debug/--no-debug", default=False)
 def api(port, host, debug):
     """Run the public API"""
-    from api.api import app
+    from backend.api import app
 
     kwargs = dict(port=int(port), host=host)
     if debug:
         kwargs["reload"] = True
-        uvicorn.run("api.api:app", **kwargs)
+        uvicorn.run("backend.api:app", **kwargs)
     else:
         uvicorn.run(app, **kwargs)
 

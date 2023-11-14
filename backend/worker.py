@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 # Instanciate Celery and configure it accordingly
-from uuid import UUID
 
 from celery import Celery, Task
 
-from . import exceptions, models
 from .config import config
 from .database import get_session
 
@@ -22,7 +20,7 @@ class BaseTask(Task):
 
     # A list/tuple of exception classes. If any of these exceptions are raised
     # during the execution of the task, the task will automatically be retried.
-    autoretry_for = (,)
+    autoretry_for = ()
 
     # A number. Maximum number of retries before giving up. A value of None
     # means task will retry forever. By default, this option is set to 3.

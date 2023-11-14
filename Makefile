@@ -1,15 +1,13 @@
 ROOT_DIR := $(shell pwd)
-PROJECT_NAME := api
+PROJECT_NAME := $(notdir $(ROOT_DIR))
 RELEASE_VERSION ?= $(shell git describe --always)
 RELEASE_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
-PACKAGE_DIR=api
+PACKAGE_DIR=backend
 
 IMAGE_REGISTRY := registry.infra.chainsquad.com
 IMAGE_NAME := relay.md/$(PROJECT_NAME)
-DEPLOY_KEY := $(shell [ -f ~/.ssh/id_rsa ] && cat ~/.ssh/id_rsa | base64 -w0)
 DOCKER_BUILD_ARGS := --build-arg BUILD_DATE=$(RELEASE_DATE) \
-                     --build-arg VCS_REF=$(RELEASE_VERSION) \
-                     --build-arg SSH_KEY=$(DEPLOY_KEY)
+                     --build-arg VCS_REF=$(RELEASE_VERSION)
 
 .PHONY: clean
 clean: clean-build clean-pyc clean-pycache

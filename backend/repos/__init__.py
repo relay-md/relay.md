@@ -1,13 +1,16 @@
+# -*- coding: utf-8 -*-
 import abc
-from uuid import UUID
 from typing import List, TypeVar
+from uuid import UUID
+
 from sqlalchemy import select
+
 from ..database import Session
 
 # Type of the underlying ORM model
 T = TypeVar("T")
 
-# Type of the 
+# Type of the
 M = TypeVar("M")
 
 
@@ -43,7 +46,7 @@ class DatabaseAbstractRepository(AbstractRepository):
         return new
 
     def get_by_id(self, id: UUID) -> T:
-        return get_by_kwargs(self, id=id)
+        return self.get_by_kwargs(self, id=id)
 
     def get_by_kwargs(self, **kwargs) -> T:
         return self._db.scalar(select(self.ORM_Model).filter_by(**kwargs))

@@ -25,18 +25,23 @@ worker)
 
 flower)
 	echo "Launching Flower:"
-	exec celery -A api.tasks.celery flower --address=${APP_HOST:="0.0.0.0"} --port=${APP_PORT:=5000} $*
+	exec celery -A backend.tasks.celery flower --address=${APP_HOST:="0.0.0.0"} --port=${APP_PORT:=5000} $*
 	;;
 
 beat)
 	echo "Launching Beat:"
-	exec celery -A api.tasks.celery beat $*
+	exec celery -A backend.tasks.celery beat $*
+	;;
+
+web)
+	echo "Public web:"
+	exec uvicorn backend.web:app --host ${APP_HOST:="0.0.0.0"} --port ${APP_PORT:=5000} --log-level $LOG_LEVEL --proxy-headers $*
 	;;
 
 # Default
 *)
 	echo "Public API:"
-	exec uvicorn api.api:app --host ${APP_HOST:="0.0.0.0"} --port ${APP_PORT:=5000} --log-level $LOG_LEVEL --proxy-headers $*
+	exec uvicorn backend.api:app --host ${APP_HOST:="0.0.0.0"} --port ${APP_PORT:=5000} --log-level $LOG_LEVEL --proxy-headers $*
 	;;
 
 esac
