@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-import logging
+# -*- coding: utf-8 -*-
 
 import click
-import uvicorn
 
-from backend import database, models
-
-assert models
-
-log = logging.getLogger(__name__)
+from backend.cli.api import api
+from backend.cli.setup import setup
+from backend.cli.web import web
 
 
 @click.group()
@@ -16,25 +13,9 @@ def main():
     pass
 
 
-@main.command()
-def db():
-    database.Base.metadata.create_all(database.engine)
-
-
-@main.command()
-@click.option("--port", default=5000)
-@click.option("--host", default="127.0.0.1")
-@click.option("--debug/--no-debug", default=False)
-def api(port, host, debug):
-    """Run the public API"""
-    from backend.api import app
-
-    kwargs = dict(port=int(port), host=host)
-    if debug:
-        kwargs["reload"] = True
-        uvicorn.run("backend.api:app", **kwargs)
-    else:
-        uvicorn.run(app, **kwargs)
+main.add_command(api)
+main.add_command(web)
+main.add_command(setup)
 
 
 if __name__ == "__main__":
