@@ -9,7 +9,7 @@ from .routes import home, login
 # Create all tables
 Base.metadata.create_all(engine)
 
-app = FastAPI()
+app = FastAPI(openapi_url=None)
 app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY)
 
 app.include_router(home.router)
