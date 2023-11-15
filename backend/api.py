@@ -2,17 +2,17 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from . import exceptions
 from .config import config
 from .database import Base, engine
-from .routes import api, v0
+from .routes import v0, v1
 
 # Create all tables
 Base.metadata.create_all(engine)
 
 app = FastAPI()
 app.include_router(v0.router)
-# app.include_router(api.router)
-assert api.router
+app.include_router(v1.router)
 
 # Set all CORS enabled origins
 app.add_middleware(
@@ -24,6 +24,4 @@ app.add_middleware(
     expose_headers=["Content-Range"],
 )
 
-# TODO:
-# exception handling:
-#  * from authlib.integrations.starlette_client import  OAuthError
+exceptions.include_app(app)

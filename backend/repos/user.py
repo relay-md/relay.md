@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from ..models.user import User as ORMUser
+from ..models.user import User
 from . import DatabaseAbstractRepository
 
 
-class User(DatabaseAbstractRepository):
-    ORM_Model = ORMUser
+class UserRepo(DatabaseAbstractRepository):
+    ORM_Model = User

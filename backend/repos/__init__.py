@@ -38,7 +38,13 @@ class DatabaseAbstractRepository(AbstractRepository):
     def __init__(self, db: Session):
         self._db = db
 
-    def create(self, **kwargs) -> T:
+    def create(self, item: T) -> T:
+        self._db.add(item)
+        self._db.commit()
+        self._db.refresh(item)
+        return item
+
+    def create_from_kwargs(self, **kwargs) -> T:
         new = self.ORM_Model(**kwargs)
         self._db.add(new)
         self._db.commit()
@@ -46,7 +52,7 @@ class DatabaseAbstractRepository(AbstractRepository):
         return new
 
     def get_by_id(self, id: UUID) -> T:
-        return self.get_by_kwargs(self, id=id)
+        return self._db.get(self.ORM_Model, id)
 
     def get_by_kwargs(self, **kwargs) -> T:
         return self._db.scalar(select(self.ORM_Model).filter_by(**kwargs))

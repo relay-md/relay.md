@@ -5,7 +5,7 @@ import logging
 import uuid
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
 
@@ -23,3 +23,4 @@ class AccessToken(Base):
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship()  # noqa

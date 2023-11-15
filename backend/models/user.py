@@ -28,4 +28,6 @@ class User(Base):
     )
 
     username: Mapped[str] = mapped_column(String(256))
-    oauth_provider: OauthProvider = Column(Enum(OauthProvider))
+    oauth_provider: OauthProvider = Column(
+        Enum(OauthProvider), default=OauthProvider.GITHUB
+    )

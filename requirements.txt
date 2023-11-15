@@ -23,3 +23,4 @@ authlib
 fastapi-sessions
 httpx
 python-multipart
+python-frontmatter
