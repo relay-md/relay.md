@@ -24,7 +24,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def list(self) -> List[T]:
+    def list(self, key: str, value: T) -> List[T]:
         raise NotImplementedError
 
     @abc.abstractmethod

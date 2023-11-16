@@ -2,14 +2,7 @@
 from uuid import UUID
 
 import frontmatter
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Request,
-    Security,
-    status,
-)
+from fastapi import APIRouter, Depends, Request, Security
 from fastapi.security import APIKeyHeader
 
 from .. import exceptions
@@ -18,6 +11,7 @@ from ..models.document import Document
 from ..models.user import User
 from ..repos.access_token import AccessTokenRepo
 from ..repos.document import DocumentRepo
+from ..repos.document_body import DocumentBodyRepo
 from ..repos.team_topic import TeamTopicRepo
 from ..schema import DocumentFrontMatter, DocumentResponse, Response
 
@@ -71,18 +65,27 @@ async def post_doc(
     user: User = Depends(authenticated_user),
     db: Session = Depends(get_session),
 ):
-    body = await request.body()
-    body = body.decode("utf-8")
-    front = DocumentFrontMatter(**frontmatter.loads(body))
     team_topic_repo = TeamTopicRepo(db)
+    document_repo = DocumentRepo(db)
+    document_body_repo = DocumentBodyRepo()
+
+    # Get body containing the raw markdown
+    body = await request.body()
+
+    # Parse frontmatter
+    front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
+
+    # Parse relay_to as team_topics
     team_topics = list()
     for team_topic in front.relay_to:
         team_topics.append(team_topic_repo.from_string(team_topic))
-    # TODO: load topic from db
-    document_repo = DocumentRepo(db)
+
+    # Store document in database
     document = Document(user_id=user.id, filename=filename, team_topics=team_topics)
     document_repo.create(document)
-    # TODO: Upload body to S3
+
+    # Update document content in DocumentBodyRepo
+    document_body_repo.create(document.id, body)
     return dict(result=document)
 
 
