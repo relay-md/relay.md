@@ -50,6 +50,8 @@ class DocumentResponse(BaseModel):
     id: UUID
     filename: str
     team_topics: List[TeamTopicReponse]
+    # FIXME: should we maybe deal with bytes instead of strings?
+    body: Optional[str]
 
     class Config:
         orm_mode = True

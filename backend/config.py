@@ -81,6 +81,12 @@ class Settings(BaseSettings):
     MAILCHIMP_API_KEY: str
     MAILCHIMP_LIST_ID: str
 
+    # Minio access
+    MINIO_ENDPOINT: str = "play.min.io"
+    MINIO_ACCESS_KEY: str = ""
+    MINIO_SECRET_KEY: str = ""
+    MINIO_SECURE: bool = True
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

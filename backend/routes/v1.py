@@ -98,7 +98,15 @@ async def post_doc(
 async def get_doc(document: Document = Depends(get_document)):
     if document.is_private:
         raise exceptions.NotAllowed("Access to this document is not allowed for you.")
-    return dict(result=document)
+    document_body_repo = DocumentBodyRepo()
+    body = document_body_repo.get_by_id(document.id)
+    ret_document = DocumentResponse(
+        id=document.id,
+        filename=document.filename,
+        team_topics=document.team_topics,
+        body=body,
+    )
+    return dict(result=ret_document)
 
 
 @router.put("/doc/{id}", tags=["v1"])
