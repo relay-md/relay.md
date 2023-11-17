@@ -2,7 +2,10 @@
 from uuid import UUID
 
 import frontmatter
-from fastapi import APIRouter, Depends, Request, Security
+from fastapi import APIRouter, Depends, Request
+from fastapi import Response as FastAPIResponse
+from fastapi import Security
+from fastapi.responses import PlainTextResponse
 from fastapi.security import APIKeyHeader
 
 from .. import exceptions
@@ -92,21 +95,32 @@ async def post_doc(
 @router.get(
     "/doc/{id}",
     tags=["v1"],
-    response_model=Response[DocumentResponse],
-    response_model_exclude_unset=True,
 )
-async def get_doc(document: Document = Depends(get_document)):
+async def get_doc(
+    request: Request,
+    response: FastAPIResponse,
+    document: Document = Depends(get_document),
+):
     if document.is_private:
         raise exceptions.NotAllowed("Access to this document is not allowed for you.")
     document_body_repo = DocumentBodyRepo()
     body = document_body_repo.get_by_id(document.id)
-    ret_document = DocumentResponse(
-        id=document.id,
-        filename=document.filename,
-        team_topics=document.team_topics,
-        body=body,
-    )
-    return dict(result=ret_document)
+
+    content_type = request.headers.get("content-type", "application/json")
+    if content_type == "application/json":
+        ret_document = DocumentResponse(
+            id=document.id,
+            filename=document.filename,
+            team_topics=document.team_topics,
+            body=body,
+        )
+        return Response(result=ret_document)
+    elif content_type == "text/markdown":
+        response.headers["X-Relay-filename"] = document.filename
+        response.headers["X-Relay-ruid"] = str(document.id)
+        return PlainTextResponse(body)
+    else:
+        raise exceptions.BadRequest(f"Unsupported content-type: {content_type}")
 
 
 @router.put("/doc/{id}", tags=["v1"])
