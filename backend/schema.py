@@ -49,7 +49,7 @@ class TeamTopicReponse(BaseModel):
 class DocumentResponse(BaseModel):
     id: UUID
     filename: str
-    team_topics: List[TeamTopicReponse]
+    to: List[TeamTopicReponse]
     # FIXME: should we maybe deal with bytes instead of strings?
     body: Optional[str]
 

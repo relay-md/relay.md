@@ -1,7 +1,7 @@
 rich
 
 # public Interface
-pydantic[dotenv]>=1.8.2,<1.9
+pydantic[dotenv]>=1.10.0a1<1.11
 email-validator
 
 # SQL Source

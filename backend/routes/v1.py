@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from uuid import UUID
 
 import frontmatter
@@ -98,7 +99,6 @@ async def post_doc(
 )
 async def get_doc(
     request: Request,
-    response: FastAPIResponse,
     document: Document = Depends(get_document),
 ):
     if document.is_private:
@@ -111,14 +111,15 @@ async def get_doc(
         ret_document = DocumentResponse(
             id=document.id,
             filename=document.filename,
-            team_topics=document.team_topics,
+            to=document.team_topics,
             body=body,
         )
         return Response(result=ret_document)
     elif content_type == "text/markdown":
+        response = PlainTextResponse(body)
         response.headers["X-Relay-filename"] = document.filename
-        response.headers["X-Relay-ruid"] = str(document.id)
-        return PlainTextResponse(body)
+        response.headers["X-Relay-to"] = json.dumps([x.name for x in document.team_topics])
+        return response
     else:
         raise exceptions.BadRequest(f"Unsupported content-type: {content_type}")
 
