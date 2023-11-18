@@ -3,6 +3,7 @@
 """
 import uuid
 
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -20,7 +21,7 @@ class TeamTopic(Base):
     team: Mapped["Team"] = relationship()  # noqa
     topic: Mapped["Topic"] = relationship()  # noqa
 
-    @property
+    @hybrid_property
     def name(self):
         return str(self)
 

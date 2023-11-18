@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from uuid import UUID
+from typing import List
 
 import frontmatter
 from fastapi import APIRouter, Depends, Request
@@ -17,7 +18,7 @@ from ..repos.access_token import AccessTokenRepo
 from ..repos.document import DocumentRepo
 from ..repos.document_body import DocumentBodyRepo
 from ..repos.team_topic import TeamTopicRepo
-from ..schema import DocumentFrontMatter, DocumentResponse, Response
+from ..schema import DocumentFrontMatter, DocumentResponse, Response, DocumentIdentifierResponse
 
 router = APIRouter(prefix="/v1")
 api_key_header = APIKeyHeader(name="X-API-Key")
@@ -62,10 +63,11 @@ async def get_user_owned_document(
     tags=["v1"],
     response_model=Response[DocumentResponse],
     response_model_exclude_unset=True,
+    response_model_by_alias=False,
 )
 async def post_doc(
-    filename: str,
     request: Request,
+    filename: str = "",
     user: User = Depends(authenticated_user),
     db: Session = Depends(get_session),
 ):
@@ -78,6 +80,11 @@ async def post_doc(
 
     # Parse frontmatter
     front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
+
+    if not filename and not front.relay_filename:
+        raise exceptions.BadRequest("Missing filename or relay_filename property!")
+    elif not filename and front.relay_filename:
+        filename = front.relay_filename
 
     # Parse relay_to as team_topics
     team_topics = list()
@@ -114,7 +121,7 @@ async def get_doc(
             to=document.team_topics,
             body=body,
         )
-        return Response(result=ret_document)
+        return Response(result=ret_document).dict(by_alias=False)
     elif content_type == "text/markdown":
         response = PlainTextResponse(body)
         response.headers["X-Relay-filename"] = document.filename
@@ -129,3 +136,31 @@ async def put_doc(
     request: Request, id: UUID, document: Document = Depends(get_user_owned_document)
 ):
     raise NotImplementedError("This functionatlity is not implemented yet!")
+
+
+@router.get(
+    "/docs",
+    tags=["v1"],
+    response_model=Response[List[DocumentIdentifierResponse]],
+    response_model_exclude_unset=True,
+)
+async def get_docs(
+    type: str = "all",
+    page: int = 0,
+    size: int = 50,
+    user: User = Depends(authenticated_user),
+    db: Session = Depends(get_session),
+):
+    document_repo = DocumentRepo(db)
+    if type == "mine":
+        documents = document_repo.get_my_documents(user, page, size)
+    else:
+        documents = document_repo.get_recent_documents_for_me(user, page, size)
+    ret = list()
+    for document in documents:
+        ret.append(DocumentIdentifierResponse(
+            id=document.id,
+            filename=document.filename,
+            to=document.team_topics,
+        ))
+    return dict(result=ret)

@@ -49,18 +49,29 @@ class TeamTopicReponse(BaseModel):
 class DocumentResponse(BaseModel):
     id: UUID
     filename: str
-    to: List[TeamTopicReponse]
+    to: List[TeamTopicReponse] = Field(alias="team_topics")
     # FIXME: should we maybe deal with bytes instead of strings?
     body: Optional[str]
 
     class Config:
         orm_mode = True
+        allow_population_by_field_name = True
 
 
 class DocumentFrontMatter(BaseModel):
     relay_to: List[str]
     rid: Optional[UUID]
+    relay_filename: Optional[str]
 
     class Config:
         orm_mode = True
         extra = Extra.allow
+
+
+class DocumentIdentifierResponse(BaseModel):
+    id: UUID
+    filename: str
+    to: List[TeamTopicReponse]
+
+    class Config:
+        orm_mode = True

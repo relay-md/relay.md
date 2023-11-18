@@ -4,6 +4,7 @@
 import enum
 import logging
 import uuid
+from datetime import datetime
 
 from sqlalchemy import Column, Enum, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -31,3 +32,5 @@ class User(Base):
     oauth_provider: OauthProvider = Column(
         Enum(OauthProvider), default=OauthProvider.GITHUB
     )
+
+    latest_document_datetime: Mapped[datetime] = mapped_column(default=datetime.utcnow)

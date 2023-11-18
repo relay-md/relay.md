@@ -19,3 +19,5 @@ class Team(Base):
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
     name: Mapped[str] = mapped_column(String(32))
+
+    # TODO: add an is_private flag
