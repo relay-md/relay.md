@@ -53,4 +53,5 @@ async def auth(request: Request, db: Session = Depends(get_session)):
         access_token = access_token_repo.create_from_kwargs(user_id=user.id)
     if github_user:
         request.session["user_id"] = str(user.id)
+        request.session["access_token"] = str(access_token.token)
     return RedirectResponse(url="/")

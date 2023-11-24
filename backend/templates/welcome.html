@@ -1,89 +1,10 @@
 {% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
-    <section class="container">
-      <div class="columns is-multiline">
-        <div class="column is-10 is-offset-1 register">
-          <div class="columns">
-            <div class="column left">
-              <img src="{{ url_for('static', path="img/logo.svg") }}" width="64rm" />
-              <h1 class="title is-2">relay.md</h1>
-              <h2 class="subtitle colored is-4">
-                simple, efficient teams through markdown
-              </h2>
-              <div class="icon-text">
-                <span class="icon has-text-success">
-                  <i class="fas fa-check-square"></i>
-                </span>
-                <span>Share condensed information with your team.</span>
-              </div>
-              <div class="icon-text">
-                <span class="icon has-text-success">
-                  <i class="fas fa-check-square"></i>
-                </span>
-                <span>Ideal to share minutes, contracts , specs...</span>
-              </div>
-              <div class="icon-text">
-                <span class="icon has-text-success">
-                  <i class="fas fa-check-square"></i>
-                </span>
-                <span>Benefit from Obsidian power-features.</span>
-              </div>
-              <div class="icon-text">
-                <span class="icon has-text-danger">
-                  <i class="fas fa-ban"></i>
-                </span>
-                <span>No more docx in email attachments.</span>
-              </div>
-              <div class="icon-text">
-                <span class="icon has-text-danger">
-                  <i class="fas fa-ban"></i>
-                </span>
-                <span>No longer search in chat history.</span>
-              </div>
-            </div>
-            <div class="column right has-text-centered">
-              <h1 class="title is-4">Stay tuned</h1>
-              <p class="description">We will let you know when things get exciting!</p>
-              <form hx-post="{{url_for('submitmail')}}">
-                <div class="field is-horizontal">
-                  <div class="field-body">
-                    <div class="field">
-                      <div class="control has-icons-left">
-                        <input class="input is-medium" type="text" name="first_name" placeholder="Bob">
-                        <span class="icon is-small is-left">
-                          <i class="fas fa-user"></i>
-                        </span>
-                      </div>
-                    </div>
-                    <div class="field">
-                      <div class="control has-icons-left">
-                        <input class="input is-medium" type="text" name="last_name" placeholder="Smith">
-                        <span class="icon is-small is-left">
-                          <i class="fas fa-user"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="field" hx-target="this" hx-swap="outerHTML">
-                  <div class="control has-icons-left has-icons-right">
-                    <input class="input is-medium"
-                           type="email"
-                           name="email"
-                           placeholder="bob@smith.com"
-                           hx-post="{{url_for('validatemail')}}" />
-                    <span class="icon is-small is-left">
-                      <i class="fas fa-envelope"></i>
-                    </span>
-                  </div>
-                </div>
-                <button class="button is-block is-primary is-fullwidth is-medium">Submit</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+{% if user %}
+{% include "get-document.html" %}
+{% else %}
+{% include "subscribe.html" %}
+{% endif %}
 
     <section class="hero is-link is-large" id="features">
       <div class="hero-body">

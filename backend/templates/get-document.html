@@ -1,0 +1,33 @@
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">
+            DocumentID Search
+          </p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <form action="{{url_for('get_document')}}" method="POST">
+              <div class="field has-addons">
+                <div class="control has-icons-left has-icons-right is-expanded">
+                  <input class="input is-large" type="search" placeholder="c62089b7-328d-4325-bcb0-91772ca435dd" name="id"/>
+                  <span class="icon is-medium is-left">
+                    <i class="fas fa-file-search"></i>
+                  </span>
+                </div>
+                <div class="control">
+                  <button type="submit" class="button is-link is-large"/>
+                  <span class="icon is-small">
+                    <i class="fas fa-search"></i>
+                  </span>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
