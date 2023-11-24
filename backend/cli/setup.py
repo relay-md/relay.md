@@ -24,7 +24,9 @@ def db():
 @setup.command()
 def dev():
     (db,) = database.get_session()
-    user = models.User(username="fabian")
+    user = models.User(
+        username="fabian", email="fabian@die-schuhs.de", name="Fabian Schuh"
+    )
     db.add(user)
     db.commit()
     db.refresh(user)

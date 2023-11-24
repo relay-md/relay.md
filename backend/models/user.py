@@ -6,7 +6,7 @@ import logging
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, Enum, String
+from sqlalchemy import Column, Enum, Index, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..database import Base
@@ -29,8 +29,14 @@ class User(Base):
     )
 
     username: Mapped[str] = mapped_column(String(256))
+    email: Mapped[str] = mapped_column(String(128), unique=True)
+    name: Mapped[str] = mapped_column(String(64))
+    location: Mapped[str] = mapped_column(String(64), nullable=True)
     oauth_provider: OauthProvider = Column(
         Enum(OauthProvider), default=OauthProvider.GITHUB
     )
 
     latest_document_datetime: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+
+Index("user_oauth_index", User.username, User.oauth_provider)

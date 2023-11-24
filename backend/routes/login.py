@@ -4,6 +4,7 @@ from starlette.responses import RedirectResponse
 
 from .. import oauth
 from ..database import Session, get_session
+from ..models.user import OauthProvider
 from ..repos.access_token import AccessTokenRepo
 from ..repos.user import UserRepo
 
@@ -36,14 +37,20 @@ async def auth(request: Request, db: Session = Depends(get_session)):
     github_user = resp.json()
     user_repo = UserRepo(db)
     access_token_repo = AccessTokenRepo(db)
-    user = user_repo.get_by_kwargs(username=github_user["login"])
+    user = user_repo.get_by_kwargs(
+        username=github_user["login"].lower(), oauth_provider=OauthProvider.GITHUB
+    )
     if not user:
-        user = user_repo.create_from_kwargs(username=github_user["login"])
+        user = user_repo.create_from_kwargs(
+            username=github_user["login"].lower(),
+            email=github_user["email"].lower(),
+            name=github_user["name"].lower(),
+            location=github_user["location"],
+            oauth_provider=OauthProvider.GITHUB,
+        )
     access_token = access_token_repo.get_by_kwargs(user_id=user.id)
     if not access_token:
         access_token = access_token_repo.create_from_kwargs(user_id=user.id)
     if github_user:
-        request.session["user"] = dict(github_user)
         request.session["user_id"] = str(user.id)
-        request.session["access_token"] = str(access_token.token)
     return RedirectResponse(url="/")
