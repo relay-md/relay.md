@@ -4,8 +4,12 @@
 """
 
 
-from fastapi import HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
+
+from .repos.user import User
+from .templates import templates
+from .utils.user import get_optional_user
 
 
 class BaseAPIException(Exception):
@@ -87,7 +91,20 @@ async def unhandled_exception(request: Request, exc: Exception):
     )
 
 
+async def web_handle_exception(
+    request: Request, exc: Exception, user: User = Depends(get_optional_user)
+):
+    # required for top
+    user = None
+    return templates.TemplateResponse("exception.html", context=dict(**locals()))
+
+
 def include_app(app):
     app.add_exception_handler(BaseAPIException, handle_exception)
     app.add_exception_handler(HTTPException, handle_http_exception)
     app.add_exception_handler(Exception, unhandled_exception)
+
+
+def include_app_web(app):
+    # FIXME: need to deal with making nicer
+    app.add_exception_handler(Exception, web_handle_exception)

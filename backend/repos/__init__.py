@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import abc
-from typing import List, TypeVar
+from typing import List, TypeVar, Union
 from uuid import UUID
 
 from sqlalchemy import select
@@ -51,7 +51,9 @@ class DatabaseAbstractRepository(AbstractRepository):
         self._db.refresh(new)
         return new
 
-    def get_by_id(self, id: UUID) -> T:
+    def get_by_id(self, id: Union[UUID, str]) -> T:
+        if isinstance(id, str):
+            return self._db.get(self.ORM_Model, UUID(id))
         return self._db.get(self.ORM_Model, id)
 
     def get_by_kwargs(self, **kwargs) -> T:

@@ -1,0 +1,55 @@
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <img src="{{ url_for('static', path="img/logo-navbar.svg") }}" width="32">
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="/">
+            Home
+          </a>
+
+          <a class="navbar-item" href="#features">
+            Features
+          </a>
+        </div>
+
+        <div class="navbar-end">
+          {% if user %}
+          <div class="navbar-item">
+            <span>{{ user.username }}</span>
+          </div>
+          <div class="navbar-item">
+            <a class="button is-primary" href="/logout">
+              <i class="fas fa-sign-out"></i>
+            </a>
+          </div>
+          {% else %}
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-primary" href="/register">
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span><strong>Sign up</strong></span>
+              </a>
+              <a class="button is-light" href="/login/github">
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span>Log in</span>
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </nav>

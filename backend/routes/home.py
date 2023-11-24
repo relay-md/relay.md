@@ -1,24 +1,19 @@
 # -*- coding: utf-8 -*-
-import json
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from starlette.responses import HTMLResponse
+
+from ..repos.user import User
+from ..templates import templates
+from ..utils.user import get_optional_user
 
 router = APIRouter(prefix="")
 
 
-@router.get("/")
-async def homepage(request: Request):
-    user = request.session.get("user")
-    user_id = request.session.get("user_id")
-    access_token = request.session.get("access_token")
-    if user:
-        data = json.dumps(user, indent=4)
-        html = (
-            f"<pre>{data}</pre>"
-            f"<pre>{user_id}</pre>"
-            f"<pre>{access_token}</pre>"
-            '<a href="/logout">logout</a>'
-        )
-        return HTMLResponse(html)
-    return HTMLResponse('<a href="/login/github">login</a>')
+@router.get(
+    "/",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def welcome(request: Request, user: User = Depends(get_optional_user)):
+    return templates.TemplateResponse("welcome.html", context=dict(**locals()))

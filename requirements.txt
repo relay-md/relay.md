@@ -1,7 +1,7 @@
 rich
 
 # public Interface
-pydantic[dotenv]>=1.10.0a1<1.11
+pydantic>=1.10.13<2
 email-validator
 
 # SQL Source
@@ -15,7 +15,6 @@ requests
 fastapi>=0.75.1,<0.76.0
 uvicorn>=0.15.0,<0.16.0
 
-
 # cli
 click
 
@@ -26,3 +25,6 @@ python-multipart
 python-frontmatter
 
 minio>=7.2.0,<7.3
+
+jinja2>=3.1.2,<4
+pypugjs>=5.9.12,<6

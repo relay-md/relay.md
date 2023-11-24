@@ -5,13 +5,12 @@ from starlette.middleware.cors import CORSMiddleware
 from . import exceptions
 from .config import config
 from .database import Base, engine
-from .routes import v0, v1
+from .routes import v1
 
 # Create all tables
 Base.metadata.create_all(engine)
 
 app = FastAPI()
-app.include_router(v0.router)
 app.include_router(v1.router)
 
 # Set all CORS enabled origins
