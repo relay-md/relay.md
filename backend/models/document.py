@@ -29,6 +29,7 @@ class Document(Base):
     team_topics: Mapped[List[TeamTopic]] = relationship(
         secondary="document_team_topics"
     )
+    user: Mapped["User"] = relationship(backref="documents")  # noqa
 
     @property
     def is_private(self):

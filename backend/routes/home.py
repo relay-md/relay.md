@@ -21,6 +21,15 @@ async def welcome(request: Request, user: User = Depends(get_optional_user)):
     return templates.TemplateResponse("welcome.html", context=dict(**locals()))
 
 
+@router.get(
+    "/profile",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def profile(request: Request, user: User = Depends(get_optional_user)):
+    return templates.TemplateResponse("profile.pug", context=dict(**locals()))
+
+
 @router.post("/document")
 async def get_document(request: Request, id: str = Form(default="")):
     fail = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
@@ -37,7 +46,9 @@ async def get_document(request: Request, id: str = Form(default="")):
 
 
 @router.get("/document/{id}")
-async def get_document_from_id(request: Request, id: str):
+async def get_document_from_id(
+    request: Request, id: str, user: User = Depends(get_optional_user)
+):
     id_uuid = UUID(id)
     access_token = request.session["access_token"]
     return templates.TemplateResponse("viewer.html", context=dict(**locals()))

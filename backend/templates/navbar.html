@@ -17,7 +17,7 @@
             Home
           </a>
 
-          <a class="navbar-item" href="#features">
+          <a class="navbar-item" href="/#features">
             Features
           </a>
         </div>
@@ -25,7 +25,12 @@
         <div class="navbar-end">
           {% if user %}
           <div class="navbar-item">
-            <span>{{ user.username }}</span>
+            <a class="button is-warning" href="/profile">
+              <span class="icon">
+                <i class="fas fa-user"></i>
+              </span>
+              <span><strong>{{ user.username }}</strong></span>
+            </a>
           </div>
           <div class="navbar-item">
             <a class="button is-primary" href="/logout">

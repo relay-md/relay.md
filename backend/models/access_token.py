@@ -23,4 +23,4 @@ class AccessToken(Base):
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
-    user: Mapped["User"] = relationship()  # noqa
+    user: Mapped["User"] = relationship(backref="access_tokens")  # noqa
