@@ -5,7 +5,7 @@ from ..models.team_topic import TeamTopic
 from ..models.user import User
 from ..models.team import Team
 from ..models.topic import Topic
-from . import DatabaseAbstractRepository
+from .base import DatabaseAbstractRepository
 
 
 class DocumentRepo(DatabaseAbstractRepository):

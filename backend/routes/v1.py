@@ -102,7 +102,12 @@ async def post_doc(
 
     # Update document content in DocumentBodyRepo
     document_body_repo.create(document.id, body)
-    return dict(result=document)
+    ret_document = DocumentResponse(
+        relay_document=document.id,
+        relay_filename=filename,
+        relay_to=front.relay_to,
+    )
+    return dict(result=ret_document)
 
 
 @router.get(
@@ -121,14 +126,15 @@ async def get_doc(
     content_type = request.headers.get("content-type", "application/json")
     if content_type == "application/json":
         ret_document = DocumentResponse(
-            id=document.id,
-            filename=document.filename,
-            to=document.team_topics,
+            relay_document=document.id,
+            relay_filename=document.filename,
+            relay_to=[x.name for x in document.team_topics],
             body=body,
         )
-        return Response(result=ret_document).dict(by_alias=False)
+        return Response(result=ret_document).dict(by_alias=True)
     elif content_type == "text/markdown":
         response = PlainTextResponse(body)
+        response.headers["X-Relay-document"] = str(document.id)
         response.headers["X-Relay-filename"] = document.filename
         response.headers["X-Relay-to"] = json.dumps(
             [x.name for x in document.team_topics]

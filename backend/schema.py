@@ -40,32 +40,30 @@ class TopicResponse(BaseModel):
 
 class TeamTopicReponse(BaseModel):
     # id: UUID
-    name: str = Field()
+    name: str
 
     class Config:
         orm_mode = True
 
 
-class DocumentResponse(BaseModel):
-    id: UUID
-    filename: str
-    to: List[TeamTopicReponse] = Field(alias="team_topics")
-    # FIXME: should we maybe deal with bytes instead of strings?
-    body: Optional[str]
-
-    class Config:
-        orm_mode = True
-        allow_population_by_field_name = True
 
 
 class DocumentFrontMatter(BaseModel):
-    relay_to: List[str]
-    rid: Optional[UUID]
-    relay_filename: Optional[str]
+    relay_document: Optional[UUID] = Field(alias="relay-document")
+    relay_to: List[str] = Field(alias="relay-to")
+    relay_filename: Optional[str] = Field(alias="relay-filename")
 
     class Config:
         orm_mode = True
         extra = Extra.allow
+        allow_population_by_field_name = True
+
+
+class DocumentResponse(DocumentFrontMatter):
+    body: Optional[str]
+
+    class Config:
+        orm_mode = True
 
 
 class DocumentIdentifierResponse(BaseModel):

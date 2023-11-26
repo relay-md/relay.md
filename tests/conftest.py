@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from backend import config, database, models
+from backend import config, database, models, repos
 from backend.api import app as api_app
 
 
@@ -75,3 +75,38 @@ def dbsession(engine, tables):
 @pytest.fixture(scope="module")
 def api_client():
     yield TestClient(api_app)
+
+
+@pytest.fixture()
+def account(dbsession):
+    return repos.user.UserRepo(dbsession).create_from_kwargs(
+        username="account",
+        email="account@example.com",
+        name="Example account",
+        location="DE-CIX",
+        oauth_provider=models.user.OauthProvider.GITHUB,
+    )
+
+
+@pytest.fixture
+def access_token(account, dbsession):
+    return repos.access_token.AccessTokenRepo(dbsession).create_from_kwargs(
+        user_id=account.id
+    )
+
+
+@pytest.fixture
+def auth_header(access_token):
+    return {"X-API-Key": str(access_token.token)}
+
+
+@pytest.fixture(autouse=True)
+def default_team_topics(dbsession):
+    team_repo = repos.team.TeamRepo(dbsession)
+    topic_repo = repos.topic.TopicRepo(dbsession)
+    team_topic_repo = repos.team_topic.TeamTopicRepo(dbsession)
+
+    team = team_repo.create_from_kwargs(name="myteam")
+    topic = topic_repo.create_from_kwargs(name="mytopic")
+    team_topic = team_topic_repo.create_from_kwargs(team_id=team.id,
+                                                    topic_id=topic.id)

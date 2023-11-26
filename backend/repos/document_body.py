@@ -6,7 +6,7 @@ from uuid import UUID
 from minio import Minio
 
 from ..config import config
-from . import AbstractRepository
+from .base import AbstractRepository
 
 
 class MinioAbstracRepo(AbstractRepository):

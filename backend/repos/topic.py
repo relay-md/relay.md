@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..models.topic import Topic
-from . import DatabaseAbstractRepository
+from .base import DatabaseAbstractRepository
 
 
 class TopicRepo(DatabaseAbstractRepository):

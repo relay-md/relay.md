@@ -6,7 +6,7 @@ from ..models.team import Team
 from ..models.team_topic import TeamTopic
 from ..models.topic import Topic
 from ..repos.team import TeamRepo
-from . import DatabaseAbstractRepository
+from .base import DatabaseAbstractRepository
 
 
 class TeamTopicRepo(DatabaseAbstractRepository):
@@ -25,7 +25,7 @@ class TeamTopicRepo(DatabaseAbstractRepository):
         )
         if team_topic:
             return team_topic
-        team_repo = TeamRepo(self.db)
+        team_repo = TeamRepo(self._db)
         team = team_repo.get_by_kwargs(name=team)
         if not team:
             raise BadRequest(f"Team '{team}' does not exist!")

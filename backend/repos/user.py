@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from ..models.user import User
-from . import DatabaseAbstractRepository
+from .base import DatabaseAbstractRepository
 
 
 class UserRepo(DatabaseAbstractRepository):
