@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Form, Request, status
 from starlette.responses import HTMLResponse, RedirectResponse
 
+from ..config import Settings, config
 from ..repos.user import User
 from ..templates import templates
 from ..utils.user import get_optional_user
@@ -17,7 +18,8 @@ router = APIRouter(prefix="")
     response_class=HTMLResponse,
     tags=["web"],
 )
-async def welcome(request: Request, user: User = Depends(get_optional_user)):
+async def welcome(request: Request, user: User = Depends(get_optional_user),
+                  config: Settings = config):
     return templates.TemplateResponse("welcome.html", context=dict(**locals()))
 
 
@@ -26,7 +28,8 @@ async def welcome(request: Request, user: User = Depends(get_optional_user)):
     response_class=HTMLResponse,
     tags=["web"],
 )
-async def profile(request: Request, user: User = Depends(get_optional_user)):
+async def profile(request: Request, user: User = Depends(get_optional_user),
+                  config: Settings = config):
     return templates.TemplateResponse("profile.pug", context=dict(**locals()))
 
 

@@ -87,6 +87,9 @@ class Settings(BaseSettings):
     MINIO_SECRET_KEY: str = ""
     MINIO_SECURE: bool = True
 
+    # Early access configs
+    ENABLE_EARLY_ACCESS: bool = True
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

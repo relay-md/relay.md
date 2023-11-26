@@ -7,6 +7,7 @@
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
+from .config import Settings, config
 from .repos.user import User
 from .templates import templates
 from .utils.user import get_optional_user
@@ -92,7 +93,8 @@ async def unhandled_exception(request: Request, exc: Exception):
 
 
 async def web_handle_exception(
-    request: Request, exc: Exception, user: User = Depends(get_optional_user)
+    request: Request, exc: Exception, user: User = Depends(get_optional_user),
+    config: Settings = config
 ):
     # required for top
     user = None
