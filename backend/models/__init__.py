@@ -14,5 +14,5 @@ __all__ = [
     Team.__name__,
     Topic.__name__,
     TeamTopic.__name__,
-    DocumentTeamTopic.__name__
+    DocumentTeamTopic.__name__,
 ]

@@ -18,7 +18,12 @@ from ..repos.access_token import AccessTokenRepo
 from ..repos.document import DocumentRepo
 from ..repos.document_body import DocumentBodyRepo
 from ..repos.team_topic import TeamTopicRepo
-from ..schema import DocumentFrontMatter, DocumentResponse, Response, DocumentIdentifierResponse
+from ..schema import (
+    DocumentFrontMatter,
+    DocumentResponse,
+    Response,
+    DocumentIdentifierResponse,
+)
 
 router = APIRouter(prefix="/v1")
 api_key_header = APIKeyHeader(name="X-API-Key")
@@ -125,7 +130,9 @@ async def get_doc(
     elif content_type == "text/markdown":
         response = PlainTextResponse(body)
         response.headers["X-Relay-filename"] = document.filename
-        response.headers["X-Relay-to"] = json.dumps([x.name for x in document.team_topics])
+        response.headers["X-Relay-to"] = json.dumps(
+            [x.name for x in document.team_topics]
+        )
         return response
     else:
         raise exceptions.BadRequest(f"Unsupported content-type: {content_type}")
@@ -158,9 +165,11 @@ async def get_docs(
         documents = document_repo.get_recent_documents_for_me(user, page, size)
     ret = list()
     for document in documents:
-        ret.append(DocumentIdentifierResponse(
-            id=document.id,
-            filename=document.filename,
-            to=document.team_topics,
-        ))
+        ret.append(
+            DocumentIdentifierResponse(
+                id=document.id,
+                filename=document.filename,
+                to=document.team_topics,
+            )
+        )
     return dict(result=ret)

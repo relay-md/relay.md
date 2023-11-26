@@ -93,8 +93,10 @@ async def unhandled_exception(request: Request, exc: Exception):
 
 
 async def web_handle_exception(
-    request: Request, exc: Exception, user: User = Depends(get_optional_user),
-    config: Settings = config
+    request: Request,
+    exc: Exception,
+    user: User = Depends(get_optional_user),
+    config: Settings = config,
 ):
     # required for top
     user = None

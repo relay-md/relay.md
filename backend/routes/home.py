@@ -18,8 +18,9 @@ router = APIRouter(prefix="")
     response_class=HTMLResponse,
     tags=["web"],
 )
-async def welcome(request: Request, user: User = Depends(get_optional_user),
-                  config: Settings = config):
+async def welcome(
+    request: Request, user: User = Depends(get_optional_user), config: Settings = config
+):
     return templates.TemplateResponse("welcome.html", context=dict(**locals()))
 
 
@@ -28,8 +29,9 @@ async def welcome(request: Request, user: User = Depends(get_optional_user),
     response_class=HTMLResponse,
     tags=["web"],
 )
-async def profile(request: Request, user: User = Depends(get_optional_user),
-                  config: Settings = config):
+async def profile(
+    request: Request, user: User = Depends(get_optional_user), config: Settings = config
+):
     return templates.TemplateResponse("profile.pug", context=dict(**locals()))
 
 

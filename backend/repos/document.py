@@ -15,15 +15,17 @@ class DocumentRepo(DatabaseAbstractRepository):
         user.latest_document_datetime = document.last_updated_at
         self._db.commit()
 
-    def get_recent_documents_for_me(self, user:User, page: int = 0, size: int = 10):
-        ret = list(self._db.scalars(
-            select(Document)
-            # TODO: add extra joins and filters as soon as we have private repos
-            .filter(Document.last_updated_at > user.latest_document_datetime)
-            .order_by(Document.last_updated_at.asc())
-            .offset(page*size)
-            .limit(size)
-        ))
+    def get_recent_documents_for_me(self, user: User, page: int = 0, size: int = 10):
+        ret = list(
+            self._db.scalars(
+                select(Document)
+                # TODO: add extra joins and filters as soon as we have private repos
+                .filter(Document.last_updated_at > user.latest_document_datetime)
+                .order_by(Document.last_updated_at.asc())
+                .offset(page * size)
+                .limit(size)
+            )
+        )
         if ret:
             self._update_user_latest_document(user, ret[-1])
         return ret
@@ -33,6 +35,6 @@ class DocumentRepo(DatabaseAbstractRepository):
             select(Document)
             .filter(Document.user_id == user.id)
             .order_by(Document.last_updated_at.desc())
-            .offset(page*size)
+            .offset(page * size)
             .limit(size)
         )
