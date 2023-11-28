@@ -19,8 +19,18 @@ sqlite_db = (
 )  # CHANGES - Do we need the immediete deletion behavior or should we change the file name to "tempfile.mkstemp()"?
 
 
+@pytest.fixture(autouse=True, scope="function")
+def patch_settings_env_file_location(monkeypatch: pytest.MonkeyPatch) -> None:
+    # avoid loading any .env files
+    monkeypatch.setattr(config.Settings.Config, "env_file", "")
+    # Reload config
+    config.config = config.Settings()
+
+
 @pytest.fixture(scope="session")
 def engine():
+    from rich import print
+    print(config.config)
     database.engine = create_engine(
         f"sqlite:///{sqlite_db}",
         echo=False,
