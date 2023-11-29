@@ -73,18 +73,18 @@ class Settings(BaseSettings):
     MAIL_FROM: str = "noreply@example.com"
 
     # Oauth Client data
-    GITHUB_CLIENT_ID: str
-    GITHUB_CLIENT_SECRET: str
+    GITHUB_CLIENT_ID: Optional[str]
+    GITHUB_CLIENT_SECRET: Optional[str]
 
     # Mailchimp
-    MAILCHIMP_API_SERVER: str
-    MAILCHIMP_API_KEY: str
-    MAILCHIMP_LIST_ID: str
+    MAILCHIMP_API_SERVER: Optional[str]
+    MAILCHIMP_API_KEY: Optional[str]
+    MAILCHIMP_LIST_ID: Optional[str]
 
     # Minio access
     MINIO_ENDPOINT: str = "play.min.io"
-    MINIO_ACCESS_KEY: str = ""
-    MINIO_SECRET_KEY: str = ""
+    MINIO_ACCESS_KEY: Optional[str]
+    MINIO_SECRET_KEY: Optional[str]
     MINIO_SECURE: bool = True
 
     # Early access configs
