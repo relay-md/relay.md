@@ -94,8 +94,9 @@ steps:
       NOMAD_ADDR: https://nomad.infra.chainsquad.com
       NOMAD_TOKEN:
         from_secret: NOMAD_TOKEN
+      NOMAD_VAR_registry_auth:
+        from_secret: NOMAD_VAR_registry_auth
+      NOMAD_VAR_api_image_version: "${DRONE_TAG}"
     commands:
-      - source jobs/infra.env
-      - export NOMAD_VAR_api_image_version=${DRONE_TAG}
       - wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
       - nomad job run -ca-cert lets-encrypt-r3.pem jobs/relaymd-backend.hcl
