@@ -9,15 +9,13 @@ from ..config import config
 from .base import AbstractRepository
 
 
-class MinioAbstracRepo(AbstractRepository):
+class MinioAbstractRepo(AbstractRepository):
     # TODO: access to s3 documents
     # filename == document id
     # nested folder structure with 6 nested nibbles
     # maybe take a look at how sccache does it
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # FIXME: own minio deployment here
-        # make use of env credentials
         self._client = Minio(
             config.MINIO_ENDPOINT,
             access_key=config.MINIO_ACCESS_KEY,
@@ -52,5 +50,5 @@ class MinioAbstracRepo(AbstractRepository):
         raise NotImplementedError
 
 
-class DocumentBodyRepo(MinioAbstracRepo):
+class DocumentBodyRepo(MinioAbstractRepo):
     BUCKET = "documents"

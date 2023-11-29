@@ -2,15 +2,30 @@
 """Configuration for pytest"""
 
 import tempfile
+from collections import namedtuple
 from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from backend import config, database, models, repos
 from backend.api import app as api_app
+
+mocked_up_text = """---
+relay-filename: example.md
+relay-to:
+ - mytopic@myteam
+---
+
+Example text
+"""
+
+
+@pytest.fixture
+def mock_document():
+    return mocked_up_text
 
 
 # Temporary file for sqlite
@@ -22,7 +37,7 @@ sqlite_db = (
 @pytest.fixture(autouse=True, scope="function")
 def patch_settings_env_file_location(monkeypatch: pytest.MonkeyPatch) -> None:
     # avoid loading any .env files
-    monkeypatch.setattr(config.Settings.Config, "env_file", "")
+    monkeypatch.setattr(config.Settings.Config, "env_file", "tests/config.env")
     # Reload config
     config.config = config.Settings()
 
@@ -30,7 +45,8 @@ def patch_settings_env_file_location(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture(scope="session")
 def engine():
     from rich import print
-    print(config.config)
+
+    print(config)
     database.engine = create_engine(
         f"sqlite:///{sqlite_db}",
         echo=False,
@@ -64,9 +80,9 @@ def dbsession(engine, tables):
     database._db = session
 
     # We need a separate session for the async tasks
-    SessionMakerForCelery = scoped_session(
-        sessionmaker(autocommit=False, autoflush=False, bind=connection)
-    )
+    # SessionMakerForCelery = scoped_session(
+    #    sessionmaker(autocommit=False, autoflush=False, bind=connection)
+    # )
     # BaseTask._db = SessionMakerForCelery()
 
     try:
@@ -118,5 +134,25 @@ def default_team_topics(dbsession):
 
     team = team_repo.create_from_kwargs(name="myteam")
     topic = topic_repo.create_from_kwargs(name="mytopic")
-    team_topic = team_topic_repo.create_from_kwargs(team_id=team.id,
-                                                    topic_id=topic.id)
+    team_topic_repo.create_from_kwargs(team_id=team.id, topic_id=topic.id)
+
+
+@pytest.fixture
+def s3_put():
+    with patch("backend.repos.document_body.DocumentBodyRepo.create") as mock:
+        yield mock
+
+
+@pytest.fixture
+def s3_get():
+    with patch(
+        "backend.repos.document_body.DocumentBodyRepo.get_by_id",
+        return_value=mocked_up_text,
+    ):
+        yield
+
+
+@pytest.fixture
+def s3(s3_put, s3_get):
+    S3 = namedtuple("S3", "s3_put s3_get")
+    return S3(s3_put, s3_get)
