@@ -95,7 +95,7 @@ steps:
       NOMAD_TOKEN:
         from_secret: NOMAD_TOKEN
     commands:
-      - source infra.env
+      - source jobs/infra.env
       - export NOMAD_VAR_api_image_version=${DRONE_TAG}
       - wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
       - nomad job apply -ca-cert lets-encrypt-r3.pem jobs/relaymd-backend.hcl
