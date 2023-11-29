@@ -63,7 +63,13 @@ class DatabaseAbstractRepository(AbstractRepository):
         return self._db.scalars(select(self.ORM_Model).filter_by(**{key: value}))
 
     def update(self, item: T, **kwargs) -> T:
-        raise NotImplementedError
+        for key, value in kwargs.items():
+            if not hasattr(item, key):
+                raise ValueError(
+                    f"Item of type {item.__class__.__name__} has no attribute {key}"
+                )
+            setattr(item, key, value)
+        self._db.commit()
 
     def delete_by_id(self, item: T) -> None:
         self._db.delete(item)

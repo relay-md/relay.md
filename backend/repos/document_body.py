@@ -29,7 +29,7 @@ class MinioAbstractRepo(AbstractRepository):
         # Upload data with content-type.
         self._client.put_object(
             self.BUCKET,
-            str(id),  # TODO: want to split this into dirs
+            f"{str(id)}.md",  # TODO: want to split this into dirs
             io.BytesIO(data),
             len(data),
             content_type="text/markdown",
@@ -46,8 +46,8 @@ class MinioAbstractRepo(AbstractRepository):
     def list(self, key: str, **kwargs) -> List[UUID]:
         raise NotImplementedError
 
-    def update(self, id: UUID, item: bytes) -> None:
-        raise NotImplementedError
+    def update(self, id: UUID, data: bytes) -> None:
+        self.create(id, data)
 
 
 class DocumentBodyRepo(MinioAbstractRepo):

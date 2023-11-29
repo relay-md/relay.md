@@ -53,14 +53,6 @@ async def get_document(id: UUID, db: Session = Depends(get_session)) -> Document
     return document
 
 
-async def get_user_owned_document(
-    user: User = Depends(authenticated_user),
-    document: Document = Depends(get_document),
-):
-    if document.user_id != user.id:
-        raise exceptions.NotAllowed("This is not your document")
-
-
 @router.post(
     "/doc",
     tags=["v1"],
@@ -85,7 +77,7 @@ async def post_doc(
     front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
 
     if not filename and not front.relay_filename:
-        raise exceptions.BadRequest("Missing filename or relay_filename property!")
+        raise exceptions.BadRequest("Missing filename or relay-filename property!")
     elif not filename and front.relay_filename:
         filename = front.relay_filename
 
@@ -93,6 +85,12 @@ async def post_doc(
     team_topics = list()
     for team_topic in front.relay_to:
         team_topics.append(team_topic_repo.from_string(team_topic))
+
+    # if the document already has an id, let's raise
+    if front.relay_document:
+        raise exceptions.BadRequest(
+            "The document you are sending already has a relay-document id"
+        )
 
     # Store document in database
     document = Document(user_id=user.id, filename=filename, team_topics=team_topics)
@@ -144,9 +142,36 @@ async def get_doc(
 
 @router.put("/doc/{id}", tags=["v1"])
 async def put_doc(
-    request: Request, id: UUID, document: Document = Depends(get_user_owned_document)
+    request: Request,
+    id: UUID,
+    user: User = Depends(authenticated_user),
+    document: Document = Depends(get_document),
+    db: Session = Depends(get_session),
 ):
-    raise NotImplementedError("This functionatlity is not implemented yet!")
+    document_repo = DocumentRepo(db)
+    team_topic_repo = TeamTopicRepo(db)
+    document_body_repo = DocumentBodyRepo()
+    if document.user_id != user.id:
+        raise exceptions.NotAllowed(
+            "Updating someone else document is not allowed currently!"
+        )
+    body = await request.body()
+    front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
+
+    # Parse relay_to as team_topics
+    team_topics = list()
+    for team_topic in front.relay_to:
+        team_topics.append(team_topic_repo.from_string(team_topic))
+    document_repo.update(document, team_topics=team_topics)
+    # Update document content in DocumentBodyRepo
+    document_body_repo.update(document.id, body)
+    ret_document = DocumentResponse(
+        relay_document=document.id,
+        relay_filename=document.filename,
+        relay_to=front.relay_to,
+        body=body,
+    )
+    return dict(result=ret_document)
 
 
 @router.get(
