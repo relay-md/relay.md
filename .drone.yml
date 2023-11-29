@@ -1,28 +1,101 @@
 ---
+################
+# Build & Test #
+################
+
+kind: pipeline
+type: docker
+name: run_tests
+
+steps:
+  - name: test-3-8
+    image: python:3.8
+    commands:
+      - pip3 install --upgrade tox
+      - tox -e py38,lint
+
+---
+################
+# Semantic release
+################
 kind: pipeline
 type: docker
 name: semantic-version
+depends_on:
+  - run_tests
+trigger:
+  branch: master
+  event: push
+  status:
+    # Only runs if the first pipeline was fully successful
+    - success
 steps:
   - name: semver
     image: python:3.8
-    when:
-      branch: master
-      event: push
     commands:
       - pip3 install python-semantic-release==7.28.0
       - semantic-release publish
 
+---
+################
+# Docker & deploy
+################
+kind: pipeline
+type: docker
+name: build_and_deploy
+
+trigger:
+  event:
+    - tag
+  status:
+    # Only runs if the first pipeline was fully successful
+    - success
+depends_on:
+  # Must run after the first pipeline
+  - run_tests
+
+steps:
+  - name: tags
+    image: python:3.8
+    commands:
+      - echo "${DRONE_TAG},latest" > .tags
+
   - name: docker
     image: plugins/docker
-    when:
-      branch: master
-      event: tag
     depends_on:
-      - semver
+      - tags
     settings:
       username:
         from_secret: CI_REGISTRY_USER
       password:
         from_secret: CI_REGISTRY_PASSWORD
-      repo: registry.infra.chainsquad.com/relay.md/api
+      repo: registry.infra.chainsquad.com/relay.md/backend
       registry: registry.infra.chainsquad.com
+
+  - name: clone jobs
+    image: alpine/git
+    environment:
+      # drone secrets add --image=<image> <repo> SSH_KEY @/path/to/.ssh/id_rsa
+      DEPLOY_KEY:
+        from_secret: DEPLOY_KEY
+    commands:
+      # https://stackoverflow.com/a/52812550
+      - mkdir $HOME/.ssh && echo "$DEPLOY_KEY" > $HOME/.ssh/id_rsa && chmod 600 $HOME/.ssh/id_rsa
+      - echo "Host *" >> ~/.ssh/config
+      - echo " StrictHostKeyChecking no" >> ~/.ssh/config
+      - git clone ssh://git@git.chainsquad.com:2222/knowledgemd/jobs.git
+
+  - name: deploy
+    depends_on:
+      - clone jobs
+      - docker
+    image: hashicorp/nomad
+    environment:
+      NOMAD_ADDR: https://nomad.infra.chainsquad.com
+      NOMAD_TOKEN:
+        from_secret: NOMAD_TOKEN
+    commands:
+      - source infra.env
+      - export NOMAD_VAR_api_image_version=${DRONE_TAG}
+      - wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
+      - nomad job apply -ca-cert lets-encrypt-r3.pem jobs/relaymd-backend.hcl

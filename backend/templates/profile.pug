@@ -1,0 +1,71 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+section.hero.is-link
+ .hero-body
+  p.title
+   span.icon
+    i.fas.fa-user
+  p.subtitle User Profile
+
+.column
+ section.section
+  h1.title Account
+  h2.subclass Personal Information of your account
+  table.table
+   tr
+    td
+     span.icon-text
+      span.icon
+       i.fas.fa-user
+      span username
+    td {{user.username}}
+   tr
+    td
+     span.icon-text
+      span.icon
+       i.fas.fa-mailbox
+      span email
+    td {{user.email}}
+   tr
+    td
+     span.icon-text
+      span.icon
+       i.fas.fa-globe
+      span location
+    td {{user.location}}
+
+
+ section.section
+  h1.title API
+  h2.subclass Access Token
+  table.table
+   {% for access_token in user.access_tokens %}
+   tr
+    td
+     span.icon-text
+      span.icon
+       i.fas.fa-key
+      span
+       tt {{access_token.token}}
+   {% endfor %}
+
+ section.section
+  h1.title Documents
+  h2.subclass List of registered documents
+  table.table
+   {% for document in user.documents %}
+   tr
+    td
+     span.icon-text
+      span.icon
+       i.fas.fa-clock
+      span
+       tt {{document.created_at}}
+    td
+     span.icon-text
+      span.icon
+       i.fas.fa-file
+      span
+       a(href="/document/{{document.id}}") {{document.filename}}
+   {% endfor %}
+{% endblock %}

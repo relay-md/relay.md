@@ -10,10 +10,10 @@ from pydantic import EmailStr, ValidationError
 from ..config import config
 from ..database import Session, get_session
 
-router = APIRouter(prefix="/v0")
+router = APIRouter(prefix="/mail")
 
 
-@router.post("/mail/validate")
+@router.post("/validate", tags=["v0"])
 async def validatemail(email: str = Form(default="")) -> str:
     danger = ""
     error = ""
@@ -48,7 +48,7 @@ async def validatemail(email: str = Form(default="")) -> str:
     )
 
 
-@router.post("/mail/submit")
+@router.post("/submit", tags=["v0"])
 async def submitmail(
     email: str = Form(default=None),
     first_name: str = Form(default=None),

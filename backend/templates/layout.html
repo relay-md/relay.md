@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>relay.md - simple, efficient communication using markdown</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.4/css/bulma.min.css" />
+    <link href=" https://cdn.jsdelivr.net/npm/bulma-pricingtable@0.2.0/dist/css/bulma-pricingtable.min.css " rel="stylesheet">
+    <link href="{{ url_for('static', path="css/style.css") }}" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    {% include "navbar.html" %}
+    {% block content %}{% endblock %}
+    <footer class="footer">
+      <nav class="level">
+        <div class="level-left">
+          <div class="level-item">
+            <span class="icon">
+              <a target="_blank" href="https://github.com/relay-md/relay.md"><i class="fab fa-github"></i></a>
+            </span> &emsp;
+            <span class="icon">
+              <a target="_blank" href="mailto:fabian@relay.md"><i class="fas fa-envelope"></i></a>
+            </span>
+          </div>
+        </div>
+        <div class="level-right">
+          <small class="level-item" style="color: var(--textLight)">
+            &copy; relay.md. All Rights Reserved.
+          </small>
+        </div>
+      </nav>
+    </footer>
+  </body>
+  <script src="{{ url_for('static', path="js/script.js") }}"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
+  {% block javascript %}{% endblock %}
+</html>

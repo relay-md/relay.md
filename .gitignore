@@ -68,3 +68,5 @@ config.yaml
 .env
 docs/html
 docs/default.db
+
+*.db

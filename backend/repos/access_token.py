@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from ..models.access_token import AccessToken as ORMAccessToken
-from . import DatabaseAbstractRepository
+from ..models.access_token import AccessToken
+from .base import DatabaseAbstractRepository
 
 
-class AccessToken(DatabaseAbstractRepository):
-    ORM_Model = ORMAccessToken
+class AccessTokenRepo(DatabaseAbstractRepository):
+    ORM_Model = AccessToken

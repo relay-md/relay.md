@@ -1,24 +1,59 @@
 # -*- coding: utf-8 -*-
-import json
 
-from fastapi import APIRouter, Request
-from starlette.responses import HTMLResponse
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, Form, Request, status
+from starlette.responses import HTMLResponse, RedirectResponse
+
+from ..config import Settings, config
+from ..repos.user import User
+from ..templates import templates
+from ..utils.user import get_optional_user
 
 router = APIRouter(prefix="")
 
 
-@router.get("/")
-async def homepage(request: Request):
-    user = request.session.get("user")
-    user_id = request.session.get("user_id")
-    access_token = request.session.get("access_token")
-    if user:
-        data = json.dumps(user, indent=4)
-        html = (
-            f"<pre>{data}</pre>"
-            f"<pre>{user_id}</pre>"
-            f"<pre>{access_token}</pre>"
-            '<a href="/logout">logout</a>'
-        )
-        return HTMLResponse(html)
-    return HTMLResponse('<a href="/login/github">login</a>')
+@router.get(
+    "/",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def welcome(
+    request: Request, user: User = Depends(get_optional_user), config: Settings = config
+):
+    return templates.TemplateResponse("welcome.html", context=dict(**locals()))
+
+
+@router.get(
+    "/profile",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def profile(
+    request: Request, user: User = Depends(get_optional_user), config: Settings = config
+):
+    return templates.TemplateResponse("profile.pug", context=dict(**locals()))
+
+
+@router.post("/document")
+async def get_document(request: Request, id: str = Form(default="")):
+    fail = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    if not id:
+        return fail
+    try:
+        UUID(id)
+    except Exception:
+        return fail
+    return RedirectResponse(
+        url=request.url_for("get_document_from_id", id=id),
+        status_code=status.HTTP_302_FOUND,
+    )
+
+
+@router.get("/document/{id}")
+async def get_document_from_id(
+    request: Request, id: str, user: User = Depends(get_optional_user)
+):
+    id_uuid = UUID(id)
+    access_token = request.session["access_token"]
+    return templates.TemplateResponse("viewer.html", context=dict(**locals()))
