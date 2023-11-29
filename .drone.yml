@@ -99,4 +99,4 @@ steps:
       NOMAD_VAR_api_image_version: "${DRONE_TAG}"
     commands:
       - wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
-      - nomad job run -ca-cert lets-encrypt-r3.pem jobs/relaymd-backend.hcl
+      - nomad job run -ca-cert lets-encrypt-r3.pem -detach jobs/relaymd-backend.hcl
