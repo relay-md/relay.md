@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.1 (2023-11-29)
+### Fix
+* Deployment via nomad uses run instead of apply ([`99ece29`](https://github.com/knowledgemd/backend/commit/99ece296b122d9b62aad03ada3efe4a010013c51))
+
 ## v0.3.0 (2023-11-29)
 ### Feature
 * **health:** Check endpoint on web ([`fecbd81`](https://github.com/knowledgemd/backend/commit/fecbd81d289ddcd78ffe9c5a96bf972f0edc7077))
