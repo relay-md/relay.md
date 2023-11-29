@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import json
 from typing import List
 from uuid import UUID
@@ -80,6 +81,8 @@ async def post_doc(
         raise exceptions.BadRequest("Missing filename or relay-filename property!")
     elif not filename and front.relay_filename:
         filename = front.relay_filename
+    if "/" in filename or "\\" in filename:
+        raise exceptions.BadRequest("Filenames must not contain slash or backslash")
 
     # Parse relay_to as team_topics
     team_topics = list()
@@ -118,6 +121,11 @@ async def get_doc(
         raise exceptions.NotAllowed("Access to this document is not allowed for you.")
     document_body_repo = DocumentBodyRepo()
     body = document_body_repo.get_by_id(document.id)
+
+    # Add document id to frontmatter
+    front = frontmatter.loads(body)
+    front["relay-document"] = str(document.id)
+    body = frontmatter.dumps(front)
 
     content_type = request.headers.get("content-type", "application/json")
     if content_type == "application/json":

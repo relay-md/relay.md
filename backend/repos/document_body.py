@@ -29,19 +29,25 @@ class MinioAbstractRepo(AbstractRepository):
         # Upload data with content-type.
         self._client.put_object(
             self.BUCKET,
-            f"{str(id)}.md",  # TODO: want to split this into dirs
+            self.get_file_name(id),  # TODO: want to split this into dirs
             io.BytesIO(data),
             len(data),
             content_type="text/markdown",
         )
 
+    def get_file_name(self, id):
+        return f"{str(id)}.md"
+
     def get_by_id(self, id: UUID) -> bytes:
         try:
-            response = self._client.get_object(self.BUCKET, str(id))
+            response = self._client.get_object(self.BUCKET, self.get_file_name(id))
             return response.data.decode("utf-8")
         finally:
-            response.close()
-            response.release_conn()
+            try:
+                response.close()
+                response.release_conn()
+            except Exception:
+                pass
 
     def list(self, key: str, **kwargs) -> List[UUID]:
         raise NotImplementedError
