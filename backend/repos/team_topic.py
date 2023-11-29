@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import select
 
-from ..exceptions import BadRequest, NotAllowed
 from ..models.team import Team
 from ..models.team_topic import TeamTopic
 from ..models.topic import Topic
@@ -13,6 +12,9 @@ class TeamTopicRepo(DatabaseAbstractRepository):
     ORM_Model = TeamTopic
 
     def from_string(self, team_topic_str: str) -> TeamTopic:
+        # import here due to cicular dependencies
+        from ..exceptions import BadRequest, NotAllowed
+
         if "@" not in team_topic_str:
             raise BadRequest(f"topic@team format violated with {team_topic_str}")
         topic, team = team_topic_str.split("@")
