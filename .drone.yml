@@ -98,4 +98,4 @@ steps:
       - source jobs/infra.env
       - export NOMAD_VAR_api_image_version=${DRONE_TAG}
       - wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
-      - nomad job apply -ca-cert lets-encrypt-r3.pem jobs/relaymd-backend.hcl
+      - nomad job run -ca-cert lets-encrypt-r3.pem jobs/relaymd-backend.hcl
