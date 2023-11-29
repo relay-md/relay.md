@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.0 (2023-11-29)
+### Feature
+* **health:** Check endpoint on web ([`fecbd81`](https://github.com/knowledgemd/backend/commit/fecbd81d289ddcd78ffe9c5a96bf972f0edc7077))
+
 ## v0.2.0 (2023-11-29)
 ### Feature
 * **tests:** Api tests happy path ([`6381bec`](https://github.com/knowledgemd/backend/commit/6381becc4b55dae1e0b67aa358e04b7d56bca3bc))
