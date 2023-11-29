@@ -46,8 +46,6 @@ class TeamTopicReponse(BaseModel):
         orm_mode = True
 
 
-
-
 class DocumentFrontMatter(BaseModel):
     relay_document: Optional[UUID] = Field(alias="relay-document")
     relay_to: List[str] = Field(alias="relay-to")

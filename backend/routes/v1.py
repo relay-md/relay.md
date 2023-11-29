@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
-from uuid import UUID
 from typing import List
+from uuid import UUID
 
 import frontmatter
-from fastapi import APIRouter, Depends, Request
-from fastapi import Response as FastAPIResponse
-from fastapi import Security
+from fastapi import APIRouter, Depends, Request, Security
 from fastapi.responses import PlainTextResponse
 from fastapi.security import APIKeyHeader
 
@@ -20,9 +18,9 @@ from ..repos.document_body import DocumentBodyRepo
 from ..repos.team_topic import TeamTopicRepo
 from ..schema import (
     DocumentFrontMatter,
+    DocumentIdentifierResponse,
     DocumentResponse,
     Response,
-    DocumentIdentifierResponse,
 )
 
 router = APIRouter(prefix="/v1")

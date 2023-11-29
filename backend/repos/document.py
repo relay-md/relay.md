@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import select
+
 from ..models.document import Document
-from ..models.team_topic import TeamTopic
 from ..models.user import User
-from ..models.team import Team
-from ..models.topic import Topic
 from .base import DatabaseAbstractRepository
 
 
