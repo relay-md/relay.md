@@ -45,3 +45,8 @@ oauth.register(
     authorize_url="https://github.com/login/oauth/authorize",
     api_base_url="https://api.github.com/",
 )
+
+
+@app.get("/health")
+def health():
+    return "ok"
