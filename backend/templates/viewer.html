@@ -28,7 +28,6 @@
 <script>
   async function get_document(id) {
     let base_url = "https://api.relay.md/v1/doc/";
-    base_url = "http://localhost:5000/v1/doc/";
     const response = await fetch(base_url + id, {
       method: "GET",
       headers: {
