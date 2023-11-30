@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import json
 from unittest.mock import patch
+from uuid import UUID
 
 import pytest
+from sqlalchemy import select
+
+from backend import models
 
 mocked_up_text = """---
 relay-filename: example.md
@@ -41,15 +45,28 @@ def s3(patch_document_body_create, patch_document_body_get):
     yield
 
 
-def test_document_upload(auth_header, api_client, s3):
+def test_document_upload(account, auth_header, api_client, s3, dbsession):
     req = api_client.post("/v1/doc", headers=auth_header, data=mocked_up_text)
     assert req.ok, req.text
 
     ret = req.json()
     doc_id = ret["result"]["relay_document"]
 
+    assert not dbsession.scalar(
+        select(models.DocumentAccess).filter_by(
+            user_id=account.id, document_id=UUID(doc_id)
+        )
+    )
+
     req = api_client.get(f"/v1/doc/{doc_id}", headers=auth_header)
     assert req.ok, req.text
+
+    # check doc has been access
+    assert dbsession.scalar(
+        select(models.DocumentAccess).filter_by(
+            user_id=account.id, document_id=UUID(doc_id)
+        )
+    )
 
     # lets add the id to the doc
     original_doc = mocked_up_text.split("\n")

@@ -30,8 +30,3 @@ class Document(Base):
         secondary="document_team_topics"
     )
     user: Mapped["User"] = relationship(backref="documents")  # noqa
-
-    @property
-    def is_private(self):
-        # TODO: Needs implemtation using team_topics
-        return False

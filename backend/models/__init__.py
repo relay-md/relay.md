@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from .access_token import AccessToken
 from .document import Document
+from .document_access import DocumentAccess
 from .document_team_topic import DocumentTeamTopic
 from .team import Team
 from .team_member import TeamMember
@@ -17,4 +18,5 @@ __all__ = [
     TeamTopic.__name__,
     DocumentTeamTopic.__name__,
     TeamMember.__name__,
+    DocumentAccess.__name__,
 ]

@@ -3,5 +3,5 @@ from ..models.team_member import TeamMember
 from .base import DatabaseAbstractRepository
 
 
-class TeamTopicRepo(DatabaseAbstractRepository):
+class TeamMemberRepo(DatabaseAbstractRepository):
     ORM_Model = TeamMember

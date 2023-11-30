@@ -14,6 +14,7 @@ from ..models.document import Document
 from ..models.user import User
 from ..repos.access_token import AccessTokenRepo
 from ..repos.document import DocumentRepo
+from ..repos.document_access import DocumentAccessRepo
 from ..repos.document_body import DocumentBodyRepo
 from ..repos.team_topic import TeamTopicRepo
 from ..schema import (
@@ -50,6 +51,34 @@ async def get_document(id: UUID, db: Session = Depends(get_session)) -> Document
     document = document_repo.get_by_id(id)
     if not document:
         raise exceptions.NotFound("document id unknown")
+    return document
+
+
+async def get_user_shared_document(
+    id: UUID,
+    db: Session = Depends(get_session),
+    user: User = Depends(authenticated_user),
+    document: Document = Depends(get_document),
+) -> Document:
+    # FIXME: here we need to check that the user is subscribed with the team
+    # that the document was shared with
+    if document.user_id != user.id:
+        raise exceptions.NotAllowed(
+            "Updating someone else document is not allowed currently!"
+        )
+    return document
+
+
+async def get_user_owned_document(
+    id: UUID,
+    db: Session = Depends(get_session),
+    user: User = Depends(authenticated_user),
+    document: Document = Depends(get_document),
+) -> Document:
+    if document.user_id != user.id:
+        raise exceptions.NotAllowed(
+            "Updating someone else document is not allowed currently!"
+        )
     return document
 
 
@@ -114,17 +143,19 @@ async def post_doc(
 )
 async def get_doc(
     request: Request,
-    document: Document = Depends(get_document),
+    document: Document = Depends(get_user_shared_document),
+    db: Session = Depends(get_session),
+    user: User = Depends(authenticated_user),
 ):
-    if document.is_private:
-        raise exceptions.NotAllowed("Access to this document is not allowed for you.")
     document_body_repo = DocumentBodyRepo()
+    document_access_repo = DocumentAccessRepo(db)
     body = document_body_repo.get_by_id(document.id)
 
     # Add document id to frontmatter
     front = frontmatter.loads(body)
     front["relay-document"] = str(document.id)
     body = frontmatter.dumps(front)
+    document_access_repo.create_from_kwargs(user_id=user.id, document_id=document.id)
 
     content_type = request.headers.get("content-type", "application/json")
     if content_type == "application/json":
@@ -151,17 +182,12 @@ async def get_doc(
 async def put_doc(
     request: Request,
     id: UUID,
-    user: User = Depends(authenticated_user),
-    document: Document = Depends(get_document),
+    document: Document = Depends(get_user_owned_document),
     db: Session = Depends(get_session),
 ):
     document_repo = DocumentRepo(db)
     team_topic_repo = TeamTopicRepo(db)
     document_body_repo = DocumentBodyRepo()
-    if document.user_id != user.id:
-        raise exceptions.NotAllowed(
-            "Updating someone else document is not allowed currently!"
-        )
     body = await request.body()
     front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
 
@@ -199,7 +225,9 @@ async def get_docs(
     if type == "mine":
         documents = document_repo.get_my_documents(user, page, size)
     else:
-        documents = document_repo.get_recent_documents_for_token(access_token, page, size)
+        documents = document_repo.get_recent_documents_for_token(
+            access_token, page, size
+        )
     ret = list()
     for document in documents:
         ret.append(
