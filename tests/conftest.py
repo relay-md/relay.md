@@ -2,31 +2,14 @@
 """Configuration for pytest"""
 
 import tempfile
-from collections import namedtuple
-from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend import config, database, models, repos
+from backend import database, models, repos
 from backend.api import app as api_app
-
-mocked_up_text = """---
-relay-filename: example.md
-relay-to:
- - mytopic@myteam
----
-
-Example text
-"""
-
-
-@pytest.fixture
-def mock_document():
-    return mocked_up_text
-
 
 # Temporary file for sqlite
 sqlite_db = (
@@ -36,9 +19,6 @@ sqlite_db = (
 
 @pytest.fixture(scope="session")
 def engine():
-    from rich import print
-
-    print(config)
     database.engine = create_engine(
         f"sqlite:///{sqlite_db}",
         echo=False,
@@ -118,6 +98,29 @@ def auth_header(access_token):
     return {"X-API-Key": str(access_token.token)}
 
 
+@pytest.fixture()
+def other_account(dbsession):
+    return repos.user.UserRepo(dbsession).create_from_kwargs(
+        username="account2",
+        email="account2@example.com",
+        name="Another Example account",
+        location="DE-CIX",
+        oauth_provider=models.user.OauthProvider.GITHUB,
+    )
+
+
+@pytest.fixture
+def other_access_token(other_account, dbsession):
+    return repos.access_token.AccessTokenRepo(dbsession).create_from_kwargs(
+        user_id=other_account.id
+    )
+
+
+@pytest.fixture
+def other_auth_header(other_access_token):
+    return {"X-API-Key": str(other_access_token.token)}
+
+
 @pytest.fixture(autouse=True)
 def default_team_topics(dbsession):
     team_repo = repos.team.TeamRepo(dbsession)
@@ -127,24 +130,3 @@ def default_team_topics(dbsession):
     team = team_repo.create_from_kwargs(name="myteam")
     topic = topic_repo.create_from_kwargs(name="mytopic")
     team_topic_repo.create_from_kwargs(team_id=team.id, topic_id=topic.id)
-
-
-@pytest.fixture
-def s3_put():
-    with patch("backend.repos.document_body.DocumentBodyRepo.create") as mock:
-        yield mock
-
-
-@pytest.fixture
-def s3_get():
-    with patch(
-        "backend.repos.document_body.DocumentBodyRepo.get_by_id",
-        return_value=mocked_up_text,
-    ):
-        yield
-
-
-@pytest.fixture
-def s3(s3_put, s3_get):
-    S3 = namedtuple("S3", "s3_put s3_get")
-    return S3(s3_put, s3_get)
