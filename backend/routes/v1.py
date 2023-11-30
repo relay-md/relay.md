@@ -8,19 +8,22 @@ from fastapi import APIRouter, Depends, Request, Security
 from fastapi.responses import PlainTextResponse
 from fastapi.security import APIKeyHeader
 
-from .. import exceptions
+from .. import __version__, exceptions
 from ..database import Session, get_session
 from ..models.document import Document
 from ..models.user import User
 from ..repos.access_token import AccessTokenRepo
 from ..repos.document import DocumentRepo
+from ..repos.document_access import DocumentAccessRepo
 from ..repos.document_body import DocumentBodyRepo
 from ..repos.team_topic import TeamTopicRepo
+from ..repos.user import UserRepo
 from ..schema import (
     DocumentFrontMatter,
     DocumentIdentifierResponse,
     DocumentResponse,
     Response,
+    VersionResponse,
 )
 
 router = APIRouter(prefix="/v1")
@@ -53,6 +56,44 @@ async def get_document(id: UUID, db: Session = Depends(get_session)) -> Document
     return document
 
 
+async def get_user_shared_document(
+    id: UUID,
+    db: Session = Depends(get_session),
+    user: User = Depends(authenticated_user),
+    document: Document = Depends(get_document),
+) -> Document:
+    # FIXME: here we need to check that the user is subscribed with the team
+    # that the document was shared with
+    if document.user_id != user.id:
+        raise exceptions.NotAllowed(
+            "Updating someone else document is not allowed currently!"
+        )
+    return document
+
+
+async def get_user_owned_document(
+    id: UUID,
+    db: Session = Depends(get_session),
+    user: User = Depends(authenticated_user),
+    document: Document = Depends(get_document),
+) -> Document:
+    if document.user_id != user.id:
+        raise exceptions.NotAllowed(
+            "Updating someone else document is not allowed currently!"
+        )
+    return document
+
+
+@router.get(
+    "/version",
+    tags=["v1"],
+    response_model=Response[VersionResponse],
+    response_model_exclude_unset=True,
+)
+async def version():
+    return dict(result=dict(version=__version__))
+
+
 @router.post(
     "/doc",
     tags=["v1"],
@@ -69,6 +110,7 @@ async def post_doc(
     team_topic_repo = TeamTopicRepo(db)
     document_repo = DocumentRepo(db)
     document_body_repo = DocumentBodyRepo()
+    user_repo = UserRepo(db)
 
     # Get body containing the raw markdown
     body = await request.body()
@@ -85,8 +127,15 @@ async def post_doc(
 
     # Parse relay_to as team_topics
     team_topics = list()
-    for team_topic in front.relay_to:
-        team_topics.append(team_topic_repo.from_string(team_topic))
+    users = list()
+    for to in front.relay_to:
+        if to.startswith("@"):
+            to_user = user_repo.get_by_kwargs(username=to[1:])
+            if not to_user:
+                raise exceptions.BadRequest(f"User {to} does not exist")
+            users.append(to_user)
+        else:
+            team_topics.append(team_topic_repo.from_string(to))
 
     # if the document already has an id, let's raise
     if front.relay_document:
@@ -95,8 +144,9 @@ async def post_doc(
         )
 
     # Store document in database
-    document = Document(user_id=user.id, filename=filename, team_topics=team_topics)
-    document_repo.create(document)
+    document = document_repo.create_from_kwargs(
+        user_id=user.id, filename=filename, team_topics=team_topics, users=users
+    )
 
     # Update document content in DocumentBodyRepo
     document_body_repo.create(document.id, body)
@@ -114,24 +164,26 @@ async def post_doc(
 )
 async def get_doc(
     request: Request,
-    document: Document = Depends(get_document),
+    document: Document = Depends(get_user_shared_document),
+    db: Session = Depends(get_session),
+    user: User = Depends(authenticated_user),
 ):
-    if document.is_private:
-        raise exceptions.NotAllowed("Access to this document is not allowed for you.")
     document_body_repo = DocumentBodyRepo()
+    document_access_repo = DocumentAccessRepo(db)
     body = document_body_repo.get_by_id(document.id)
 
     # Add document id to frontmatter
     front = frontmatter.loads(body)
     front["relay-document"] = str(document.id)
     body = frontmatter.dumps(front)
+    document_access_repo.create_from_kwargs(user_id=user.id, document_id=document.id)
 
     content_type = request.headers.get("content-type", "application/json")
     if content_type == "application/json":
         ret_document = DocumentResponse(
             relay_document=document.id,
             relay_filename=document.filename,
-            relay_to=[x.name for x in document.team_topics],
+            relay_to=document.shared_with,
             body=body,
         )
         return Response(result=ret_document).dict(by_alias=True)
@@ -139,9 +191,7 @@ async def get_doc(
         response = PlainTextResponse(body)
         response.headers["X-Relay-document"] = str(document.id)
         response.headers["X-Relay-filename"] = document.filename
-        response.headers["X-Relay-to"] = json.dumps(
-            [x.name for x in document.team_topics]
-        )
+        response.headers["X-Relay-to"] = json.dumps(document.shared_with)
         return response
     else:
         raise exceptions.BadRequest(f"Unsupported content-type: {content_type}")
@@ -151,25 +201,29 @@ async def get_doc(
 async def put_doc(
     request: Request,
     id: UUID,
-    user: User = Depends(authenticated_user),
-    document: Document = Depends(get_document),
+    document: Document = Depends(get_user_owned_document),
     db: Session = Depends(get_session),
 ):
     document_repo = DocumentRepo(db)
     team_topic_repo = TeamTopicRepo(db)
     document_body_repo = DocumentBodyRepo()
-    if document.user_id != user.id:
-        raise exceptions.NotAllowed(
-            "Updating someone else document is not allowed currently!"
-        )
+    user_repo = UserRepo(db)
     body = await request.body()
     front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
 
     # Parse relay_to as team_topics
+    # FIXME: duplicated code
     team_topics = list()
-    for team_topic in front.relay_to:
-        team_topics.append(team_topic_repo.from_string(team_topic))
-    document_repo.update(document, team_topics=team_topics)
+    users = list()
+    for to in front.relay_to:
+        if to.startswith("@"):
+            to_user = user_repo.get_by_kwargs(username=to[1:])
+            if not to_user:
+                raise exceptions.BadRequest(f"User {to} does not exist")
+            users.append(to_user)
+        else:
+            team_topics.append(team_topic_repo.from_string(to))
+    document_repo.update(document, team_topics=team_topics, users=users)
     # Update document content in DocumentBodyRepo
     document_body_repo.update(document.id, body)
     ret_document = DocumentResponse(
@@ -199,14 +253,16 @@ async def get_docs(
     if type == "mine":
         documents = document_repo.get_my_documents(user, page, size)
     else:
-        documents = document_repo.get_recent_documents_for_token(access_token, page, size)
+        documents = document_repo.get_recent_documents_for_token(
+            access_token, page, size
+        )
     ret = list()
     for document in documents:
         ret.append(
             DocumentIdentifierResponse(
                 id=document.id,
                 filename=document.filename,
-                to=document.team_topics,
+                to=document.shared_with,
             )
         )
     return dict(result=ret)

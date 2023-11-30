@@ -71,3 +71,7 @@ class DocumentIdentifierResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class VersionResponse(BaseModel):
+    version: str

@@ -11,7 +11,7 @@ from backend import models
 mocked_up_text = """---
 relay-filename: example.md
 relay-to:
-- mytopic@myteam
+- '@account2'
 ---
 
 Example text"""
@@ -45,7 +45,9 @@ def s3(patch_document_body_create, patch_document_body_get):
     yield
 
 
-def test_document_upload(account, auth_header, api_client, s3, dbsession):
+def test_document_upload(
+    account, other_account, auth_header, api_client, s3, dbsession
+):
     req = api_client.post("/v1/doc", headers=auth_header, data=mocked_up_text)
     assert req.ok, req.text
 
@@ -77,7 +79,7 @@ def test_document_upload(account, auth_header, api_client, s3, dbsession):
     ret = req.json()["result"]
     assert ret["body"] == new_body
     assert ret["relay-document"] == doc_id
-    assert ret["relay-to"] == ["mytopic@myteam"]
+    assert ret["relay-to"] == ["@account2"]
     assert ret["relay-filename"] == "example.md"
 
     req = api_client.get(
@@ -89,21 +91,21 @@ def test_document_upload(account, auth_header, api_client, s3, dbsession):
 relay-document: {doc_id}
 relay-filename: example.md
 relay-to:
-- mytopic@myteam
+- '@account2'
 ---
 """
     assert req.text.startswith(expected)
     assert req.headers.get("x-relay-filename") == "example.md"
     assert req.headers.get("x-relay-document") == doc_id
-    assert json.loads(req.headers.get("x-relay-to")) == ["mytopic@myteam"]
+    assert json.loads(req.headers.get("x-relay-to")) == ["@account2"]
 
 
-def test_document_perms(auth_header, api_client):
+def test_document_perms(auth_header, api_client, other_account):
     other_mocked_up_text = """---
 relay-document: 8b9a08b5-9fe1-46c3-9d9c-348a42e8bd3f
 relay-filename: example.md
 relay-to:
-- mytopic@myteam
+- '@account2'
 ---
 
 Example text
@@ -126,7 +128,7 @@ def test_document_put(
     original_doc = """---
 relay-filename: example.md
 relay-to:
- - mytopic@myteam
+- '@account2'
 ---
 
 Example text
