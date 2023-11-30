@@ -62,8 +62,7 @@ steps:
   - name: tags
     image: python:3.8
     commands:
-    #- echo "${DRONE_TAG},latest" > .tags
-    - echo "develop.${DRONE_BUILD_NUMBER},latest" > .tags
+      - echo "${DRONE_TAG},latest" > .tags
 
   - name: docker
     image: plugins/docker
@@ -101,8 +100,7 @@ steps:
         from_secret: NOMAD_TOKEN
       NOMAD_VAR_registry_auth:
         from_secret: NOMAD_VAR_registry_auth
-      # NOMAD_VAR_api_image_version: "${DRONE_TAG}"
-      NOMAD_VAR_api_image_version: "develop.${DRONE_BUILD_NUMBER}"
+      NOMAD_VAR_api_image_version: "${DRONE_TAG}"
     commands:
       - wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
       - nomad job run -ca-cert lets-encrypt-r3.pem -detach jobs/relaymd-backend.hcl
