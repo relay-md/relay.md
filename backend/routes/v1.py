@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import re
 import json
 from typing import List
 from uuid import UUID
