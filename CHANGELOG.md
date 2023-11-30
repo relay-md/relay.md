@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.0 (2023-11-30)
+### Feature
+* **put:** Allow to put an entire object ([`f6414ea`](https://github.com/knowledgemd/backend/commit/f6414ea87ba665b48d2a24c359de0cacb569036c))
+
+### Fix
+* Linting ([`c6151db`](https://github.com/knowledgemd/backend/commit/c6151dbd379481b5165e95fc968b850ec195d3d7))
+* Properly patch minio ([`3fa8392`](https://github.com/knowledgemd/backend/commit/3fa839285cc8c7e89b05e591436d905a4737d799))
+* Unittests now with relay-document ([`3d2bcd7`](https://github.com/knowledgemd/backend/commit/3d2bcd7a25d41bdf3426f88be0e84faf8e49cfc5))
+* Remove pricing section ([`77dfa85`](https://github.com/knowledgemd/backend/commit/77dfa8516d5f8ceff0807299d11b7bf4a2f07336))
+* More robust uploads, dd document-id ([`845e498`](https://github.com/knowledgemd/backend/commit/845e498086973f91aaaa42766778f2e181eab781))
+* Import issues when running api and web ([`84f4d98`](https://github.com/knowledgemd/backend/commit/84f4d9810eed075d1857fcc0f297ab1b90044fd8))
+
 ## v0.3.1 (2023-11-29)
 ### Fix
 * Deployment via nomad uses run instead of apply ([`99ece29`](https://github.com/knowledgemd/backend/commit/99ece296b122d9b62aad03ada3efe4a010013c51))
