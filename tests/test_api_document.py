@@ -7,11 +7,10 @@ import pytest
 mocked_up_text = """---
 relay-filename: example.md
 relay-to:
- - mytopic@myteam
+- mytopic@myteam
 ---
 
-Example text
-"""
+Example text"""
 
 
 @pytest.fixture
@@ -52,8 +51,18 @@ def test_document_upload(auth_header, api_client, s3):
     req = api_client.get(f"/v1/doc/{doc_id}", headers=auth_header)
     assert req.ok, req.text
 
+    # lets add the id to the doc
+    original_doc = mocked_up_text.split("\n")
+    new_body = "\n".join(
+        [
+            original_doc[0],
+            f"relay-document: {doc_id}",
+            *original_doc[1:]
+        ]
+    )
+
     ret = req.json()["result"]
-    assert ret["body"] == mocked_up_text
+    assert ret["body"] == new_body
     assert ret["relay-document"] == doc_id
     assert ret["relay-to"] == ["mytopic@myteam"]
     assert ret["relay-filename"] == "example.md"
@@ -63,15 +72,14 @@ def test_document_upload(auth_header, api_client, s3):
     )
     assert req.ok, req.text
 
-    assert req.text.startswith(
-        """---
+    expected = f"""---
+relay-document: {doc_id}
 relay-filename: example.md
 relay-to:
- - mytopic@myteam
+- mytopic@myteam
 ---
 """
-    )
-
+    assert req.text.startswith(expected)
     assert req.headers.get("x-relay-filename") == "example.md"
     assert req.headers.get("x-relay-document") == doc_id
     assert json.loads(req.headers.get("x-relay-to")) == ["mytopic@myteam"]
