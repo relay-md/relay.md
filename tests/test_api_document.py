@@ -54,11 +54,7 @@ def test_document_upload(auth_header, api_client, s3):
     # lets add the id to the doc
     original_doc = mocked_up_text.split("\n")
     new_body = "\n".join(
-        [
-            original_doc[0],
-            f"relay-document: {doc_id}",
-            *original_doc[1:]
-        ]
+        [original_doc[0], f"relay-document: {doc_id}", *original_doc[1:]]
     )
 
     ret = req.json()["result"]
@@ -104,7 +100,11 @@ Example text
 
 
 def test_document_put(
-    other_auth_header, auth_header, api_client, patch_document_body_update
+    other_auth_header,
+    auth_header,
+    api_client,
+    patch_document_body_update,
+    patch_document_body_create,
 ):
     original_doc = """---
 relay-filename: example.md
