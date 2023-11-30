@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, Request, Security
 from fastapi.responses import PlainTextResponse
 from fastapi.security import APIKeyHeader
 
-from .. import exceptions
+from .. import __version__, exceptions
 from ..database import Session, get_session
 from ..models.document import Document
 from ..models.user import User
@@ -23,6 +23,7 @@ from ..schema import (
     DocumentIdentifierResponse,
     DocumentResponse,
     Response,
+    VersionResponse,
 )
 
 router = APIRouter(prefix="/v1")
@@ -81,6 +82,16 @@ async def get_user_owned_document(
             "Updating someone else document is not allowed currently!"
         )
     return document
+
+
+@router.get(
+    "/version",
+    tags=["v1"],
+    response_model=Response[VersionResponse],
+    response_model_exclude_unset=True,
+)
+async def version():
+    return dict(result=dict(version=__version__))
 
 
 @router.post(
