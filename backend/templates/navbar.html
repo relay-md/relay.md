@@ -24,28 +24,28 @@
         </div>
 
         <div class="navbar-end">
-          {% if config.ENABLE_EARLY_ACCESS %}
+          {% if user %}
           <div class="navbar-item">
-            <a class="button is-danger" href="/#getearlyaccess">
+            <a class="button is-warning" href="/profile">
               <span class="icon">
-                <i class="fas fa-envelope"></i>
+                <i class="fas fa-user"></i>
               </span>
-              <span><strong>Get Early Access</strong></span>
+              <span><strong>{{ user.username }}</strong></span>
+            </a>
+          </div>
+          <div class="navbar-item">
+            <a class="button is-primary" href="/logout">
+              <i class="fas fa-sign-out"></i>
             </a>
           </div>
           {% else %}
-            {% if user %}
+            {% if config.ENABLE_EARLY_ACCESS %}
             <div class="navbar-item">
-              <a class="button is-warning" href="/profile">
+              <a class="button is-danger" href="/#getearlyaccess">
                 <span class="icon">
-                  <i class="fas fa-user"></i>
+                  <i class="fas fa-envelope"></i>
                 </span>
-                <span><strong>{{ user.username }}</strong></span>
-              </a>
-            </div>
-            <div class="navbar-item">
-              <a class="button is-primary" href="/logout">
-                <i class="fas fa-sign-out"></i>
+                <span><strong>Get Early Access</strong></span>
               </a>
             </div>
             {% else %}
