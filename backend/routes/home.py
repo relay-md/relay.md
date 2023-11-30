@@ -52,7 +52,7 @@ async def get_document(request: Request, id: str = Form(default="")):
 
 @router.get("/document/{id}")
 async def get_document_from_id(
-    request: Request, id: str, user: User = Depends(get_optional_user)
+    request: Request, id: str, user: User = Depends(get_optional_user), config: Settings = config
 ):
     id_uuid = UUID(id)
     access_token = request.session["access_token"]
