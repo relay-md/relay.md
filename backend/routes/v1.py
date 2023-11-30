@@ -193,12 +193,13 @@ async def get_docs(
     size: int = 50,
     user: User = Depends(authenticated_user),
     db: Session = Depends(get_session),
+    access_token: str = Security(get_access_token),
 ):
     document_repo = DocumentRepo(db)
     if type == "mine":
         documents = document_repo.get_my_documents(user, page, size)
     else:
-        documents = document_repo.get_recent_documents_for_me(user, page, size)
+        documents = document_repo.get_recent_documents_for_token(access_token, page, size)
     ret = list()
     for document in documents:
         ret.append(

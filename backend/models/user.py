@@ -27,6 +27,7 @@ class User(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     username: Mapped[str] = mapped_column(String(256))
     email: Mapped[str] = mapped_column(String(128), unique=True)
@@ -35,8 +36,6 @@ class User(Base):
     oauth_provider: OauthProvider = Column(
         Enum(OauthProvider), default=OauthProvider.GITHUB
     )
-
-    latest_document_datetime: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
 
 Index("user_oauth_index", User.username, User.oauth_provider)
