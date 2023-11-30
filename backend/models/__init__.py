@@ -3,6 +3,7 @@ from .access_token import AccessToken
 from .document import Document
 from .document_access import DocumentAccess
 from .document_team_topic import DocumentTeamTopic
+from .document_user import DocumentUser
 from .team import Team
 from .team_member import TeamMember
 from .team_topic import TeamTopic
@@ -19,4 +20,5 @@ __all__ = [
     DocumentTeamTopic.__name__,
     TeamMember.__name__,
     DocumentAccess.__name__,
+    DocumentUser.__name__,
 ]

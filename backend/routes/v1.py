@@ -17,6 +17,7 @@ from ..repos.document import DocumentRepo
 from ..repos.document_access import DocumentAccessRepo
 from ..repos.document_body import DocumentBodyRepo
 from ..repos.team_topic import TeamTopicRepo
+from ..repos.user import UserRepo
 from ..schema import (
     DocumentFrontMatter,
     DocumentIdentifierResponse,
@@ -98,6 +99,7 @@ async def post_doc(
     team_topic_repo = TeamTopicRepo(db)
     document_repo = DocumentRepo(db)
     document_body_repo = DocumentBodyRepo()
+    user_repo = UserRepo(db)
 
     # Get body containing the raw markdown
     body = await request.body()
@@ -114,8 +116,15 @@ async def post_doc(
 
     # Parse relay_to as team_topics
     team_topics = list()
-    for team_topic in front.relay_to:
-        team_topics.append(team_topic_repo.from_string(team_topic))
+    users = list()
+    for to in front.relay_to:
+        if to.startswith("@"):
+            to_user = user_repo.get_by_kwargs(username=to[1:])
+            if not to_user:
+                raise exceptions.BadRequest(f"User {to} does not exist")
+            users.append(to_user)
+        else:
+            team_topics.append(team_topic_repo.from_string(to))
 
     # if the document already has an id, let's raise
     if front.relay_document:
@@ -124,8 +133,9 @@ async def post_doc(
         )
 
     # Store document in database
-    document = Document(user_id=user.id, filename=filename, team_topics=team_topics)
-    document_repo.create(document)
+    document = document_repo.create_from_kwargs(
+        user_id=user.id, filename=filename, team_topics=team_topics, users=users
+    )
 
     # Update document content in DocumentBodyRepo
     document_body_repo.create(document.id, body)
@@ -162,7 +172,7 @@ async def get_doc(
         ret_document = DocumentResponse(
             relay_document=document.id,
             relay_filename=document.filename,
-            relay_to=[x.name for x in document.team_topics],
+            relay_to=document.shared_with,
             body=body,
         )
         return Response(result=ret_document).dict(by_alias=True)
@@ -170,9 +180,7 @@ async def get_doc(
         response = PlainTextResponse(body)
         response.headers["X-Relay-document"] = str(document.id)
         response.headers["X-Relay-filename"] = document.filename
-        response.headers["X-Relay-to"] = json.dumps(
-            [x.name for x in document.team_topics]
-        )
+        response.headers["X-Relay-to"] = json.dumps(document.shared_with)
         return response
     else:
         raise exceptions.BadRequest(f"Unsupported content-type: {content_type}")
@@ -188,14 +196,23 @@ async def put_doc(
     document_repo = DocumentRepo(db)
     team_topic_repo = TeamTopicRepo(db)
     document_body_repo = DocumentBodyRepo()
+    user_repo = UserRepo(db)
     body = await request.body()
     front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
 
     # Parse relay_to as team_topics
+    # FIXME: duplicated code
     team_topics = list()
-    for team_topic in front.relay_to:
-        team_topics.append(team_topic_repo.from_string(team_topic))
-    document_repo.update(document, team_topics=team_topics)
+    users = list()
+    for to in front.relay_to:
+        if to.startswith("@"):
+            to_user = user_repo.get_by_kwargs(username=to[1:])
+            if not to_user:
+                raise exceptions.BadRequest(f"User {to} does not exist")
+            users.append(to_user)
+        else:
+            team_topics.append(team_topic_repo.from_string(to))
+    document_repo.update(document, team_topics=team_topics, users=users)
     # Update document content in DocumentBodyRepo
     document_body_repo.update(document.id, body)
     ret_document = DocumentResponse(
@@ -234,7 +251,7 @@ async def get_docs(
             DocumentIdentifierResponse(
                 id=document.id,
                 filename=document.filename,
-                to=document.team_topics,
+                to=document.shared_with,
             )
         )
     return dict(result=ret)

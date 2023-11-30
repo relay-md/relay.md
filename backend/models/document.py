@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
 from .team_topic import TeamTopic
+from .user import User
 
 
 class Document(Base):
@@ -29,4 +30,11 @@ class Document(Base):
     team_topics: Mapped[List[TeamTopic]] = relationship(
         secondary="document_team_topics"
     )
+    users: Mapped[List[User]] = relationship(secondary="document_user")
     user: Mapped["User"] = relationship(backref="documents")  # noqa
+
+    @property
+    def shared_with(self):
+        return [x.name for x in self.team_topics] + [
+            f"@{x.username}" for x in self.users
+        ]
