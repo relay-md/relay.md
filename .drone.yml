@@ -45,12 +45,8 @@ type: docker
 name: build_and_deploy
 
 trigger:
-  branch:
-    - master
-    - develop
   event:
     - tag
-    - push
   status:
     # Only runs if the first pipeline was fully successful
     - success
