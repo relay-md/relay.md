@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.1 (2023-11-30)
+### Fix
+* Forcing release ([`761d5be`](https://github.com/knowledgemd/backend/commit/761d5be65e69d9deb5d8dd4cb5982aa27f6f4d43))
+
 ## v0.4.0 (2023-11-30)
 ### Feature
 * **put:** Allow to put an entire object ([`f6414ea`](https://github.com/knowledgemd/backend/commit/f6414ea87ba665b48d2a24c359de0cacb569036c))
