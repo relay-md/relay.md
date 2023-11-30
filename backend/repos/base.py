@@ -59,8 +59,8 @@ class DatabaseAbstractRepository(AbstractRepository):
     def get_by_kwargs(self, **kwargs) -> T:
         return self._db.scalar(select(self.ORM_Model).filter_by(**kwargs))
 
-    def list(self, key: str, value: T) -> List[T]:
-        return self._db.scalars(select(self.ORM_Model).filter_by(**{key: value}))
+    def list(self, **kwargs) -> List[T]:
+        return self._db.scalars(select(self.ORM_Model).filter_by(**kwargs))
 
     def update(self, item: T, **kwargs) -> T:
         for key, value in kwargs.items():

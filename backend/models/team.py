@@ -2,9 +2,10 @@
 """ DB Storage models
 """
 import uuid
+from datetime import datetime
 
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
 
@@ -19,5 +20,11 @@ class Team(Base):
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
     name: Mapped[str] = mapped_column(String(32))
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
-    # TODO: add an is_private flag
+    # Owner
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
+    is_private: Mapped[bool] = mapped_column(default=False)
+    allow_create_topics: Mapped[bool] = mapped_column(default=True)
+
+    user: Mapped["User"] = relationship()  # noqa

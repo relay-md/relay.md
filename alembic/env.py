@@ -3,10 +3,12 @@ from logging.config import fileConfig
 
 from alembic import context
 from backend import models
+from backend.config import config
 from backend.database import Base, engine
 
 # need this so autoflake doesn't remove our model
 assert models
+assert config
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

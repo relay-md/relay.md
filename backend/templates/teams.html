@@ -1,0 +1,21 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+<div class="column fluid">
+  <table class="table">
+    <thead>
+      <th>Name</th>
+      <th>Owner</th>
+      <th>Creation Date</th>
+    </thead>
+    <tbody>
+    {% for team in teams %}
+    <tr>
+      <td><tt>{{team.name}}</tt></td>
+      <td>{{team.user.username}}</td>
+      <td>{{team.created_at}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

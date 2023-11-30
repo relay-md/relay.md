@@ -122,11 +122,11 @@ def other_auth_header(other_access_token):
 
 
 @pytest.fixture(autouse=True)
-def default_team_topics(dbsession):
+def default_team_topics(dbsession, account):
     team_repo = repos.team.TeamRepo(dbsession)
     topic_repo = repos.topic.TopicRepo(dbsession)
     team_topic_repo = repos.team_topic.TeamTopicRepo(dbsession)
 
-    team = team_repo.create_from_kwargs(name="myteam")
+    team = team_repo.create_from_kwargs(name="myteam", user_id=account.id)
     topic = topic_repo.create_from_kwargs(name="mytopic")
     team_topic_repo.create_from_kwargs(team_id=team.id, topic_id=topic.id)

@@ -36,7 +36,7 @@ def dev():
         )
     )
     topic = models.Topic(name="templates")
-    team = models.Team(name="_")
+    team = models.Team(name="_", user_id=user.id)
     db.add(team)
     db.add(topic)
     db.commit()
