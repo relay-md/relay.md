@@ -2,6 +2,20 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.0 (2023-11-30)
+### Feature
+* How it works ([`509efec`](https://github.com/knowledgemd/backend/commit/509efeccaf49dda5c2744fd7c616468a0a5ec011))
+* Allow sharing docs with users ([`31c6711`](https://github.com/knowledgemd/backend/commit/31c6711ca507f62ed3d63e3d4c959345136e165e))
+* Initial work on permission scheme ([`aec0022`](https://github.com/knowledgemd/backend/commit/aec002201e734741c39c8e0078b587a9e0ad2141))
+
+### Fix
+* Log access to documents ([`dca3115`](https://github.com/knowledgemd/backend/commit/dca311553a329eaf554f0869be8dc23552b3937e))
+* Remove how it works from navbar ([`95fd349`](https://github.com/knowledgemd/backend/commit/95fd3497cae6f78de4b628e873cea9506454da4d))
+* Relay_to is now called relay-to ([`55ea950`](https://github.com/knowledgemd/backend/commit/55ea950904fe4c10c740aa9ceaf39c60d0a1e19b))
+* Viewer obtain documents from public api ([`1a25854`](https://github.com/knowledgemd/backend/commit/1a2585406a2ba20a56d9e9e0a6a42b1d45789e43))
+* When properly logged in, show profile link ([`94688be`](https://github.com/knowledgemd/backend/commit/94688bec6b6ea7883cb059e4f67e6f21ea7871ae))
+* Need config for navbar ([`4e30b5b`](https://github.com/knowledgemd/backend/commit/4e30b5b355b4867dbdf4dbdf59fff72e1c6de5c6))
+
 ## v0.4.1 (2023-11-30)
 ### Fix
 * Forcing release ([`761d5be`](https://github.com/knowledgemd/backend/commit/761d5be65e69d9deb5d8dd4cb5982aa27f6f4d43))
