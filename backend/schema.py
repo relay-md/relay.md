@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, List, Optional, TypeVar, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra, Field, validator
 from pydantic.generics import GenericModel
 
 DataT = TypeVar("DataT")
@@ -38,23 +38,22 @@ class TopicResponse(BaseModel):
         orm_mode = True
 
 
-class TeamTopicReponse(BaseModel):
-    # id: UUID
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
 class DocumentFrontMatter(BaseModel):
     relay_document: Optional[UUID] = Field(alias="relay-document")
-    relay_to: List[str] = Field(alias="relay-to")
+    relay_to: Union[str, List[str]] = Field(alias="relay-to")
     relay_filename: Optional[str] = Field(alias="relay-filename")
 
     class Config:
         orm_mode = True
         extra = Extra.allow
         allow_population_by_field_name = True
+
+    @validator("relay_to")
+    def ensure_list(cls, value: Union[str, List[str]]):
+        if not isinstance(value, list):
+            return [value]
+
+        return value
 
 
 class DocumentResponse(DocumentFrontMatter):
@@ -65,12 +64,16 @@ class DocumentResponse(DocumentFrontMatter):
 
 
 class DocumentIdentifierResponse(BaseModel):
-    id: UUID
-    filename: str
-    to: List[TeamTopicReponse]
+    """This schema is only used when listing all documents that need to be
+    fetched individually"""
+
+    relay_document: Optional[UUID] = Field(alias="relay-document")
+    relay_to: Union[str, List[str]] = Field(alias="relay-to")
+    relay_filename: Optional[str] = Field(alias="relay-filename")
 
     class Config:
         orm_mode = True
+        allow_population_by_field_name = True
 
 
 class VersionResponse(BaseModel):
