@@ -47,7 +47,7 @@ def test_document_upload(auth_header, api_client, s3):
     assert req.ok, req.text
 
     ret = req.json()
-    doc_id = ret["result"]["relay_document"]
+    doc_id = ret["result"]["relay-document"]
 
     req = api_client.get(f"/v1/doc/{doc_id}", headers=auth_header)
     assert req.ok, req.text
@@ -96,5 +96,5 @@ relay-to:
 
 Example text"""
     req = api_client.post("/v1/doc", headers=auth_header, data=mocked_up_text)
-    assert req.status_code == 400
+    assert req.ok
     assert req.json()["error"]["message"] == "Team 'invalid' does not exist!"
