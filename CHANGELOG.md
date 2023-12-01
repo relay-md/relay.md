@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.0 (2023-12-01)
+### Feature
+* Public docs and read-password ([`2d6c4c8`](https://github.com/knowledgemd/backend/commit/2d6c4c836742e2d4035521c59b24b8165e7ac2f3))
+* **web:** A site that explains how to install the plugin ([`4b0c2ba`](https://github.com/knowledgemd/backend/commit/4b0c2ba137a1d53cacae0ede97fd242bf3406651))
+
+### Fix
+* Reuse team.is_private instead of hardcoding _ ([`3c56020`](https://github.com/knowledgemd/backend/commit/3c56020d5c5e769f89b6b18aebfaee2fff9b636c))
+
 ## v0.5.0 (2023-11-30)
 ### Feature
 * How it works ([`509efec`](https://github.com/knowledgemd/backend/commit/509efeccaf49dda5c2744fd7c616468a0a5ec011))
