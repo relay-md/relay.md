@@ -32,3 +32,14 @@ async def profile(
     request: Request, user: User = Depends(get_optional_user), config: Settings = config
 ):
     return templates.TemplateResponse("profile.pug", context=dict(**locals()))
+
+
+@router.get(
+    "/plugin",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def plugin(
+    request: Request, user: User = Depends(get_optional_user), config: Settings = config
+):
+    return templates.TemplateResponse("plugin.pug", context=dict(**locals()))

@@ -3,9 +3,11 @@
     https://github.com/tiangolo/fastapi/issues/1667
 """
 
+import urllib
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
+from starlette.responses import RedirectResponse
 
 from .config import Settings, config
 from .repos.user import User
@@ -46,6 +48,14 @@ class Unauthorized(BaseAPIException):
 
     code = 10003
     status_code = status.HTTP_401_UNAUTHORIZED
+
+
+class LoginRequiredException(BaseAPIException):
+    """401"""
+
+    code = 10003
+    status_code = status.HTTP_401_UNAUTHORIZED
+    next_url = None
 
 
 async def handle_exception(request: Request, exc: BaseAPIException):
@@ -103,6 +113,19 @@ async def web_handle_exception(
     return templates.TemplateResponse("exception.html", context=dict(**locals()))
 
 
+async def redirect_to_login(
+    request: Request,
+    exc: Exception,
+    user: User = Depends(get_optional_user),
+    config: Settings = config,
+):
+    url = request.url_for("login")
+    parsed = list(urllib.parse.urlparse(url))
+    parsed[4] = urllib.parse.urlencode(dict(next=exc.next_url))
+    url = urllib.parse.urlunparse(parsed)
+    return RedirectResponse(url=url)
+
+
 def include_app(app):
     app.add_exception_handler(BaseAPIException, handle_exception)
     app.add_exception_handler(HTTPException, handle_http_exception)
@@ -111,4 +134,5 @@ def include_app(app):
 
 def include_app_web(app):
     # FIXME: need to deal with making nicer
+    app.add_exception_handler(LoginRequiredException, redirect_to_login)
     app.add_exception_handler(Exception, web_handle_exception)

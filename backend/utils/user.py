@@ -15,3 +15,16 @@ def get_optional_user(
         return
     # Returns non in case the user-is invalid
     return UserRepo(db).get_by_id(user_id)
+
+
+def require_user(
+    request: Request, db: Session = Depends(get_session)
+) -> Optional[User]:
+    user_id = request.session.get("user_id")
+    if not user_id:
+        # circular dependency here
+        from ..exceptions import LoginRequiredException
+
+        raise LoginRequiredException()
+    # Returns non in case the user-is invalid
+    return UserRepo(db).get_by_id(user_id)

@@ -68,6 +68,9 @@ def test_document_upload(account, auth_header, api_client, s3, dbsession):
         )
     )
 
+    document = dbsession.scalar(select(models.Document).filter_by(id=UUID(doc_id)))
+    assert not document.is_public
+
     # lets add the id to the doc
     original_doc = mocked_up_text.split("\n")
     new_body = "\n".join(
