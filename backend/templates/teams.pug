@@ -1,0 +1,55 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5.mb-5
+ .columns
+  .column.is-8.is-offset-2
+   h1.title.is-1 Team Overview
+   table.table.is-fullwidth
+    thead
+     th Name
+     th Owner
+     th Creation Date
+     th Public
+     th Open Topics
+     // th Controls
+    tbody
+     {% for team in teams %}
+     tr
+      td
+       tt {{team.name}}
+      td {{team.user.username}}
+      td {{team.created_at}}
+      td
+       {% if not team.is_private %}
+       span.icon
+        i.fas.fa-check
+       {% else %}
+       span.icon
+        i.fas.fa-times
+       {% endif %}
+      td
+       {% if not team.allow_create_topics %}
+       span.icon
+        i.fas.fa-check
+       {% else %}
+       span.icon
+        i.fas.fa-times
+       {% endif %}
+      // td
+      //  .field.has-addons
+      //   {% if not team.is_private %}
+      //   p.control
+      //     button.button
+      //       span.icon.is-small
+      //         i.fas.fa-signature
+      //       span Subscribe
+      //   {% endif %}
+      //   {% if user and team.user_id == user.id %}
+      //   p.control
+      //     button.button
+      //       span.icon.is-small
+      //         i.fas.fa-edit
+      //   {% endif %}
+
+     {% endfor %}
+{% endblock %}
