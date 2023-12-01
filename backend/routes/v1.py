@@ -101,7 +101,7 @@ async def version():
     tags=["v1"],
     response_model=Response[DocumentResponse],
     response_model_exclude_unset=True,
-    response_model_by_alias=False,
+    response_model_by_alias=True,
 )
 async def post_doc(
     request: Request,
@@ -118,7 +118,8 @@ async def post_doc(
     body = await request.body()
 
     # Parse frontmatter
-    front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
+    front = frontmatter.loads(body.decode("utf-8"))
+    front = DocumentFrontMatter(**front)
 
     if not filename and not front.relay_filename:
         raise exceptions.BadRequest("Missing filename or relay-filename property!")
@@ -253,6 +254,7 @@ async def put_doc(
     tags=["v1"],
     response_model=Response[List[DocumentIdentifierResponse]],
     response_model_exclude_unset=True,
+    response_model_by_alias=True,
 )
 async def get_docs(
     type: str = "all",
@@ -273,9 +275,9 @@ async def get_docs(
     for document in documents:
         ret.append(
             DocumentIdentifierResponse(
-                id=document.id,
-                filename=document.filename,
-                to=document.shared_with,
+                relay_document=document.id,
+                relay_filename=document.filename,
+                relay_to=document.shared_with,
             )
         )
     return dict(result=ret)
