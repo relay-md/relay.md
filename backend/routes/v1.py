@@ -139,9 +139,12 @@ async def post_doc(
             users.append(to_user)
         else:
             topic, team = to.split("@")
-            if team == "_":
+            team_topic = team_topic_repo.from_string(to)
+            # WARNING: If any of the targets is non-private, the entire document
+            # becomes public!
+            if not team_topic.team.is_private:
                 is_public = True
-            team_topics.append(team_topic_repo.from_string(to))
+            team_topics.append(team_topic)
 
     # if the document already has an id, let's raise
     if front.relay_document:

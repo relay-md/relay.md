@@ -128,9 +128,11 @@ def default_team_topics(dbsession, account):
     team_topic_repo = repos.team_topic.TeamTopicRepo(dbsession)
 
     team = team_repo.create_from_kwargs(
-        name="_", user_id=account.id, allow_create_topics=True
+        name="_", user_id=account.id, allow_create_topics=True, is_private=False
     )
 
-    team = team_repo.create_from_kwargs(name="myteam", user_id=account.id)
+    team = team_repo.create_from_kwargs(
+        name="myteam", user_id=account.id, is_private=True
+    )
     topic = topic_repo.create_from_kwargs(name="mytopic")
     team_topic_repo.create_from_kwargs(team_id=team.id, topic_id=topic.id)
