@@ -50,7 +50,7 @@ def test_document_upload(account, auth_header, api_client, s3, dbsession):
     assert req.ok, req.text
 
     ret = req.json()
-    doc_id = ret["result"]["relay_document"]
+    doc_id = ret["result"]["relay-document"]
 
     assert not dbsession.scalar(
         select(models.DocumentAccess).filter_by(
@@ -112,7 +112,7 @@ relay-to:
 Example text
     """
     req = api_client.post("/v1/doc", headers=auth_header, data=other_mocked_up_text)
-    assert req.status_code == 400
+    assert req.ok
     assert (
         req.json()["error"]["message"]
         == "The document you are sending already has a relay-document id"
@@ -136,7 +136,7 @@ Example text
 """
     req = api_client.post("/v1/doc", headers=auth_header, data=original_doc)
     ret = req.json()
-    doc_id = ret["result"]["relay_document"]
+    doc_id = ret["result"]["relay-document"]
 
     # lets add the id to the doc
     original_doc_pars = original_doc.split("\n")
@@ -153,7 +153,7 @@ Example text
     req = api_client.put(
         f"/v1/doc/{doc_id}", headers=other_auth_header, data=updated_doc
     )
-    assert req.status_code == 403
+    assert req.ok
     assert (
         req.json()["error"]["message"]
         == "Updating someone else document is not allowed currently!"

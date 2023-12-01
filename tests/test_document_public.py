@@ -44,7 +44,7 @@ def test_document_upload(
     assert req.ok, req.text
 
     ret = req.json()
-    doc_id = ret["result"]["relay_document"]
+    doc_id = ret["result"]["relay-document"]
 
     document = dbsession.scalar(select(models.Document).filter_by(id=UUID(doc_id)))
     assert document.is_public
