@@ -15,43 +15,7 @@
   <body>
     {% include "navbar.html" %}
     {% block content %}{% endblock %}
-    <footer class="footer">
-      <div class="container">
-        <div class="columns">
-          <div class="column is-4">
-            <div class="block">
-              <a href="/">
-                <img src="{{ url_for('static', path="img/logo-navbar.svg") }}" width=64>
-              </a>
-              <div class="title is-5">Relay.md</div>
-              <div class="sub-title is-3">Markdown workflows for teams</div>
-            </div>
-            <div class="block">
-              <span class="icon">
-                <a target="_blank" href="https://github.com/relay-md/relay.md"><i class="fab fa-github"></i></a>
-              </span> &emsp;
-              <span class="icon">
-                <a target="_blank" href="mailto:fabian@relay.md"><i class="fas fa-envelope"></i></a>
-              </span>
-            </div>
-            <div class="block">
-              <small style="color: var(--textLight)">
-                &copy; ChainSquad GmbH
-              </small>
-            </div>
-          </div>
-          <div class="column is-4">
-            <div class="title is-5">Product</div>
-            <a class="navbar-item p-0" href="/#features">
-              Features
-            </a>
-            <a class="navbar-item p-0" href="/#howitworks">
-              How it works
-            </a>
-          </div>
-          <div class="column is-4">
-          </div>
-    </footer>
+    {% include "footer.html" %}
   </body>
   <script src="{{ url_for('static', path="js/script.js") }}"></script>
   <script src="https://unpkg.com/htmx.org@1.9.6"></script>
