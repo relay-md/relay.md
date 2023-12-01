@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.1 (2023-12-01)
+### Fix
+* Unittests need to compliy with new status codes ([`3c49ec8`](https://github.com/knowledgemd/backend/commit/3c49ec880b19afd41024c20ff5fe6aaf589ced1e))
+* Improve error handling ([`1c6e73b`](https://github.com/knowledgemd/backend/commit/1c6e73bd692bf6421e99c620c47711125c690f8a))
+
 ## v0.6.0 (2023-12-01)
 ### Feature
 * Public docs and read-password ([`2d6c4c8`](https://github.com/knowledgemd/backend/commit/2d6c4c836742e2d4035521c59b24b8165e7ac2f3))
