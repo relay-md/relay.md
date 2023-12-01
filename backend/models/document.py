@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import CHAR, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -32,6 +32,14 @@ class Document(Base):
     )
     users: Mapped[List[User]] = relationship(secondary="document_user")
     user: Mapped["User"] = relationship(backref="documents")  # noqa
+
+    # if this is set, the document can be viewed online by anyone on the web
+    # viewer, this will be automatically set when uploading a document. For
+    # instance, when sending a doc to the `_` team.
+    is_public: Mapped[bool] = mapped_column(default=False)
+
+    # 128bit password hash, as bytes TODO: needs implementation
+    read_password_hash: Mapped[bytes] = mapped_column(CHAR(32), default=b"")
 
     @property
     def shared_with(self):

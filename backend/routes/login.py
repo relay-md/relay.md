@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from typing import Optional
+
 from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, Depends, Request
 from starlette.responses import RedirectResponse
@@ -31,12 +33,19 @@ async def logout(request: Request):
 
 
 @router.get("/register")
-async def register(request: Request):
+async def register(request: Request, next: Optional[str] = ""):
+    return RedirectResponse(url="/login/github")
+
+
+# TODO: Deal with the next-url item below, maybe build a stack of urls to visit
+# in a session like in previous projects
+@router.get("/login")
+async def login(request: Request, next: Optional[str] = ""):
     return RedirectResponse(url="/login/github")
 
 
 @router.get("/login/github")
-async def login(request: Request):
+async def login_github(request: Request, next: Optional[str] = ""):
     redirect_uri = request.url_for("auth")
     return await oauth.github.authorize_redirect(request, redirect_uri)
 

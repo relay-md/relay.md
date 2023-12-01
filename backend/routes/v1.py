@@ -64,6 +64,8 @@ async def get_user_shared_document(
 ) -> Document:
     # FIXME: here we need to check that the user is subscribed with the team
     # that the document was shared with
+    if document.is_public:
+        return document
     if document.user_id != user.id:
         raise exceptions.NotAllowed(
             "Updating someone else document is not allowed currently!"
@@ -128,6 +130,7 @@ async def post_doc(
     # Parse relay_to as team_topics
     team_topics = list()
     users = list()
+    is_public = False
     for to in front.relay_to:
         if to.startswith("@"):
             to_user = user_repo.get_by_kwargs(username=to[1:])
@@ -135,6 +138,9 @@ async def post_doc(
                 raise exceptions.BadRequest(f"User {to} does not exist")
             users.append(to_user)
         else:
+            topic, team = to.split("@")
+            if team == "_":
+                is_public = True
             team_topics.append(team_topic_repo.from_string(to))
 
     # if the document already has an id, let's raise
@@ -145,7 +151,11 @@ async def post_doc(
 
     # Store document in database
     document = document_repo.create_from_kwargs(
-        user_id=user.id, filename=filename, team_topics=team_topics, users=users
+        user_id=user.id,
+        filename=filename,
+        team_topics=team_topics,
+        users=users,
+        is_public=is_public,
     )
 
     # Update document content in DocumentBodyRepo
