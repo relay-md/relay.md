@@ -123,7 +123,9 @@ async def post_doc(
 
     if not filename and not front.relay_filename:
         raise exceptions.BadRequest("Missing filename or relay-filename property!")
-    elif not filename and front.relay_filename:
+
+    # priority of frontmatter filename over query string
+    if front.relay_filename:
         filename = front.relay_filename
     if "/" in filename or "\\" in filename:
         raise exceptions.BadRequest("Filenames must not contain slash or backslash")

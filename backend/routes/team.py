@@ -17,4 +17,4 @@ async def get_teams(
 ):
     team_repo = TeamRepo(db)
     teams = team_repo.list(is_private=False)
-    return templates.TemplateResponse("teams.html", context=dict(**locals()))
+    return templates.TemplateResponse("teams.pug", context=dict(**locals()))

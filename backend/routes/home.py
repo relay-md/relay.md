@@ -35,11 +35,22 @@ async def profile(
 
 
 @router.get(
-    "/plugin",
+    "/documentation/plugins/obsidian",
     response_class=HTMLResponse,
     tags=["web"],
 )
-async def plugin(
+async def obsidian_plugin(
     request: Request, user: User = Depends(get_optional_user), config: Settings = config
 ):
     return templates.TemplateResponse("plugin.pug", context=dict(**locals()))
+
+
+@router.get(
+    "/documentation/relay/basics",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def relay_basics(
+    request: Request, user: User = Depends(get_optional_user), config: Settings = config
+):
+    return templates.TemplateResponse("howto-relay.pug", context=dict(**locals()))

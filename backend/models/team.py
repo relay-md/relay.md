@@ -20,6 +20,8 @@ class Team(Base):
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
     name: Mapped[str] = mapped_column(String(32))
+    # TODO: add a description to teams for the overview
+    # description: Mapped[str] = mapped_column(Text())
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     # Owner

@@ -51,6 +51,10 @@ class LoginRequiredException(BaseAPIException):
     code = status.HTTP_401_UNAUTHORIZED
     next_url = None
 
+    def __init__(self, *args, next_url=None, **kwargs):
+        super().__init__(*args, *kwargs)
+        self.next_url = next_url
+
 
 async def handle_exception(request: Request, exc: BaseAPIException):
     """Our internal exceptions are handled here"""
@@ -103,9 +107,10 @@ async def redirect_to_login(
     config: Settings = config,
 ):
     url = request.url_for("login")
-    parsed = list(urllib.parse.urlparse(url))
-    parsed[4] = urllib.parse.urlencode(dict(next=exc.next_url))
-    url = urllib.parse.urlunparse(parsed)
+    if exc.next_url:
+        parsed = list(urllib.parse.urlparse(url))
+        parsed[4] = urllib.parse.urlencode(dict(next=exc.next_url))
+        url = urllib.parse.urlunparse(parsed)
     return RedirectResponse(url=url)
 
 

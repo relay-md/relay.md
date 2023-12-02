@@ -25,6 +25,6 @@ def require_user(
         # circular dependency here
         from ..exceptions import LoginRequiredException
 
-        raise LoginRequiredException()
+        raise LoginRequiredException(next_url=request.url)
     # Returns non in case the user-is invalid
     return UserRepo(db).get_by_id(user_id)

@@ -1,0 +1,59 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5
+ .columns
+  .column.is-8.is-offset-2
+   h1.title.is-1 How to use Relay.md
+   p.subtitle This site explains some of the basic functionalities of relay.md
+
+   .card.block
+    .card-header
+     .card-header-title Relay Targets / Recipients of Notes
+    .card-content
+     p.block Using relay.md, a lot of options exist to share information with firends, family, co-workers, clans and teams.
+     p.block We distinguish between targeting individual users (e.g. their
+      span.icon-text
+        span.icon
+          i.fab.fa-github
+      tt.tag.is-dark.is-small @accountname
+      | ), or a &nbsp;
+      tt.tag.is-dark.is-small topic@team
+      | &nbsp; identifier.
+     p.has-text-centered.block
+      a.button.is-info.is-medium.is-rounded(href="{{url_for('get_teams')}}") Teams Overview
+     p.block Labels on the other hand can be created at will for most teams. The owner of a team has a choice to disable creation of labels by anyone other than the owner.
+
+   .card.block
+    .card-header
+     .card-header-title Frontmatter Attributes
+    .card-content
+     p.block
+      | Relay.md makes heavy use of Markdown's frontmatter to communicate parameters and options. The existing options are:
+     .list.block
+      .list-item
+       .list-item-content
+        .list-item-header
+         tt.tag.is-dark.is-medium relay-to
+         | &nbsp;
+         span.has-text-weight-light string | List[string]
+        .list-item-description This list defines the recipients of your note. You can define many recipients and used
+         tt.tag.is-dark @account
+         | &nbsp; or &nbsp;
+         tt.tag.is-dark topic@team
+         | &nbsp; syntax freely.
+      .list-item
+       .list-item-content
+        .list-item-header
+         tt.tag.is-dark.is-medium relay-filename
+         | &nbsp;
+         span.has-text-weight-light string
+        .list-item-description The filename that should be used instead of the actual filename. This allows to define which name should be used when the file is created in the recipients Vault.
+      .list-item
+       .list-item-content
+        .list-item-header
+         tt.tag.is-dark.is-medium relay-document
+         | &nbsp;
+         span.has-text-weight-light string
+        .list-item-description This serves as an internal tracker of the document so we can find them in the vault. If changed, or removed, the files detach from relay.md.
+
+{% endblock %}
