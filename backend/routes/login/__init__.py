@@ -2,8 +2,10 @@
 from typing import Optional
 
 from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from starlette.responses import RedirectResponse
+
+from ...utils.user import User, require_user
 
 router = APIRouter(prefix="")
 oauth = OAuth()
@@ -27,3 +29,13 @@ async def register(request: Request, next: Optional[str] = ""):
 @router.get("/login")
 async def login(request: Request, next: Optional[str] = ""):
     return RedirectResponse(url="/login/github")
+
+
+@router.get("/configure/obsidian")
+async def configure_obsidian(
+    request: Request, next: Optional[str] = "", user: User = Depends(require_user)
+):
+    access_token = request.session["access_token"]
+    return RedirectResponse(
+        url=f"obsidian://relay.md:access-token?token={access_token}"
+    )
