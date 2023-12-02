@@ -9,6 +9,7 @@ from ...database import Session, get_session
 from ...models.user import OauthProvider
 from ...repos.access_token import AccessTokenRepo
 from ...repos.user import UserRepo
+from ...utils.url import get_next_url
 from . import oauth
 
 router = APIRouter(prefix="/login/github")
@@ -53,4 +54,4 @@ async def auth(request: Request, db: Session = Depends(get_session)):
     if github_user:
         request.session["user_id"] = str(user.id)
         request.session["access_token"] = str(access_token.token)
-    return RedirectResponse(url="/")
+    return RedirectResponse(url=get_next_url(request) or "/")
