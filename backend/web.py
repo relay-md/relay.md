@@ -3,6 +3,7 @@ import os
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.sessions import SessionMiddleware
 
 from . import exceptions
@@ -37,6 +38,7 @@ app.include_router(team.router)
 #  * from authlib.integrations.starlette_client import  OAuthError
 #
 exceptions.include_app_web(app)
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/health")
