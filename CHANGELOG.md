@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.9.0 (2023-12-02)
+### Feature
+* Include prometheus exporter ([`e7ba269`](https://github.com/knowledgemd/backend/commit/e7ba269201657d1943652b25c0ca8e8d727add06))
+
 ## v0.8.0 (2023-12-02)
 ### Feature
 * **hijs:** Code highlighting in viewer ([`f855b9b`](https://github.com/knowledgemd/backend/commit/f855b9b6463b301d93623bc433bc3b9d301df6eb))
