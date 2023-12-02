@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.7.0 (2023-12-02)
+### Feature
+* Deal with redirects during auth/login/register etc ([`96f2aa1`](https://github.com/knowledgemd/backend/commit/96f2aa13ad7d564e1606c899367ef3f1f0b7733d))
+* Allow to configure obsidian with a single click ([`9d1f15f`](https://github.com/knowledgemd/backend/commit/9d1f15fd2ca48bde05fa98f9c5c831a113f294eb))
+* Explain attributes, list teams ([`d7caa2b`](https://github.com/knowledgemd/backend/commit/d7caa2be4a165f9b812f390a9a6b54446f3eeba3))
+
+### Fix
+* Give frontmatter filename priority over query string ([`cb9b734`](https://github.com/knowledgemd/backend/commit/cb9b734320cc7af26b73f046e40d3f0553fb5c5b))
+
 ## v0.6.1 (2023-12-01)
 ### Fix
 * Unittests need to compliy with new status codes ([`3c49ec8`](https://github.com/knowledgemd/backend/commit/3c49ec880b19afd41024c20ff5fe6aaf589ced1e))
