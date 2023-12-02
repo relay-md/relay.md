@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.0 (2023-12-02)
+### Feature
+* **hijs:** Code highlighting in viewer ([`f855b9b`](https://github.com/knowledgemd/backend/commit/f855b9b6463b301d93623bc433bc3b9d301df6eb))
+* Allow to read public docs without api-key ([`0d721ef`](https://github.com/knowledgemd/backend/commit/0d721ef28b257b55c15c7d637e0a4b277b103433))
+
 ## v0.7.0 (2023-12-02)
 ### Feature
 * Deal with redirects during auth/login/register etc ([`96f2aa1`](https://github.com/knowledgemd/backend/commit/96f2aa13ad7d564e1606c899367ef3f1f0b7733d))
