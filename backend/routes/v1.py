@@ -47,6 +47,7 @@ async def get_access_token(
 async def get_optional_access_token(
     api_key_header: str = Security(api_key_header), db: Session = Depends(get_session)
 ) -> str:
+    """This still requires that the X-API-key is defined in the header"""
     try:
         api_key_uuid = UUID(api_key_header)
         access_token_repo = AccessTokenRepo(db)
@@ -218,7 +219,10 @@ async def get_doc(
     front = frontmatter.loads(body)
     front["relay-document"] = str(document.id)
     body = frontmatter.dumps(front)
-    document_access_repo.create_from_kwargs(user_id=user.id, document_id=document.id)
+    if user:
+        document_access_repo.create_from_kwargs(
+            user_id=user.id, document_id=document.id
+        )
 
     content_type = request.headers.get("content-type", "application/json")
     if content_type == "application/json":
