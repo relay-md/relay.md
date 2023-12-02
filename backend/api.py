@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.cors import CORSMiddleware
 
 from . import exceptions
@@ -22,11 +23,10 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["Content-Range"],
 )
+exceptions.include_app(app)
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/health")
 def health():
     return "ok"
-
-
-exceptions.include_app(app)
