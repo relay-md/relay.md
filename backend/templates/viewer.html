@@ -38,6 +38,11 @@
     if (!response.ok) {
       throw new Error(response.statusText);
     }
+
+    if (response.headers.get("content-type") == "application/json") {
+      res = await response.json();
+      throw Error(res.error.message);
+    }
     return await response.text();
   }
   get_document("{{id}}")
