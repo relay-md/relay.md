@@ -9,6 +9,7 @@ from . import exceptions
 from .config import config
 from .database import Base, engine
 from .routes import document, home, login, subscribe, team
+from .routes.login import github
 
 # Create all tables
 Base.metadata.create_all(engine)
@@ -26,6 +27,7 @@ app.mount(
 
 app.include_router(home.router)
 app.include_router(login.router)
+app.include_router(github.router)
 app.include_router(subscribe.router)
 app.include_router(document.router)
 app.include_router(team.router)

@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 from typing import Optional
 
-from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, Depends, Request
 from starlette.responses import RedirectResponse
 
-from ..config import config
-from ..database import Session, get_session
-from ..models.user import OauthProvider
-from ..repos.access_token import AccessTokenRepo
-from ..repos.user import UserRepo
+from ...config import config
+from ...database import Session, get_session
+from ...models.user import OauthProvider
+from ...repos.access_token import AccessTokenRepo
+from ...repos.user import UserRepo
+from . import oauth
 
-router = APIRouter(prefix="")
-oauth = OAuth()
+router = APIRouter(prefix="/login/github")
 oauth.register(
     name="github",
     client_id=config.GITHUB_CLIENT_ID,
@@ -24,33 +23,13 @@ oauth.register(
 )
 
 
-@router.get("/logout")
-async def logout(request: Request):
-    request.session.pop("user", None)
-    request.session.pop("user_id", None)
-    request.session.pop("access_token", None)
-    return RedirectResponse(url="/")
-
-
-@router.get("/register")
-async def register(request: Request, next: Optional[str] = ""):
-    return RedirectResponse(url="/login/github")
-
-
-# TODO: Deal with the next-url item below, maybe build a stack of urls to visit
-# in a session like in previous projects
-@router.get("/login")
-async def login(request: Request, next: Optional[str] = ""):
-    return RedirectResponse(url="/login/github")
-
-
-@router.get("/login/github")
+@router.get("")
 async def login_github(request: Request, next: Optional[str] = ""):
     redirect_uri = request.url_for("auth")
     return await oauth.github.authorize_redirect(request, redirect_uri)
 
 
-@router.get("/login/github/auth")
+@router.get("/auth")
 async def auth(request: Request, db: Session = Depends(get_session)):
     token = await oauth.github.authorize_access_token(request)
     resp = await oauth.github.get("user", token=token)
