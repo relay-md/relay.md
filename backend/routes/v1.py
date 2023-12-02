@@ -44,8 +44,35 @@ async def get_access_token(
     raise exceptions.Unauthorized("Invalid or missing API Key")
 
 
-async def authenticated_user(access_token: str = Security(get_access_token)):
+async def get_optional_access_token(
+    api_key_header: str = Security(api_key_header), db: Session = Depends(get_session)
+) -> str:
+    """This still requires that the X-API-key is defined in the header"""
+    try:
+        api_key_uuid = UUID(api_key_header)
+        access_token_repo = AccessTokenRepo(db)
+        access_token = access_token_repo.get_by_id(api_key_uuid)
+        if access_token:
+            return access_token
+    except Exception:
+        pass
+    # We need this optional autentication to be able to share documents
+    # without requiring a login
+    return
+
+
+async def require_authenticated_user(access_token: str = Security(get_access_token)):
     return access_token.user
+
+
+async def optional_authenticated_user(
+    access_token: str = Security(get_optional_access_token),
+):
+    """We need this optional autentication to be able to share documents
+    without requiring a login
+    """
+    if access_token:
+        return access_token.user
 
 
 async def get_document(id: UUID, db: Session = Depends(get_session)) -> Document:
@@ -59,14 +86,14 @@ async def get_document(id: UUID, db: Session = Depends(get_session)) -> Document
 async def get_user_shared_document(
     id: UUID,
     db: Session = Depends(get_session),
-    user: User = Depends(authenticated_user),
+    user: User = Depends(optional_authenticated_user),
     document: Document = Depends(get_document),
 ) -> Document:
     # FIXME: here we need to check that the user is subscribed with the team
     # that the document was shared with
     if document.is_public:
         return document
-    if document.user_id != user.id:
+    if not user or document.user_id != user.id:
         raise exceptions.NotAllowed(
             "Updating someone else document is not allowed currently!"
         )
@@ -76,7 +103,7 @@ async def get_user_shared_document(
 async def get_user_owned_document(
     id: UUID,
     db: Session = Depends(get_session),
-    user: User = Depends(authenticated_user),
+    user: User = Depends(require_authenticated_user),
     document: Document = Depends(get_document),
 ) -> Document:
     if document.user_id != user.id:
@@ -106,7 +133,7 @@ async def version():
 async def post_doc(
     request: Request,
     filename: str = "",
-    user: User = Depends(authenticated_user),
+    user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
 ):
     team_topic_repo = TeamTopicRepo(db)
@@ -182,7 +209,7 @@ async def get_doc(
     request: Request,
     document: Document = Depends(get_user_shared_document),
     db: Session = Depends(get_session),
-    user: User = Depends(authenticated_user),
+    user: User = Depends(optional_authenticated_user),
 ):
     document_body_repo = DocumentBodyRepo()
     document_access_repo = DocumentAccessRepo(db)
@@ -192,7 +219,10 @@ async def get_doc(
     front = frontmatter.loads(body)
     front["relay-document"] = str(document.id)
     body = frontmatter.dumps(front)
-    document_access_repo.create_from_kwargs(user_id=user.id, document_id=document.id)
+    if user:
+        document_access_repo.create_from_kwargs(
+            user_id=user.id, document_id=document.id
+        )
 
     content_type = request.headers.get("content-type", "application/json")
     if content_type == "application/json":
@@ -262,7 +292,7 @@ async def get_docs(
     type: str = "all",
     page: int = 0,
     size: int = 50,
-    user: User = Depends(authenticated_user),
+    user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
     access_token: str = Security(get_access_token),
 ):

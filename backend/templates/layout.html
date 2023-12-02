@@ -6,12 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>relay.md - simple, efficient communication using markdown</title>
     <link href="https://fonts.googleapis.com/css2?family=Lato:400,700" rel="stylesheet">
-    <link href=" https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css " rel="stylesheet">
-    <link href=" https://cdn.jsdelivr.net/npm/bulma-pricingtable@0.2.0/dist/css/bulma-pricingtable.min.css " rel="stylesheet">
-    <link href=" https://cdn.jsdelivr.net/npm/bulma-list@1.2.0/css/bulma-list.min.css " rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bulma-pricingtable@0.2.0/dist/css/bulma-pricingtable.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bulma-list@1.2.0/css/bulma-list.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/default.min.css" rel="stylesheet">
     <link href="{{ url_for('static', path="css/style.css") }}" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
   </head>
   <body>
     {% include "navbar.html" %}
@@ -21,5 +20,15 @@
   <script src="{{ url_for('static', path="js/script.js") }}"></script>
   <script src="https://unpkg.com/htmx.org@1.9.6"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
-  {% block javascript %}{% endblock %}
+  <script src="https://kit.fontawesome.com/15181efa86.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/go.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/javascript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js"></script>
+  <link href=" https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css " rel="stylesheet">
+  {% block javascript %}
+    hljs.highlightAll();
+  {% endblock %}
 </html>

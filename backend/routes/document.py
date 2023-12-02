@@ -8,7 +8,7 @@ from starlette.responses import RedirectResponse
 from ..config import Settings, config
 from ..repos.user import User
 from ..templates import templates
-from ..utils.user import require_user
+from ..utils.user import get_optional_user
 
 router = APIRouter(prefix="")
 
@@ -32,9 +32,11 @@ async def get_document(request: Request, id: str = Form(default="")):
 async def get_document_from_id(
     request: Request,
     id: str,
-    user: User = Depends(require_user),
+    user: User = Depends(get_optional_user),
     config: Settings = config,
 ):
     id_uuid = UUID(id)
-    access_token = request.session.get("access_token")
+    access_token = (
+        request.session.get("access_token") or "empty"
+    )  # in case no user exists
     return templates.TemplateResponse("viewer.html", context=dict(**locals()))
