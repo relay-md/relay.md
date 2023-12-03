@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from ..models.access_token import AccessToken
 from ..models.document import Document
@@ -7,6 +7,7 @@ from ..models.document_team_topic import DocumentTeamTopic
 from ..models.document_user import DocumentUser
 from ..models.team_topic import TeamTopic
 from ..models.user import User
+from ..models.user_team_topic import UserTeamTopic
 from ..schema import DocumentShareType
 from .base import DatabaseAbstractRepository
 
@@ -35,20 +36,34 @@ class DocumentRepo(DatabaseAbstractRepository):
             .limit(size)
         )
 
-        if share_flags & DocumentTeamTopic.PUBLIC:
+        filters = list()
+        if share_flags and share_flags & DocumentShareType.PUBLIC:
             # Return *public* documents
-            query = query.filter(Document.is_public.is_(True))
-        if share_flags & DocumentTeamTopic.SHARED_WITH_USER:
+            filters.append(Document.is_public.is_(True))
+
+        # Below, we need OUTER JOIN because a document can be shared either by
+        # team topic or by user and we do not want to miss one of them by
+        # requiring the other through an inner join!
+        if share_flags and share_flags & DocumentShareType.SHARED_WITH_USER:
             # Return documents that have been shared with the user directly
-            query = query.join(DocumentUser).filter(
+            query = query.outerjoin(DocumentUser)
+            filters.append(
                 DocumentUser.user_id == access_token.user_id,
             )
-        if share_flags & DocumentTeamTopic.SUBSCRIBED_TEAM:
+
+        if share_flags and share_flags & DocumentShareType.SUBSCRIBED_TEAM:
             # Return documents that have been shared with a team the user
             # subscribed to
-            # TODO: mid-term, we
-            query = query.join(DocumentTeamTopic).join(TeamTopic).filter()
+            query = (
+                query.outerjoin(DocumentTeamTopic)
+                .outerjoin(TeamTopic)
+                .outerjoin(UserTeamTopic)
+            )
+            filters.append(
+                UserTeamTopic.user_id == access_token.user_id,
+            )
 
+        query = query.filter(or_(*[x for x in filters]))
         ret = list(self._db.scalars(query))
         if ret:
             self._update_user_latest_document(access_token, ret[-1])

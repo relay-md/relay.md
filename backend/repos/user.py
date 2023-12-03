@@ -21,3 +21,6 @@ class UserRepo(DatabaseAbstractRepository):
             user_id=user.id,
             team_topic_id=team_topic.id,
         )
+
+    def from_string(self, username):
+        return self.get_by_kwargs(username=username)

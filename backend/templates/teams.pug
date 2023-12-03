@@ -25,6 +25,9 @@
        tt {{team.name}}
        {%endif%}
       td
+       {% if team.is_private %}
+       span.tag.is-danger confidential
+       {% else %}
        {% for topic in team.topics %}
        // FIXME: this is super inefficient
        {% if user and user_repo.is_subscribed(user, team, topic) %}
@@ -35,6 +38,7 @@
         p.tag.is-dark {{topic.name}}
        {% endif %}
        {% endfor %}
+       {% endif %}
       td {{team.user.username}}
       td {{team.created_at}}
       td

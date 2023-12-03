@@ -38,7 +38,7 @@ async def get_teams(
 ):
     user_repo = UserRepo(db)
     team_repo = TeamRepo(db)
-    teams = team_repo.list(is_private=False)
+    teams = team_repo.list()
     return templates.TemplateResponse("teams.pug", context=dict(**locals()))
 
 
@@ -52,6 +52,8 @@ async def subscribe(
     db: Session = Depends(get_session),
 ):
     repo = UserTeamTopicRepo(db)
+    if team_topic.team.is_private:
+        raise exceptions.NotAllowed(f"Team {team_topic.team.name} is private!")
     repo.create_from_kwargs(user_id=user.id, team_topic_id=team_topic.id)
     return RedirectResponse(url=request.url_for("get_teams"))
 
