@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from collections import namedtuple
 from typing import List
 from uuid import UUID
 
@@ -28,6 +29,30 @@ from ..schema import (
 
 router = APIRouter(prefix="/v1")
 api_key_header = APIKeyHeader(name="X-API-Key")
+Shareables = namedtuple("Shareables", "team_topics users is_public")
+
+
+def get_shareables(db, front):
+    user_repo = UserRepo(db)
+    team_topic_repo = TeamTopicRepo(db)
+    team_topics = list()
+    users = list()
+    is_public = False
+    for to in front.relay_to:
+        if to.startswith("@"):
+            to_user = user_repo.get_by_kwargs(username=to[1:])
+            if not to_user:
+                raise exceptions.BadRequest(f"User {to} does not exist")
+            users.append(to_user)
+        else:
+            # WARNING: If any of the targets is non-private, the entire document
+            # becomes public!
+            topic, team = to.split("@")
+            team_topic = team_topic_repo.from_string(to)
+            if not team_topic.team.is_private:
+                is_public = True
+            team_topics.append(team_topic_repo.from_string(to))
+    return Shareables(team_topics=team_topics, users=users, is_public=is_public)
 
 
 async def get_access_token(
@@ -136,10 +161,10 @@ async def post_doc(
     user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
 ):
-    team_topic_repo = TeamTopicRepo(db)
+    TeamTopicRepo(db)
     document_repo = DocumentRepo(db)
     document_body_repo = DocumentBodyRepo()
-    user_repo = UserRepo(db)
+    UserRepo(db)
 
     # Get body containing the raw markdown
     body = await request.body()
@@ -158,23 +183,7 @@ async def post_doc(
         raise exceptions.BadRequest("Filenames must not contain slash or backslash")
 
     # Parse relay_to as team_topics
-    team_topics = list()
-    users = list()
-    is_public = False
-    for to in front.relay_to:
-        if to.startswith("@"):
-            to_user = user_repo.get_by_kwargs(username=to[1:])
-            if not to_user:
-                raise exceptions.BadRequest(f"User {to} does not exist")
-            users.append(to_user)
-        else:
-            topic, team = to.split("@")
-            team_topic = team_topic_repo.from_string(to)
-            # WARNING: If any of the targets is non-private, the entire document
-            # becomes public!
-            if not team_topic.team.is_private:
-                is_public = True
-            team_topics.append(team_topic)
+    shareables = get_shareables(db, front)
 
     # if the document already has an id, let's raise
     if front.relay_document:
@@ -186,9 +195,9 @@ async def post_doc(
     document = document_repo.create_from_kwargs(
         user_id=user.id,
         filename=filename,
-        team_topics=team_topics,
-        users=users,
-        is_public=is_public,
+        team_topics=shareables.team_topics,
+        users=shareables.users,
+        is_public=shareables.is_public,
     )
 
     # Update document content in DocumentBodyRepo
@@ -251,25 +260,21 @@ async def put_doc(
     db: Session = Depends(get_session),
 ):
     document_repo = DocumentRepo(db)
-    team_topic_repo = TeamTopicRepo(db)
+    TeamTopicRepo(db)
     document_body_repo = DocumentBodyRepo()
-    user_repo = UserRepo(db)
+    UserRepo(db)
     body = await request.body()
     front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
 
     # Parse relay_to as team_topics
-    # FIXME: duplicated code
-    team_topics = list()
-    users = list()
-    for to in front.relay_to:
-        if to.startswith("@"):
-            to_user = user_repo.get_by_kwargs(username=to[1:])
-            if not to_user:
-                raise exceptions.BadRequest(f"User {to} does not exist")
-            users.append(to_user)
-        else:
-            team_topics.append(team_topic_repo.from_string(to))
-    document_repo.update(document, team_topics=team_topics, users=users)
+    shareables = get_shareables(db, front)
+
+    document_repo.update(
+        document,
+        team_topics=shareables.team_topics,
+        users=shareables.users,
+        is_public=shareables.is_public,
+    )
     # Update document content in DocumentBodyRepo
     document_body_repo.update(document.id, body)
     ret_document = DocumentResponse(
