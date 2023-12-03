@@ -100,6 +100,19 @@ async def web_handle_exception(
     return templates.TemplateResponse("exception.html", context=dict(**locals()))
 
 
+async def web_unhandled_exception(
+    request: Request,
+    exc: Exception,
+    user: User = Depends(get_optional_user),
+    config: Settings = config,
+):
+    # required for top
+    user = None
+    return templates.TemplateResponse(
+        "exception-unhandled.html", context=dict(**locals())
+    )
+
+
 async def redirect_to_login(
     request: Request,
     exc: Exception,
@@ -123,4 +136,7 @@ def include_app(app):
 def include_app_web(app):
     # FIXME: need to deal with making nicer
     app.add_exception_handler(LoginRequiredException, redirect_to_login)
-    app.add_exception_handler(Exception, web_handle_exception)
+    app.add_exception_handler(NotAllowed, web_handle_exception)
+    app.add_exception_handler(NotFound, web_handle_exception)
+    app.add_exception_handler(Unauthorized, web_handle_exception)
+    app.add_exception_handler(Exception, web_unhandled_exception)

@@ -71,6 +71,6 @@ class DatabaseAbstractRepository(AbstractRepository):
             setattr(item, key, value)
         self._db.commit()
 
-    def delete_by_id(self, item: T) -> None:
+    def delete(self, item: T) -> None:
         self._db.delete(item)
         self._db.commit()

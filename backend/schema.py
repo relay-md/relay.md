@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import enum
 from typing import Generic, List, Optional, TypeVar, Union
 from uuid import UUID
 
@@ -6,6 +7,12 @@ from pydantic import BaseModel, Extra, Field, validator
 from pydantic.generics import GenericModel
 
 DataT = TypeVar("DataT")
+
+
+class DocumentShareType(enum.IntFlag):
+    PUBLIC = 2**0
+    SHARED_WITH_USER = 2**1
+    SUBSCRIBED_TEAM = 2**2
 
 
 class Error(BaseModel):

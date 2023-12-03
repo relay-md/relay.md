@@ -23,6 +23,7 @@ from ..schema import (
     DocumentFrontMatter,
     DocumentIdentifierResponse,
     DocumentResponse,
+    DocumentShareType,
     Response,
     VersionResponse,
 )
@@ -305,8 +306,13 @@ async def get_docs(
     if type == "mine":
         documents = document_repo.get_my_documents(user, page, size)
     else:
-        documents = document_repo.get_recent_documents_for_token(
-            access_token, page, size
+        documents = document_repo.get_shared_documents(
+            access_token,
+            page,
+            size,
+            DocumentShareType.PUBLIC
+            | DocumentShareType.SHARED_WITH_USER
+            | DocumentShareType.SUBSCRIBED_TEAM,
         )
     ret = list()
     for document in documents:

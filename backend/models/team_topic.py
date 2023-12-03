@@ -18,8 +18,10 @@ class TeamTopic(Base):
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team.id"))
     topic_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("topic.id"))
 
-    team: Mapped["Team"] = relationship()  # noqa
-    topic: Mapped["Topic"] = relationship()  # noqa
+    # If needed, we habe to look for SA warnings caused by those.
+    # viewonly surpresses the warnings
+    team: Mapped["Team"] = relationship(viewonly=True)  # noqa
+    topic: Mapped["Topic"] = relationship(viewonly=True)  # noqa
 
     @hybrid_property
     def name(self):
