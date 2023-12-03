@@ -19,3 +19,6 @@ class Topic(Base):
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
     name: Mapped[str] = mapped_column(String(32))
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: {self.name}>"

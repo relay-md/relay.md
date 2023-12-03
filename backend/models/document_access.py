@@ -19,3 +19,6 @@ class DocumentAccess(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("document.id"))
     access_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}@{self.user.username}>"

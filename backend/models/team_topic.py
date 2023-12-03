@@ -3,8 +3,8 @@
 """
 import uuid
 
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -27,3 +27,6 @@ class TeamTopic(Base):
 
     def __str__(self):
         return f"{self.topic.name}@{self.team.name}"
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}@{self.topic.name} in {self.team.name}>"

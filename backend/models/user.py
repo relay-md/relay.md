@@ -5,9 +5,10 @@ import enum
 import logging
 import uuid
 from datetime import datetime
+from typing import List
 
 from sqlalchemy import Column, Enum, Index, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
 
@@ -36,6 +37,16 @@ class User(Base):
     oauth_provider: OauthProvider = Column(
         Enum(OauthProvider), default=OauthProvider.GITHUB
     )
+
+    shared_documents: Mapped[List["Document"]] = relationship(  # noqa
+        secondary="document_user", back_populates="users"
+    )
+    owned_documents: Mapped[List["Document"]] = relationship(  # noqa
+        back_populates="user"
+    )
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: @{str(self.username)}>"
 
 
 Index("user_oauth_index", User.username, User.oauth_provider)

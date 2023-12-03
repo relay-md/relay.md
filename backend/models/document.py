@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-""" DB Storage models
-"""
+""" DB Storage modat"""
 import uuid
 from datetime import datetime
 from typing import List
@@ -31,7 +30,7 @@ class Document(Base):
         secondary="document_team_topics"
     )
     users: Mapped[List[User]] = relationship(secondary="document_user")
-    user: Mapped["User"] = relationship(backref="documents")  # noqa
+    user: Mapped["User"] = relationship(back_populates="owned_documents")  # noqa
 
     # if this is set, the document can be viewed online by anyone on the web
     # viewer, this will be automatically set when uploading a document. For
@@ -40,6 +39,9 @@ class Document(Base):
 
     # 128bit password hash, as bytes TODO: needs implementation
     read_password_hash: Mapped[bytes] = mapped_column(CHAR(32), default=b"")
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}@{self.user.username}>"
 
     @property
     def shared_with(self):

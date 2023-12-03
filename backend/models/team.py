@@ -30,3 +30,6 @@ class Team(Base):
     allow_create_topics: Mapped[bool] = mapped_column(default=True)
 
     user: Mapped["User"] = relationship()  # noqa
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: {self.name}>"

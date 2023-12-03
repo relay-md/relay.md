@@ -16,3 +16,6 @@ class DocumentTeamTopic(Base):
     )
     document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("document.id"))
     team_topic_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team_topics.id"))
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}>"
