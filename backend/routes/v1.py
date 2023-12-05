@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from collections import namedtuple
+from datetime import datetime
 from typing import List
 from uuid import UUID
 
@@ -275,6 +276,7 @@ async def put_doc(
         team_topics=shareables.team_topics,
         users=shareables.users,
         is_public=shareables.is_public,
+        last_updated_at=datetime.utcnow(),
     )
     # Update document content in DocumentBodyRepo
     document_body_repo.update(document.id, body)
