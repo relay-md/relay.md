@@ -49,6 +49,7 @@ class DocumentFrontMatter(BaseModel):
     relay_document: Optional[UUID] = Field(alias="relay-document")
     relay_to: Union[str, List[str]] = Field(alias="relay-to")
     relay_filename: Optional[str] = Field(alias="relay-filename")
+    relay_title: Optional[str] = Field(alias="relay-title")
 
     class Config:
         orm_mode = True

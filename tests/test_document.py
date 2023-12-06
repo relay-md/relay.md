@@ -82,6 +82,7 @@ def test_document_upload(account, auth_header, api_client, s3, dbsession):
     assert ret["relay-document"] == doc_id
     assert ret["relay-to"] == ["mytopic@myteam"]
     assert ret["relay-filename"] == "example.md"
+    assert ret["relay-title"] == "Example text"
 
     req = api_client.get(
         f"/v1/doc/{doc_id}", headers={**auth_header, "content-type": "text/markdown"}
@@ -97,6 +98,7 @@ relay-to:
 """
     assert req.text.startswith(expected)
     assert req.headers.get("x-relay-filename") == "example.md"
+    assert req.headers.get("x-relay-title") == "Example text"
     assert req.headers.get("x-relay-document") == doc_id
     assert json.loads(req.headers.get("x-relay-to")) == ["mytopic@myteam"]
 
@@ -163,7 +165,6 @@ Example text
     req = api_client.put(f"/v1/doc/{doc_id}", headers=auth_header, data=updated_doc)
     assert req.ok
     assert req.json()["result"]["relay-document"] == doc_id
+    assert req.json()["result"]["relay-title"] == "Example text"
 
-    assert "Additional text" in patch_document_body_update.call_args.args[1].decode(
-        "utf-8"
-    )
+    assert "Additional text" in patch_document_body_update.call_args.args[1]

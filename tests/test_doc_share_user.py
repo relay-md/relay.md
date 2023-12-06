@@ -97,6 +97,7 @@ relay-to:
     assert req.text.startswith(expected)
     assert req.headers.get("x-relay-filename") == "example.md"
     assert req.headers.get("x-relay-document") == doc_id
+    assert req.headers.get("x-relay-title") == "Example text"
     assert json.loads(req.headers.get("x-relay-to")) == ["@account2"]
 
 
@@ -163,6 +164,4 @@ Example text
     assert req.ok
     assert req.json()["result"]["relay-document"] == doc_id
 
-    assert "Additional text" in patch_document_body_update.call_args.args[1].decode(
-        "utf-8"
-    )
+    assert "Additional text" in patch_document_body_update.call_args.args[1]
