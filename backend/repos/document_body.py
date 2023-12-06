@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import io
-from typing import List
+from typing import List, Union
 from uuid import UUID
 
 from minio import Minio
@@ -20,7 +20,7 @@ class MinioAbstractRepo(AbstractRepository):
             secure=config.MINIO_SECURE,
         )
 
-    def create(self, id: UUID, data: bytes | str) -> None:
+    def create(self, id: UUID, data: Union[bytes, str]) -> None:
         if not self._client.bucket_exists(self.BUCKET):
             self._client.make_bucket(self.BUCKET)
         if isinstance(data, str):
