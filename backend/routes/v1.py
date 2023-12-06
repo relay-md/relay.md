@@ -28,6 +28,7 @@ from ..schema import (
     Response,
     VersionResponse,
 )
+from ..utils.document import get_title_from_body
 
 router = APIRouter(prefix="/v1")
 api_key_header = APIKeyHeader(name="X-API-Key")
@@ -169,18 +170,24 @@ async def post_doc(
     UserRepo(db)
 
     # Get body containing the raw markdown
-    body = await request.body()
+    body = (await request.body()).decode("utf-8")
 
     # Parse frontmatter
-    front = frontmatter.loads(body.decode("utf-8"))
-    front = DocumentFrontMatter(**front)
+    front_matter = frontmatter.loads(body)
+    front = DocumentFrontMatter(**front_matter)
 
     if not filename and not front.relay_filename:
         raise exceptions.BadRequest("Missing filename or relay-filename property!")
 
-    # priority of frontmatter filename over query string
+    # priority of frontmatter
+    if front.relay_title:
+        title = front.relay_title
+    else:
+        title = get_title_from_body(front_matter.content)
     if front.relay_filename:
         filename = front.relay_filename
+
+    # At this point we do not allow paths as filename
     if "/" in filename or "\\" in filename:
         raise exceptions.BadRequest("Filenames must not contain slash or backslash")
 
@@ -196,6 +203,7 @@ async def post_doc(
     # Store document in database
     document = document_repo.create_from_kwargs(
         user_id=user.id,
+        title=title,
         filename=filename,
         team_topics=shareables.team_topics,
         users=shareables.users,
@@ -206,6 +214,7 @@ async def post_doc(
     document_body_repo.create(document.id, body)
     ret_document = DocumentResponse(
         relay_document=document.id,
+        relay_title=document.title,
         relay_filename=filename,
         relay_to=front.relay_to,
     )
@@ -240,6 +249,7 @@ async def get_doc(
         ret_document = DocumentResponse(
             relay_document=document.id,
             relay_filename=document.filename,
+            relay_title=document.title,
             relay_to=document.shared_with,
             body=body,
         )
@@ -249,6 +259,7 @@ async def get_doc(
         response.headers["X-Relay-document"] = str(document.id)
         response.headers["X-Relay-filename"] = document.filename
         response.headers["X-Relay-to"] = json.dumps(document.shared_with)
+        response.headers["X-Relay-title"] = document.title
         return response
     else:
         raise exceptions.BadRequest(f"Unsupported content-type: {content_type}")
@@ -265,8 +276,14 @@ async def put_doc(
     TeamTopicRepo(db)
     document_body_repo = DocumentBodyRepo()
     UserRepo(db)
-    body = await request.body()
-    front = DocumentFrontMatter(**frontmatter.loads(body.decode("utf-8")))
+    body = (await request.body()).decode("utf-8")
+    front_matter = frontmatter.loads(body)
+    front = DocumentFrontMatter(**front_matter)
+
+    if front.relay_title:
+        title = front.relay_title
+    else:
+        title = get_title_from_body(front_matter.content)
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front)
@@ -274,6 +291,7 @@ async def put_doc(
     document_repo.update(
         document,
         team_topics=shareables.team_topics,
+        title=title,
         users=shareables.users,
         is_public=shareables.is_public,
         last_updated_at=datetime.utcnow(),
@@ -283,6 +301,7 @@ async def put_doc(
     ret_document = DocumentResponse(
         relay_document=document.id,
         relay_filename=document.filename,
+        relay_title=title,
         relay_to=front.relay_to,
         body=body,
     )

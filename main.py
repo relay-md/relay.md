@@ -17,6 +17,7 @@ clis = [
     "backend.cli.user",
     "backend.cli.web",
     "backend.cli.document",
+    "backend.cli.document_body",
 ]
 
 for cli in clis:

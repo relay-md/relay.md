@@ -7,7 +7,7 @@ from starlette.responses import HTMLResponse
 from ..config import Settings, config
 from ..repos.user import User
 from ..templates import templates
-from ..utils.user import get_optional_user
+from ..utils.user import get_optional_user, require_user
 
 router = APIRouter(prefix="")
 
@@ -29,7 +29,7 @@ async def welcome(
     tags=["web"],
 )
 async def profile(
-    request: Request, user: User = Depends(get_optional_user), config: Settings = config
+    request: Request, user: User = Depends(require_user), config: Settings = config
 ):
     return templates.TemplateResponse("profile.pug", context=dict(**locals()))
 

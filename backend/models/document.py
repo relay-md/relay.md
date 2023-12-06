@@ -22,6 +22,7 @@ class Document(Base):
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
 
+    title: Mapped[str] = mapped_column(String(256), nullable=True)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     filename: Mapped[str] = mapped_column(String(length=256))
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
