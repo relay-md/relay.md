@@ -65,6 +65,22 @@ async def my_documents(
 
 
 @router.get(
+    "/news",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def news(
+    request: Request,
+    user: User = Depends(get_optional_user),
+    config: Settings = config,
+    db: Session = Depends(get_session),
+):
+    document_repo = DocumentRepo(db)
+    news = document_repo.latest_news()
+    return templates.TemplateResponse("news.pug", context=dict(**locals()))
+
+
+@router.get(
     "/documentation/plugins/obsidian",
     response_class=HTMLResponse,
     tags=["web"],

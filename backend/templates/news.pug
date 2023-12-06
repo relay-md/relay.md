@@ -1,0 +1,12 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5.mb-5
+ .columns
+  .column.is-8.is-offset-2
+   h1.title.is-1 Relay News
+
+   {% for new in news %}
+   p.block
+    span.subtitle {{news.id}}
+   {% endfor %}
+{% endblock %}
