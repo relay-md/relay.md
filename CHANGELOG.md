@@ -2,6 +2,20 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.0 (2023-12-06)
+### Feature
+* Automatically subscribe to news@relay.md ([`4983140`](https://github.com/knowledgemd/backend/commit/4983140d24daad46f82d103fea380211afe81acb))
+* **web:** Dark/light switcher ([`2dc7269`](https://github.com/knowledgemd/backend/commit/2dc72699085bc781498d0ec92a9fa91d188475ff))
+* Store documents in subfolders on minio ([`83c4f45`](https://github.com/knowledgemd/backend/commit/83c4f45661776163c712a447e90ea7f02ce1cb42))
+* **title:** Store document title in database ([`efad9a8`](https://github.com/knowledgemd/backend/commit/efad9a86b97f9fd61232571156ae911cb6906e79))
+
+### Fix
+* Typing error in py38 ([`e657a77`](https://github.com/knowledgemd/backend/commit/e657a7748b73d344fba3e9e911336645cb20ac3e))
+* Create documents could be called with string argument ([`003aa25`](https://github.com/knowledgemd/backend/commit/003aa253cf194fb9b284102b85cc133a9865e5e7))
+* Shared/owned document list in profile ([`5950bd0`](https://github.com/knowledgemd/backend/commit/5950bd0c66fcf04c1b997e8201e748266e522526))
+* Wrong logic ([`469e381`](https://github.com/knowledgemd/backend/commit/469e381aa19ff267e2f5466450505e06270eee21))
+* Only show teams when logged or leave early access mode ([`d767cfc`](https://github.com/knowledgemd/backend/commit/d767cfca6f96e1884ad6ef7eedff8b8038d2af19))
+
 ## v0.10.0 (2023-12-06)
 ### Feature
 * Proper testing for subscriptions and listing of posts ([`b8aa95a`](https://github.com/knowledgemd/backend/commit/b8aa95ab710a67eae3a7f07d1727a39e30b6eaab))
