@@ -22,9 +22,11 @@
           <a class="navbar-item" href="{{url_for('obsidian_plugin')}}">
             Plugin
           </a>
+          {% if not config.ENABLE_EARLY_ACCESS or user%}
           <a class="navbar-item" href="{{url_for('get_teams')}}">
             Teams/Topics
           </a>
+          {% endif %}
         </div>
 
         <div class="navbar-end">
