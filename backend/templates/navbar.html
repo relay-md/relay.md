@@ -1,7 +1,7 @@
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="/">
-          <img src="{{ url_for('static', path="img/logo-navbar.svg") }}" width="32">
+          <img src="{{ url_for('static', path="img/logo-navbar.svg") }}" width="32" class="brand-logo">
         </a>
 
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navBarBurger">
@@ -30,6 +30,9 @@
         </div>
 
         <div class="navbar-end">
+          <div class="navbar-item">
+            <div id="switcher-default"></div>
+          </div>
           {% if user %}
           <div class="navbar-item">
             <a class="button is-warning" href="/profile">
