@@ -4,16 +4,13 @@ from typing import List
 from uuid import UUID
 
 from minio import Minio
+from minio.commonconfig import CopySource
 
 from ..config import config
 from .base import AbstractRepository
 
 
 class MinioAbstractRepo(AbstractRepository):
-    # TODO: access to s3 documents
-    # filename == document id
-    # nested folder structure with 6 nested nibbles
-    # maybe take a look at how sccache does it
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._client = Minio(
@@ -31,14 +28,16 @@ class MinioAbstractRepo(AbstractRepository):
         # Upload data with content-type.
         self._client.put_object(
             self.BUCKET,
-            self.get_file_name(id),  # TODO: want to split this into dirs
+            self.get_file_name(id),
             io.BytesIO(data),
             len(data),
             content_type="text/markdown",
         )
 
     def get_file_name(self, id):
-        return f"{str(id)}.md"
+        name = str(id)
+        # We are nesting uuid based filenames into 4 sub directories
+        return f"{name[0]}/{name[1]}/{name[2]}/{name[3]}/{name}.md"
 
     def get_by_id(self, id: UUID) -> bytes:
         try:
@@ -51,8 +50,16 @@ class MinioAbstractRepo(AbstractRepository):
             except Exception:
                 pass
 
-    def list(self, key: str, **kwargs) -> List[UUID]:
-        raise NotImplementedError
+    def list(self, prefix="", recursive=False) -> List[UUID]:
+        return self._client.list_objects(self.BUCKET, prefix, recursive=recursive)
+
+    def copy(self, source, destination):
+        return self._client.copy_object(
+            self.BUCKET, destination, CopySource(self.BUCKET, source)
+        )
+
+    def stat(self, path: str):
+        return self._client.stat_object(self.BUCKET, path)
 
     def update(self, id: UUID, data: bytes) -> None:
         self.create(id, data)
