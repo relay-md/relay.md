@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.0 (2023-12-06)
+### Feature
+* Proper testing for subscriptions and listing of posts ([`b8aa95a`](https://github.com/knowledgemd/backend/commit/b8aa95ab710a67eae3a7f07d1727a39e30b6eaab))
+* Allow to subscribe to team/topics ([`98eebe5`](https://github.com/knowledgemd/backend/commit/98eebe5181aa4a37f6c2eeb8d4e412f6c31e026d))
+* **cli:** More powerfull cli tools ([`5f09225`](https://github.com/knowledgemd/backend/commit/5f09225ed0f2f6e008474abd4b8f0acf161ed2d0))
+
+### Fix
+* Update the datetime on PUT ([`993b95d`](https://github.com/knowledgemd/backend/commit/993b95d107b3fb4902c4834b4ccae8ef1332bd69))
+
 ## v0.9.0 (2023-12-02)
 ### Feature
 * Include prometheus exporter ([`e7ba269`](https://github.com/knowledgemd/backend/commit/e7ba269201657d1943652b25c0ca8e8d727add06))
