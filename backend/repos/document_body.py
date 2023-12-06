@@ -23,9 +23,11 @@ class MinioAbstractRepo(AbstractRepository):
             secure=config.MINIO_SECURE,
         )
 
-    def create(self, id: UUID, data: bytes) -> None:
+    def create(self, id: UUID, data: bytes | str) -> None:
         if not self._client.bucket_exists(self.BUCKET):
             self._client.make_bucket(self.BUCKET)
+        if isinstance(data, str):
+            data = bytes(data, "utf-8")
         # Upload data with content-type.
         self._client.put_object(
             self.BUCKET,
