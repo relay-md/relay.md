@@ -16,3 +16,6 @@ class DocumentUser(Base):
     )
     document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("document.id"))
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}@{self.user.username}>"

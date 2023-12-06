@@ -3,19 +3,26 @@
 
 import click
 
-from backend.cli.api import api
-from backend.cli.setup import setup
-from backend.cli.web import web
-
 
 @click.group()
 def main():
     pass
 
 
-main.add_command(api)
-main.add_command(web)
-main.add_command(setup)
+clis = [
+    "backend.cli.api",
+    "backend.cli.setup",
+    "backend.cli.team",
+    "backend.cli.topic",
+    "backend.cli.user",
+    "backend.cli.web",
+    "backend.cli.document",
+]
+
+for cli in clis:
+    parts = cli.split(".")
+    mod = __import__(".".join(parts), fromlist=[parts[-1]])
+    main.add_command(getattr(mod, parts[-1]))
 
 
 if __name__ == "__main__":

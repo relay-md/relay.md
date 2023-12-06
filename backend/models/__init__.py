@@ -9,6 +9,7 @@ from .team_member import TeamMember
 from .team_topic import TeamTopic
 from .topic import Topic
 from .user import User
+from .user_team_topic import UserTeamTopic
 
 __all__ = [
     Document.__name__,
@@ -21,4 +22,5 @@ __all__ = [
     TeamMember.__name__,
     DocumentAccess.__name__,
     DocumentUser.__name__,
+    UserTeamTopic.__name__,
 ]

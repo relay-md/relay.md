@@ -2,6 +2,7 @@
 """Configuration for pytest"""
 
 import tempfile
+from typing import List
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,6 +11,11 @@ from sqlalchemy.orm import sessionmaker
 
 from backend import database, models, repos
 from backend.api import app as api_app
+from backend.repos.document import DocumentRepo
+from backend.repos.team import TeamRepo
+from backend.repos.team_topic import TeamTopicRepo
+from backend.repos.user import UserRepo
+from backend.repos.user_team_topic import UserTeamTopicRepo
 
 # Temporary file for sqlite
 sqlite_db = (
@@ -121,6 +127,29 @@ def other_auth_header(other_access_token):
     return {"X-API-Key": str(other_access_token.token)}
 
 
+@pytest.fixture()
+def eve(dbsession):
+    return repos.user.UserRepo(dbsession).create_from_kwargs(
+        username="eve",
+        email="eve@example.com",
+        name="Another Example account",
+        location="DE-CIX",
+        oauth_provider=models.user.OauthProvider.GITHUB,
+    )
+
+
+@pytest.fixture
+def eve_access_token(eve, dbsession):
+    return repos.access_token.AccessTokenRepo(dbsession).create_from_kwargs(
+        user_id=eve.id
+    )
+
+
+@pytest.fixture
+def eve_auth_header(eve_access_token):
+    return {"X-API-Key": str(eve_access_token.token)}
+
+
 @pytest.fixture(autouse=True)
 def default_team_topics(dbsession, account):
     team_repo = repos.team.TeamRepo(dbsession)
@@ -136,3 +165,86 @@ def default_team_topics(dbsession, account):
     )
     topic = topic_repo.create_from_kwargs(name="mytopic")
     team_topic_repo.create_from_kwargs(team_id=team.id, topic_id=topic.id)
+
+
+@pytest.fixture()
+def document_repo(dbsession):
+    return DocumentRepo(dbsession)
+
+
+@pytest.fixture()
+def user_repo(dbsession):
+    return UserRepo(dbsession)
+
+
+@pytest.fixture()
+def team_repo(dbsession):
+    return TeamRepo(dbsession)
+
+
+@pytest.fixture()
+def team_topic_repo(dbsession):
+    return TeamTopicRepo(dbsession)
+
+
+@pytest.fixture
+def user_team_topic_repo(dbsession):
+    return UserTeamTopicRepo(dbsession)
+
+
+@pytest.fixture
+def create_document(account, team_topic_repo, user_repo, document_repo):
+    def func(
+        filename: str,
+        team_topics: List[str] = [],
+        users: List[str] = [],
+        is_public: bool = False,
+    ):
+        tts = list()
+        for tt_name in team_topics:
+            tts.append(team_topic_repo.from_string(tt_name))
+        us = list()
+        for user in users:
+            us.append(user_repo.from_string(user))
+        return document_repo.create_from_kwargs(
+            filename=filename,
+            team_topics=tts,
+            user_id=account.id,
+            users=us,
+            is_public=is_public,
+        )
+
+    yield func
+
+
+@pytest.fixture
+def subscribe_to_team_topic(account, team_topic_repo, user_team_topic_repo):
+    def func(team_topic: str, acc=account):
+        t = team_topic_repo.from_string(team_topic)
+        return user_team_topic_repo.create_from_kwargs(
+            team_topic_id=t.id,
+            user_id=acc.id,
+        )
+
+    yield func
+
+
+@pytest.fixture
+def create_team(team_repo, account):
+    def func(name: str, is_private: bool = False, allow_create_topics: bool = False):
+        return team_repo.create_from_kwargs(
+            name=name,
+            user_id=account.id,
+            is_private=is_private,
+            allow_create_topics=allow_create_topics,
+        )
+
+    return func
+
+
+@pytest.fixture
+def create_team_topic(team_topic_repo):
+    def func(name: str):
+        return team_topic_repo.from_string(name)
+
+    return func

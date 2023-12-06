@@ -36,7 +36,7 @@ class TeamTopicRepo(DatabaseAbstractRepository):
             # Teams cannot be created this way!
             raise BadRequest(f"Team '{team_name}' does not exist!")
         if not team.allow_create_topics:
-            raise NotAllowed("Topic creation is not allowed yet")
+            raise NotAllowed(f"Topic creation is not allowed for team {team.name}")
 
         topic_repo = TopicRepo(self._db)
         topic = topic_repo.get_by_kwargs(name=topic_name)

@@ -8,6 +8,7 @@ from .team_member import TeamMemberRepo
 from .team_topic import TeamTopicRepo
 from .topic import TopicRepo
 from .user import UserRepo
+from .user_team_topic import UserTeamTopicRepo
 
 __all__ = [
     AccessTokenRepo.__name__,
@@ -19,4 +20,5 @@ __all__ = [
     UserRepo.__name__,
     TeamMemberRepo.__name__,
     DocumentAccess.__name__,
+    UserTeamTopicRepo.__name__,
 ]

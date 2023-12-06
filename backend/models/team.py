@@ -3,6 +3,7 @@
 """
 import uuid
 from datetime import datetime
+from typing import List
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -30,3 +31,9 @@ class Team(Base):
     allow_create_topics: Mapped[bool] = mapped_column(default=True)
 
     user: Mapped["User"] = relationship()  # noqa
+    topics: Mapped[List["Topic"]] = relationship(  # noqa
+        secondary="team_topics", back_populates="teams"
+    )
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: {self.name}>"

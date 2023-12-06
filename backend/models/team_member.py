@@ -25,3 +25,6 @@ class TeamMember(Base):
 
     # can moderate a team
     is_moderator: Mapped[bool] = mapped_column(default=False)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}@{self.user.name} in {self.team.name}>"

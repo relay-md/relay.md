@@ -4,19 +4,45 @@
  .columns
   .column.is-8.is-offset-2
    h1.title.is-1 Team Overview
-   table.table.is-fullwidth
+   p.block You can subscribe to individual topics of each team.
+   p.block
+    span.tag.is-primary Subscribed
+    span.tag Unsubscribed
+   table.table.is-fullwidth.block
     thead
-     th Name
+     th Team
+     th Topics
      th Owner
      th Creation Date
      th Public
-     th Open Topics
-     // th Controls
+     th Create Topics
     tbody
      {% for team in teams %}
      tr
       td
+       {%if team.name == "_"%}
+       .icon-text
+        span.tag.is-primary.icon
+          i.fas.fa-globe
+        span Global
+       {%else%}
        tt {{team.name}}
+       {%endif%}
+      td
+       {% if team.is_private %}
+       span.is-italic confidential
+       {% else %}
+       {% for topic in team.topics %}
+       // FIXME: this is super inefficient
+       {% if user and user_repo.is_subscribed(user, team, topic) %}
+       a(href="{{url_for('unsubscribe', team_topic_name=topic.name+'@'+team.name)}}")
+        p.tag.is-primary {{topic.name}}
+       {% else %}
+       a(href="{{url_for('subscribe', team_topic_name=topic.name+'@'+team.name)}}")
+        p.tag {{topic.name}}
+       {% endif %}
+       {% endfor %}
+       {% endif %}
       td {{team.user.username}}
       td {{team.created_at}}
       td
@@ -35,21 +61,5 @@
        span.icon
         i.fas.fa-times
        {% endif %}
-      // td
-      //  .field.has-addons
-      //   {% if not team.is_private %}
-      //   p.control
-      //     button.button
-      //       span.icon.is-small
-      //         i.fas.fa-signature
-      //       span Subscribe
-      //   {% endif %}
-      //   {% if user and team.user_id == user.id %}
-      //   p.control
-      //     button.button
-      //       span.icon.is-small
-      //         i.fas.fa-edit
-      //   {% endif %}
-
      {% endfor %}
 {% endblock %}
