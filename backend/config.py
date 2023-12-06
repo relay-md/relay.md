@@ -89,6 +89,7 @@ class Settings(BaseSettings):
 
     # Early access configs
     ENABLE_EARLY_ACCESS: bool = True
+    NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
 
     class Config:
         env_file = ".env"

@@ -6,9 +6,12 @@ from starlette.responses import RedirectResponse
 
 from ...config import config
 from ...database import Session, get_session
+from ...exceptions import BadRequest, NotAllowed
 from ...models.user import OauthProvider
 from ...repos.access_token import AccessTokenRepo
+from ...repos.team_topic import TeamTopicRepo
 from ...repos.user import UserRepo
+from ...repos.user_team_topic import UserTeamTopicRepo
 from ...utils.url import get_next_url
 from . import oauth
 
@@ -48,6 +51,21 @@ async def auth(request: Request, db: Session = Depends(get_session)):
             location=github_user["location"],
             oauth_provider=OauthProvider.GITHUB,
         )
+
+        # Automatically subscribe to some team topics
+        team_topic_repo = TeamTopicRepo(db)
+        user_team_topic_repo = UserTeamTopicRepo(db)
+        for subscribe_to in config.NEW_USER_SUBSCRIBE_TO:
+            try:
+                team_topic = team_topic_repo.from_string(subscribe_to)
+                user_team_topic_repo.create_from_kwargs(
+                    user_id=user.id, team_topic_id=team_topic.id
+                )
+            except (BadRequest, NotAllowed):
+                # may fail if the team topic does not exist
+                # or creation of topic is not allowed
+                pass
+
     access_token = access_token_repo.get_by_kwargs(user_id=user.id)
     if not access_token:
         access_token = access_token_repo.create_from_kwargs(user_id=user.id)
