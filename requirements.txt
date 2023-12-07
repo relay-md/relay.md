@@ -11,10 +11,9 @@ alembic>=1.12.1,<2
 
 # Server
 requests>=2.31.0,<3
-fastapi>=0.75.1,<0.76.0
-uvicorn>=0.15.0,<0.16.0
-#fastapi>=0.104.1,<1
-#uvicorn>=0.24.0,<1
+fastapi>=0.104.1,<1
+uvicorn>=0.24.0,<1
+starlette==0.27.0
 
 # cli
 click>=8.1.7,<9

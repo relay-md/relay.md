@@ -1,0 +1,52 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.column.is-8.is-offset-2
+
+ h1.title Documents
+
+ .block
+  {% if type == "owned" %}
+  a.button(href="{{url_for('my_documents').include_query_params(type='shared')}}") Documents shared with me
+  {% else %}
+  a.button(href="{{url_for('my_documents').include_query_params(type='owned')}}") My Documents
+  {% endif %}
+
+ table.table.block
+  {% for document in documents %}
+  tr
+   td
+    span.icon-text
+     span.icon
+      i.fas.fa-clock
+     span
+      tt {{document.created_at}}
+   td
+    span.icon-text
+     span.icon
+      i.fas.fa-file
+     span
+      a(href="/document/{{document.id}}") {{document.title}}
+  {% endfor %}
+  nav.pagination(role="navication" aria-label="pagination")
+   {% if page %}
+   a.pagination-previous(href="{{url_for('my_documents').include_query_params(type=type, size=size, page=page-1)}}") Previous
+   {% endif %}
+   {% if documents | length == size %}
+   a.pagination-next(href="{{url_for('my_documents').include_query_params(type=type, size=size, page=page+1)}}") Next Page
+   {% endif %}
+   // ul.pagination-list
+   //  li
+   //   a.pagination-link(aria-label="Goto 1") 1
+   //  li
+   //   span.pagination-ellipsis &hellip;
+   //  li
+   //   a.pagination-link(aria-label="Goto 1") 1
+   //  li
+   //   a.pagination-link(aria-label="Goto 1") 1
+   //  li
+   //   a.pagination-link(aria-label="Goto 1") 1
+   //  li
+   //   span.pagination-ellipsis &hellip;
+   //  li
+   //   a.pagination-link(aria-label="Goto 1") 85
+{% endblock %}
