@@ -46,14 +46,21 @@
         .list-item-header
          tt.tag.is-dark.is-medium relay-filename
          | &nbsp;
-         span.has-text-weight-light string
+         span.has-text-weight-light optional(string)
         .list-item-description The filename that should be used instead of the actual filename. This allows to define which name should be used when the file is created in the recipients Vault.
       .list-item
        .list-item-content
         .list-item-header
          tt.tag.is-dark.is-medium relay-document
          | &nbsp;
-         span.has-text-weight-light string
+         span.has-text-weight-light auto(string)
         .list-item-description This serves as an internal tracker of the document so we can find them in the vault. If changed, or removed, the files detach from relay.md.
+      .list-item
+       .list-item-content
+        .list-item-header
+         tt.tag.is-dark.is-medium relay-title
+         | &nbsp;
+         span.has-text-weight-light optional(string)
+        .list-item-description This allows to customize the title of the document. If not present, it will be guessed from the document content.
 
 {% endblock %}
