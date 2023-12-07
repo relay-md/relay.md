@@ -9,6 +9,7 @@ from ..database import Session, get_session
 from ..repos.team import Team, TeamRepo
 from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
+from ..repos.user_team import UserTeamRepo
 from ..repos.user_team_topic import UserTeamTopicRepo
 from ..templates import templates
 from ..utils.user import User, require_user
@@ -42,7 +43,7 @@ async def get_teams(
     return templates.TemplateResponse("teams.pug", context=dict(**locals()))
 
 
-@router.get("/{team_topic_name}/subscribe")
+@router.get("/topic/{team_topic_name}/subscribe")
 async def subscribe(
     team_topic_name: str,
     request: Request,
@@ -58,7 +59,7 @@ async def subscribe(
     return RedirectResponse(url=request.url_for("get_teams"))
 
 
-@router.get("/{team_topic_name}/unsubscribe")
+@router.get("/topic/{team_topic_name}/unsubscribe")
 async def unsubscribe(
     team_topic_name: str,
     request: Request,
@@ -69,6 +70,47 @@ async def unsubscribe(
 ):
     repo = UserTeamTopicRepo(db)
     user_team_topic = repo.get_by_kwargs(user_id=user.id, team_topic_id=team_topic.id)
-    if user_team_topic:
-        repo.delete(user_team_topic)
+    repo.delete(user_team_topic)
     return RedirectResponse(url=request.url_for("get_teams"))
+
+
+@router.get("/team/{team_name}/join")
+async def join(
+    team_name: str,
+    request: Request,
+    config=config,
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    repo = UserTeamRepo(db)
+    if team.is_private or team.is_restricted:
+        raise exceptions.NotAllowed(f"Team {team.name} is private or restricted!")
+    repo.create_from_kwargs(user_id=user.id, team_id=team.id)
+    return RedirectResponse(url=request.url_for("get_teams"))
+
+
+@router.get("/team/{team_name}/leave")
+async def leave(
+    team_name: str,
+    request: Request,
+    config=config,
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    repo = UserTeamRepo(db)
+    user_team = repo.get_by_kwargs(user_id=user.id, team_id=team.id)
+    repo.delete(user_team)
+    return RedirectResponse(url=request.url_for("get_teams"))
+
+
+@router.get("/team/{team_name}/settings")
+async def settings(
+    request: Request,
+    config=config,
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    return templates.TemplateResponse("team-admin.pug", context=dict(**locals()))

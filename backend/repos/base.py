@@ -72,5 +72,7 @@ class DatabaseAbstractRepository(AbstractRepository):
         self._db.commit()
 
     def delete(self, item: T) -> None:
+        if not item:
+            return
         self._db.delete(item)
         self._db.commit()

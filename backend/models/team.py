@@ -10,6 +10,7 @@ from sqlalchemy import Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
+from .user import User
 
 
 class TeamType(enum.Enum):
@@ -43,6 +44,9 @@ class Team(Base):
     allow_create_topics: Mapped[bool] = mapped_column(default=True)
 
     user: Mapped["User"] = relationship()  # noqa
+    members: Mapped[List["User"]] = relationship(
+        secondary="user_team", back_populates="teams"
+    )
     topics: Mapped[List["Topic"]] = relationship(  # noqa
         secondary="team_topics", back_populates="teams"
     )
@@ -50,6 +54,14 @@ class Team(Base):
     @property
     def is_private(self):
         return self.type == TeamType.PRIVATE
+
+    @property
+    def is_public(self):
+        return self.type == TeamType.PUBLIC
+
+    @property
+    def is_restricted(self):
+        return self.type == TeamType.RESTRICTED
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.name}>"

@@ -44,6 +44,9 @@ class User(Base):
     owned_documents: Mapped[List["Document"]] = relationship(  # noqa
         back_populates="user"
     )
+    teams: Mapped[List["Team"]] = relationship(  # noqa
+        secondary="user_team", back_populates="members"
+    )
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: @{str(self.username)}>"
