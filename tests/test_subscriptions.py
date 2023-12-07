@@ -3,6 +3,8 @@ from typing import List
 
 import pytest
 
+from backend.models.team import TeamType
+
 
 @pytest.fixture
 def create_document(account, team_topic_repo, user_repo, document_repo):
@@ -113,7 +115,7 @@ def test_cannot_subscribe_private_team(
     create_team_topic,
     subscribe_to_team_topic,
 ):
-    create_team("test", allow_create_topics=True, is_private=True)
+    create_team("test", allow_create_topics=True, type=TeamType.PRIVATE)
     create_team_topic("unit@test")
 
     # No we subscribe and try again
