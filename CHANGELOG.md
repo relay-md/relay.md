@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v0.12.0 (2023-12-07)
+### Feature
+* Explanation for relay-title ([`4db3ad0`](https://github.com/knowledgemd/backend/commit/4db3ad05cdc62d803b6376729f78510647e69873))
+* **join:** Allow a user to join a team, prevent posting to restricted or private teams ([`8975fd2`](https://github.com/knowledgemd/backend/commit/8975fd26d122aed3766d1f029f08392f50113ab1))
+* **team-membership:** Enable to be part of a team, indpendent of subscriptions ([`ce89522`](https://github.com/knowledgemd/backend/commit/ce89522d61f78c879e3cce2396c1c35af03a91b1))
+* More flexible team.type ([`1cfd902`](https://github.com/knowledgemd/backend/commit/1cfd90286f534b36c36040ecf935b145a10ac790))
+
+### Fix
+* Flip icons for dark/light mode ([`1fc2209`](https://github.com/knowledgemd/backend/commit/1fc2209dcd8f5eae7a6d03545510791127d40320))
+
 ## v0.11.0 (2023-12-06)
 ### Feature
 * Automatically subscribe to news@relay.md ([`4983140`](https://github.com/knowledgemd/backend/commit/4983140d24daad46f82d103fea380211afe81acb))
