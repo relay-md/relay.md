@@ -152,19 +152,25 @@ def eve_auth_header(eve_access_token):
 
 @pytest.fixture(autouse=True)
 def default_team_topics(dbsession, account):
-    team_repo = repos.team.TeamRepo(dbsession)
-    topic_repo = repos.topic.TopicRepo(dbsession)
-    team_topic_repo = repos.team_topic.TeamTopicRepo(dbsession)
+    team_repo = repos.TeamRepo(dbsession)
+    topic_repo = repos.TopicRepo(dbsession)
+    team_topic_repo = repos.TeamTopicRepo(dbsession)
+    user_team_repo = repos.UserTeamRepo(dbsession)
 
     team = team_repo.create_from_kwargs(
-        name="_", user_id=account.id, allow_create_topics=True, is_private=False
+        name="_",
+        user_id=account.id,
+        allow_create_topics=True,
+        type=models.team.TeamType.PUBLIC,
     )
 
     team = team_repo.create_from_kwargs(
-        name="myteam", user_id=account.id, is_private=True
+        name="myteam", user_id=account.id, type=models.team.TeamType.PRIVATE
     )
     topic = topic_repo.create_from_kwargs(name="mytopic")
     team_topic_repo.create_from_kwargs(team_id=team.id, topic_id=topic.id)
+    # Join account into default team
+    user_team_repo.create_from_kwargs(team_id=team.id, user_id=account.id)
 
 
 @pytest.fixture()
@@ -231,11 +237,15 @@ def subscribe_to_team_topic(account, team_topic_repo, user_team_topic_repo):
 
 @pytest.fixture
 def create_team(team_repo, account):
-    def func(name: str, is_private: bool = False, allow_create_topics: bool = False):
+    def func(
+        name: str,
+        type: models.team.TeamType = models.team.TeamType.PUBLIC,
+        allow_create_topics: bool = False,
+    ):
         return team_repo.create_from_kwargs(
             name=name,
             user_id=account.id,
-            is_private=is_private,
+            type=type,
             allow_create_topics=allow_create_topics,
         )
 

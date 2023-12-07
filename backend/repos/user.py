@@ -3,6 +3,7 @@ from ..models.user import User
 from .base import DatabaseAbstractRepository
 from .team import Team
 from .topic import Topic
+from .user_team import UserTeamRepo
 from .user_team_topic import UserTeamTopicRepo
 
 
@@ -20,6 +21,13 @@ class UserRepo(DatabaseAbstractRepository):
         return user_team_topic_repo.get_by_kwargs(
             user_id=user.id,
             team_topic_id=team_topic.id,
+        )
+
+    def is_member(self, user: User, team: Team):
+        user_team_topic_repo = UserTeamRepo(self._db)
+        return user_team_topic_repo.get_by_kwargs(
+            user_id=user.id,
+            team_id=team.id,
         )
 
     def from_string(self, username):

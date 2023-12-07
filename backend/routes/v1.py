@@ -35,7 +35,7 @@ api_key_header = APIKeyHeader(name="X-API-Key")
 Shareables = namedtuple("Shareables", "team_topics users is_public")
 
 
-def get_shareables(db, front):
+def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Shareables:
     user_repo = UserRepo(db)
     team_topic_repo = TeamTopicRepo(db)
     team_topics = list()
@@ -52,8 +52,13 @@ def get_shareables(db, front):
             # becomes public!
             topic, team = to.split("@")
             team_topic = team_topic_repo.from_string(to)
-            if not team_topic.team.is_private:
+            if team_topic.team.is_public:
                 is_public = True
+            if team_topic.team.is_restricted or team_topic.team.is_private:
+                if not user_repo.is_member(user, team_topic.team):
+                    raise exceptions.NotAllowed(
+                        f"You are not allowed to post to {team_topic.team}!"
+                    )
             team_topics.append(team_topic_repo.from_string(to))
     return Shareables(team_topics=team_topics, users=users, is_public=is_public)
 
@@ -164,10 +169,8 @@ async def post_doc(
     user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
 ):
-    TeamTopicRepo(db)
     document_repo = DocumentRepo(db)
     document_body_repo = DocumentBodyRepo()
-    UserRepo(db)
 
     # Get body containing the raw markdown
     body = (await request.body()).decode("utf-8")
@@ -192,7 +195,7 @@ async def post_doc(
         raise exceptions.BadRequest("Filenames must not contain slash or backslash")
 
     # Parse relay_to as team_topics
-    shareables = get_shareables(db, front)
+    shareables = get_shareables(db, front, user)
 
     # if the document already has an id, let's raise
     if front.relay_document:
@@ -270,12 +273,13 @@ async def put_doc(
     request: Request,
     id: UUID,
     document: Document = Depends(get_user_owned_document),
+    user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
 ):
     document_repo = DocumentRepo(db)
-    TeamTopicRepo(db)
     document_body_repo = DocumentBodyRepo()
     UserRepo(db)
+
     body = (await request.body()).decode("utf-8")
     front_matter = frontmatter.loads(body)
     front = DocumentFrontMatter(**front_matter)
@@ -286,7 +290,7 @@ async def put_doc(
         title = get_title_from_body(front_matter.content)
 
     # Parse relay_to as team_topics
-    shareables = get_shareables(db, front)
+    shareables = get_shareables(db, front, user)
 
     document_repo.update(
         document,
