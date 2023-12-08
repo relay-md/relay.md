@@ -1,3 +1,16 @@
+{% macro icon(name) %}
+span.icon
+ i{{name}}
+{% endmacro %}
+{% macro bool_icon(flag) %}
+{% if flag %}
+span.icon
+ i.fas.fa-check
+{% else %}
+span.icon
+ i.fas.fa-times
+{% endif %}
+{% endmacro %}
 {% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 .mt-5.mb-5
@@ -18,6 +31,49 @@
      span.icon.is-left
       i.fas.fa-globe
      div(id="team-type-updated")
+
+   .section
+    h1
+    h1.block.title.is-3 Members
+    h2.subtitle.is-5 Add others to your team
+     nav.pagination(role="navication" aria-label="pagination")
+      {% if page %}
+      a.pagination-previous(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page-1)}}") Previous
+      {% endif %}
+      {% if documents | length == size %}
+      a.pagination-next(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page+1)}}") Next Page
+      {% endif %}
+      table.table
+       thead
+        tr
+         th
+          span.icon
+           i.fas.fa-user
+         th
+          span.icon
+           i.fas.fa-user-plus
+         th
+          span.icon
+           i.fas.fa-file-plus
+         th
+          span.icon
+           i.fas.fa-user-times
+         th
+          span.icon
+           i.fas.fa-edit
+         th control
+       {% for member in members %}
+       tr
+        td {{member.user.username}}
+        td {{bool_icon(member.can_invite_users)}}
+        td {{bool_icon(member.can_post_documents)}}
+        td {{bool_icon(member.can_delete_documents)}}
+        td {{bool_icon(member.can_modify_documents)}}
+        td
+         a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
+          span.icon.is-small
+           i.fas.fa-trash
+       {% endfor %}
 
    .section
     h1.block.title.is-3 Invite Users

@@ -27,6 +27,12 @@ class NotAllowed(BaseAPIException):
     code = status.HTTP_403_FORBIDDEN
 
 
+class DatabaseException(BaseAPIException):
+    """Bad user request"""
+
+    code = status.HTTP_400_BAD_REQUEST
+
+
 class BadRequest(BaseAPIException):
     """Bad user request"""
 

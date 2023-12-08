@@ -4,6 +4,7 @@ from typing import List, TypeVar, Union
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from ..database import Session
 
@@ -39,15 +40,25 @@ class DatabaseAbstractRepository(AbstractRepository):
         self._db = db
 
     def create(self, item: T) -> T:
-        self._db.add(item)
-        self._db.commit()
+        try:
+            self._db.add(item)
+            self._db.commit()
+        except IntegrityError:
+            raise Exception(
+                "Database complained. Probably a uniqueness constraint is violated by your request!"
+            )
         self._db.refresh(item)
         return item
 
     def create_from_kwargs(self, **kwargs) -> T:
         new = self.ORM_Model(**kwargs)
-        self._db.add(new)
-        self._db.commit()
+        try:
+            self._db.add(new)
+            self._db.commit()
+        except IntegrityError:
+            raise Exception(
+                "Database complained. Probably a uniqueness constraint is violated by your request!"
+            )
         self._db.refresh(new)
         return new
 

@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, Query, Request
 from fastapi.responses import PlainTextResponse
 from starlette.responses import RedirectResponse
 
@@ -127,6 +127,38 @@ async def invite_user(
     return RedirectResponse(url=request.url_for("settings", team_name=team_name))
 
 
+@router.get("/team/{team_name}/remove/{membership_id}")
+async def remove_user(
+    team_name: str,
+    membership_id: UUID,
+    request: Request,
+    config=config,
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    if team.is_public:
+        raise exceptions.NotAllowed("You cannot uninvite anyone from global teams!")
+    user_repo = UserRepo(db)
+    user_team_repo = UserTeamRepo(db)
+    membership_to_remove = user_team_repo.get_by_kwargs(id=membership_id)
+    if not membership_to_remove:
+        raise exceptions.BadRequest("Invalid membership id!")
+    membership = user_repo.is_member(user, team)
+    if (team.is_private or team.is_restricted) and not membership:
+        # TODO: check that we are allowed to invite people
+        raise exceptions.NotAllowed(
+            f"Team {team.name} is private or restricted and you are not member!"
+        )
+
+    if not membership.can_invite_users:
+        raise exceptions.NotAllowed(
+            f"You are not allowed to manage members of team {team_name}!"
+        )
+    user_team_repo.delete(membership_to_remove)
+    return RedirectResponse(url=request.url_for("settings", team_name=team_name))
+
+
 @router.get("/team/{team_name}/leave")
 async def leave(
     team_name: str,
@@ -149,7 +181,11 @@ async def settings(
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
+    size: int = Query(default=10),
+    page: int = Query(default=0),
 ):
+    team_repo = TeamRepo(db)
+    members = team_repo.list_team_members(team, page, size)
     return templates.TemplateResponse("team-admin.pug", context=dict(**locals()))
 
 
