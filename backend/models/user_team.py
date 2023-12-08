@@ -17,6 +17,11 @@ class UserTeam(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team.id"))
 
+    can_invite_users: Mapped[bool] = mapped_column(default=False)
+    can_post_documents: Mapped[bool] = mapped_column(default=False)
+    can_delete_documents: Mapped[bool] = mapped_column(default=False)
+    can_modify_documents: Mapped[bool] = mapped_column(default=False)
+
     def __repr__(self):
         return f"<{self.__class__.__name__}>"
 

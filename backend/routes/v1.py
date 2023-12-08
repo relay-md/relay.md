@@ -35,7 +35,34 @@ api_key_header = APIKeyHeader(name="X-API-Key")
 Shareables = namedtuple("Shareables", "team_topics users is_public")
 
 
+def chech_permissions(db: Session, user: User, shareables: Shareables):
+    # WARNING: If any of the targets is non-private, the entire document
+    # becomes public!
+    user_repo = UserRepo(db)
+    for team_topic in shareables.team_topics:
+        if team_topic.team.is_public:
+            # No further checking, anything goes if public
+            continue
+
+        # If not public, membership is required
+        membership = user_repo.is_member(user, team_topic.team)
+        if not membership:
+            raise exceptions.NotAllowed(
+                f"You are not allowed to post to {team_topic.team}!"
+            )
+
+        # some members are allowed to post in restricted teams
+        if team_topic.team.is_restricted and not membership.can_post_documents:
+            raise exceptions.NotAllowed(
+                f"You are not allowed to post to {team_topic.team}!"
+            )
+
+
 def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Shareables:
+    """Is used on POST and PUT.
+    Converts string version of relay-to into team_topic instances or user
+    instance.
+    """
     user_repo = UserRepo(db)
     team_topic_repo = TeamTopicRepo(db)
     team_topics = list()
@@ -54,11 +81,6 @@ def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Share
             team_topic = team_topic_repo.from_string(to)
             if team_topic.team.is_public:
                 is_public = True
-            if team_topic.team.is_restricted or team_topic.team.is_private:
-                if not user_repo.is_member(user, team_topic.team):
-                    raise exceptions.NotAllowed(
-                        f"You are not allowed to post to {team_topic.team}!"
-                    )
             team_topics.append(team_topic_repo.from_string(to))
     return Shareables(team_topics=team_topics, users=users, is_public=is_public)
 
@@ -196,6 +218,7 @@ async def post_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
+    chech_permissions(db, user, shareables)
 
     # if the document already has an id, let's raise
     if front.relay_document:
@@ -291,6 +314,7 @@ async def put_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
+    chech_permissions(db, user, shareables)
 
     document_repo.update(
         document,
