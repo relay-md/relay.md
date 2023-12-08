@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from sqlalchemy import select
+
 from ..models.user import User
 from .base import DatabaseAbstractRepository
 from .team import Team
@@ -32,3 +34,6 @@ class UserRepo(DatabaseAbstractRepository):
 
     def from_string(self, username):
         return self.get_by_kwargs(username=username)
+
+    def search_username(self, name):
+        return self._db.scalars(select(User).filter(User.username.like(f"%{name}%")))

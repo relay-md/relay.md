@@ -3,8 +3,29 @@
 .mt-5.mb-5
  .columns
   .column.is-8.is-offset-2
-   h1.title.is-1 Team {{team.name}}
+   .section
+    h1.title.is-1 {{team.name}}
 
-   p Site is under contruction
+   .section
+    h1.title.is-3 Team Privacy
+    h2.subtitle.is-5 Define what kind of Team this is
+    .control.has-icons-left
+     .select
+      select(name="type" hx-post="settings/type" hx-target="#team-type-updated")
+       option(value="public" selected="{{'1' if team.is_public else '0'}}") Public
+       option(value="restricted" selected="{{'1' if team.is_restricted else '0'}}") Restricted
+       option(value="private" selected="{{'1' if team.is_private else '0'}}") Private
+     span.icon.is-left
+      i.fas.fa-globe
+     div(id="team-type-updated")
+
+   .section
+    h1.block.title.is-3 Invite Users
+    h2.subtitle.is-5 Add others to your team
+    .control.has-icons-left
+     input.input(type="tags" id="invite-users" name="name", hx-post="settings/user/search" hx-trigger="input changed delay:500ms, search" hx-target="#users")
+     span.icon.is-left
+      i.fas.fa-search
+    div(id="users")
 
 {% endblock %}
