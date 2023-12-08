@@ -43,6 +43,8 @@ class Settings(BaseSettings):
     # Oauth Client data
     GITHUB_CLIENT_ID: Optional[str]
     GITHUB_CLIENT_SECRET: Optional[str]
+    GOOGLE_CLIENT_ID: Optional[str]
+    GOOGLE_CLIENT_SECRET: Optional[str]
 
     # Mailchimp
     MAILCHIMP_API_SERVER: Optional[str]

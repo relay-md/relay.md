@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 
 class OauthProvider(enum.Enum):
     GITHUB = "github"
+    GOOGLE = "google"
 
 
 class User(Base):

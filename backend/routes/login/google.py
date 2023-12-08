@@ -15,41 +15,40 @@ from ...repos.user_team_topic import UserTeamTopicRepo
 from ...utils.url import get_next_url
 from . import oauth
 
-router = APIRouter(prefix="/login/github")
+router = APIRouter(prefix="/login/google")
 oauth.register(
-    name="github",
-    client_id=config.GITHUB_CLIENT_ID,
-    client_secret=config.GITHUB_CLIENT_SECRET,
-    client_kwargs={"scope": "read:user"},
-    access_token_url="https://github.com/login/oauth/access_token",
-    authorize_url="https://github.com/login/oauth/authorize",
-    api_base_url="https://api.github.com/",
+    name="google",
+    client_id=config.GOOGLE_CLIENT_ID,
+    client_secret=config.GOOGLE_CLIENT_SECRET,
+    client_kwargs={"scope": "openid email profile"},
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
 )
 
 
 @router.get("")
-async def login_github(request: Request, next: Optional[str] = ""):
-    redirect_uri = request.url_for("auth_github")
-    return await oauth.github.authorize_redirect(request, redirect_uri)
+async def login_google(request: Request, next: Optional[str] = ""):
+    redirect_uri = request.url_for("auth_google")
+    return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/auth")
-async def auth_github(request: Request, db: Session = Depends(get_session)):
-    token = await oauth.github.authorize_access_token(request)
-    resp = await oauth.github.get("user", token=token)
-    github_user = resp.json()
+async def auth_google(request: Request, db: Session = Depends(get_session)):
+    token = await oauth.google.authorize_access_token(request)
+    google_user = token.get("userinfo")
+    print(google_user)
     user_repo = UserRepo(db)
     access_token_repo = AccessTokenRepo(db)
     user = user_repo.get_by_kwargs(
-        username=github_user["login"].lower(), oauth_provider=OauthProvider.GITHUB
+        username=google_user["name"].lower(), oauth_provider=OauthProvider.GOOGLE
     )
     if not user:
         user = user_repo.create_from_kwargs(
-            username=github_user["login"].lower(),
-            email=github_user["email"].lower(),
-            name=github_user["name"].lower(),
-            location=github_user["location"],
-            oauth_provider=OauthProvider.GITHUB,
+            # FIXME: MUST ASK USER TO PROVIDE A USERNAME!?!?
+            username=google_user["sub"].lower(),
+            email=google_user["email"].lower(),
+            name=google_user["name"].lower(),
+            location="",
+            oauth_provider=OauthProvider.GOOGLE,
         )
 
         # Automatically subscribe to some team topics
@@ -69,7 +68,7 @@ async def auth_github(request: Request, db: Session = Depends(get_session)):
     access_token = access_token_repo.get_by_kwargs(user_id=user.id)
     if not access_token:
         access_token = access_token_repo.create_from_kwargs(user_id=user.id)
-    if github_user:
+    if google_user:
         request.session["user_id"] = str(user.id)
         request.session["access_token"] = str(access_token.token)
     return RedirectResponse(url=get_next_url(request) or "/")
