@@ -52,4 +52,4 @@ class User(Base):
         return f"<{self.__class__.__name__}: @{str(self.username)}>"
 
 
-Index("user_oauth_index", User.username, User.oauth_provider)
+Index("user_oauth_index_unique", User.username, User.oauth_provider, unique=True)

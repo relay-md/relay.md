@@ -4,7 +4,7 @@
 import uuid
 
 from sqlalchemy import ForeignKey, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
 
@@ -17,6 +17,9 @@ class UserTeam(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team.id"))
 
+    user: Mapped["User"] = relationship(viewonly=True)  # noqa
+    team: Mapped["Team"] = relationship(viewonly=True)  # noqa
+
     can_invite_users: Mapped[bool] = mapped_column(default=False)
     can_post_documents: Mapped[bool] = mapped_column(default=False)
     can_delete_documents: Mapped[bool] = mapped_column(default=False)
@@ -26,4 +29,4 @@ class UserTeam(Base):
         return f"<{self.__class__.__name__}>"
 
 
-Index("user_team_idx", UserTeam.user_id, UserTeam.team_id)
+Index("user_team_idx_unique", UserTeam.user_id, UserTeam.team_id, unique=True)

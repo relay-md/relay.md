@@ -5,7 +5,6 @@ from .document_access import DocumentAccess
 from .document_team_topic import DocumentTeamTopic
 from .document_user import DocumentUser
 from .team import Team
-from .team_member import TeamMember
 from .team_topic import TeamTopic
 from .topic import Topic
 from .user import User
@@ -20,7 +19,6 @@ __all__ = [
     Topic.__name__,
     TeamTopic.__name__,
     DocumentTeamTopic.__name__,
-    TeamMember.__name__,
     DocumentAccess.__name__,
     DocumentUser.__name__,
     UserTeamTopic.__name__,
