@@ -48,8 +48,8 @@ def s3(patch_document_body_create, patch_document_body_get):
 def test_document_upload(
     account, other_account, auth_header, api_client, s3, dbsession
 ):
-    req = api_client.post("/v1/doc", headers=auth_header, data=mocked_up_text)
-    assert req.ok, req.text
+    req = api_client.post("/v1/doc", headers=auth_header, content=mocked_up_text)
+    req.raise_for_status(), req.text
 
     ret = req.json()
     doc_id = ret["result"]["relay-document"]
@@ -61,7 +61,7 @@ def test_document_upload(
     )
 
     req = api_client.get(f"/v1/doc/{doc_id}", headers=auth_header)
-    assert req.ok, req.text
+    req.raise_for_status(), req.text
 
     # check doc has been access
     assert dbsession.scalar(
@@ -85,7 +85,7 @@ def test_document_upload(
     req = api_client.get(
         f"/v1/doc/{doc_id}", headers={**auth_header, "content-type": "text/markdown"}
     )
-    assert req.ok, req.text
+    req.raise_for_status(), req.text
 
     expected = f"""---
 relay-document: {doc_id}
@@ -111,8 +111,8 @@ relay-to:
 
 Example text
     """
-    req = api_client.post("/v1/doc", headers=auth_header, data=other_mocked_up_text)
-    assert req.ok
+    req = api_client.post("/v1/doc", headers=auth_header, content=other_mocked_up_text)
+    req.raise_for_status()
     assert (
         req.json()["error"]["message"]
         == "The document you are sending already has a relay-document id"
@@ -134,7 +134,7 @@ relay-to:
 
 Example text
 """
-    req = api_client.post("/v1/doc", headers=auth_header, data=original_doc)
+    req = api_client.post("/v1/doc", headers=auth_header, content=original_doc)
     ret = req.json()
     doc_id = ret["result"]["relay-document"]
 
@@ -151,17 +151,17 @@ Example text
 
     # Now trying to put as wrong user
     req = api_client.put(
-        f"/v1/doc/{doc_id}", headers=other_auth_header, data=updated_doc
+        f"/v1/doc/{doc_id}", headers=other_auth_header, content=updated_doc
     )
-    assert req.ok
+    req.raise_for_status()
     assert (
         req.json()["error"]["message"]
         == "Updating someone else document is not allowed currently!"
     )
 
     # Now trying to put as correct user
-    req = api_client.put(f"/v1/doc/{doc_id}", headers=auth_header, data=updated_doc)
-    assert req.ok
+    req = api_client.put(f"/v1/doc/{doc_id}", headers=auth_header, content=updated_doc)
+    req.raise_for_status()
     assert req.json()["result"]["relay-document"] == doc_id
 
     assert "Additional text" in patch_document_body_update.call_args.args[1]

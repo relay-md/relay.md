@@ -76,7 +76,6 @@ async def submitmail(
         },
     )
     res = req.json()
-    print(res)
     if not req.ok:
         if res.get("title") == "Member Exists":
             return HTMLResponse(

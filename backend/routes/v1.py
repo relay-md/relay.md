@@ -195,6 +195,7 @@ async def post_doc(
         relay_filename=filename,
         relay_to=front.relay_to,
     )
+    print(dict(result=ret_document))
     return dict(result=ret_document)
 
 
@@ -230,7 +231,7 @@ async def get_doc(
             relay_to=document.shared_with,
             body=body,
         )
-        return Response(result=ret_document).dict(by_alias=True)
+        return Response(result=ret_document).model_dump(by_alias=True)
     elif content_type == "text/markdown":
         response = PlainTextResponse(body)
         response.headers["X-Relay-document"] = str(document.id)

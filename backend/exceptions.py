@@ -68,7 +68,7 @@ async def handle_exception(request: Request, exc: BaseAPIException):
 
     error = dict(message=str(exc), code=exc.code)
     content: Response = Response(error=error)
-    return JSONResponse(content=content.dict(exclude_none=True), status_code=200)
+    return JSONResponse(content=content.model_dump(exclude_none=True), status_code=200)
 
 
 async def handle_http_exception(request: Request, exc: HTTPException):
@@ -76,7 +76,7 @@ async def handle_http_exception(request: Request, exc: HTTPException):
 
     error = dict(message=str(exc.detail))
     content: Response = Response(error=error)
-    return JSONResponse(content=content.dict(exclude_none=True), status_code=200)
+    return JSONResponse(content=content.model_dump(exclude_none=True), status_code=200)
 
 
 async def handle_basegateway_exception(request: Request, exc: HTTPException):
@@ -84,7 +84,7 @@ async def handle_basegateway_exception(request: Request, exc: HTTPException):
 
     error = dict(message=str(exc))
     content: Response = Response(error=error)
-    return JSONResponse(content=content.dict(exclude_none=True), status_code=200)
+    return JSONResponse(content=content.model_dump(exclude_none=True), status_code=200)
 
 
 async def unhandled_exception(request: Request, exc: Exception):
@@ -92,7 +92,7 @@ async def unhandled_exception(request: Request, exc: Exception):
 
     error = dict(message="unhandled exception", detail=dict(message=str(exc)))
     content: Response = Response(error=error)
-    return JSONResponse(content=content.dict(exclude_none=True), status_code=200)
+    return JSONResponse(content=content.model_dump(exclude_none=True), status_code=200)
 
 
 async def web_handle_exception(

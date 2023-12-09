@@ -76,4 +76,4 @@ class MyCelery(Celery):
 
 
 celery = MyCelery(__name__)
-celery.conf.update(config.CELERY_CONF.dict())
+celery.conf.update(config.CELERY_CONF.model_dump())

@@ -47,7 +47,7 @@ def test_get_docs_no_subscription(
     account, auth_header, api_client, dbsession, create_document
 ):
     req = api_client.get("/v1/docs", headers=auth_header)
-    assert req.ok
+    req.raise_for_status()
     assert req.json()["result"] == []
 
 
@@ -63,14 +63,14 @@ def test_get_docs_just_shared_with_me(
 ):
     document = create_document("foo.bar.text", [], [other_account.username], False)
     req = api_client.get("/v1/docs", headers=other_auth_header)
-    assert req.ok
+    req.raise_for_status()
     assert len(req.json()["result"]) == 1
     ret_doc = req.json()["result"][0]
     ret_doc["relay-document"] == str(document.id)
 
     # not shared with me though :D
     req = api_client.get("/v1/docs", headers=eve_auth_header)
-    assert req.ok
+    req.raise_for_status()
     assert len(req.json()["result"]) == 0
 
 
@@ -91,13 +91,13 @@ def test_get_docs_in_team_topics_i_subscribed(
     team_topic = create_team_topic("unit@test")
     document = create_document("foo.bar.text", [team_topic.name], [], False)
     req = api_client.get("/v1/docs", headers=auth_header)
-    assert req.ok
+    req.raise_for_status()
     assert len(req.json()["result"]) == 0
 
     # No we subscribe and try again
     subscribe_to_team_topic(account, team_topic.name)
     req = api_client.get("/v1/docs", headers=auth_header)
-    assert req.ok
+    req.raise_for_status()
     assert len(req.json()["result"]) == 1
     ret_doc = req.json()["result"][0]
     ret_doc["relay-document"] == str(document.id)
