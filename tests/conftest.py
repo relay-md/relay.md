@@ -87,7 +87,6 @@ def account(dbsession):
         username="account",
         email="account@example.com",
         name="Example account",
-        location="DE-CIX",
         oauth_provider=models.user.OauthProvider.GITHUB,
     )
 
@@ -110,7 +109,6 @@ def other_account(dbsession):
         username="account2",
         email="account2@example.com",
         name="Another Example account",
-        location="DE-CIX",
         oauth_provider=models.user.OauthProvider.GITHUB,
     )
 
@@ -133,7 +131,6 @@ def eve(dbsession):
         username="eve",
         email="eve@example.com",
         name="Another Example account",
-        location="DE-CIX",
         oauth_provider=models.user.OauthProvider.GITHUB,
     )
 
