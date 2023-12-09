@@ -1,0 +1,21 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5
+ .columns.is-centered
+  .column.is-6.is-centered
+   h1.title.is-1 Select Auth Provider
+
+   .block
+    a.button.is-large(href="{{url_for('login_github')}}")
+     span.icon.is-large
+      i.fab.fa-github
+     span Sign-in with GitHub
+
+   .block
+    a.button.is-large(href="{{url_for('login_google')}}")
+     span.icon.is-large
+      i.fab.fa-google
+     span Sign-in with Google
+
+   .block
+{% endblock %}

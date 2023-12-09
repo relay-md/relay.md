@@ -5,8 +5,10 @@ from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, Depends, Request
 from starlette.responses import RedirectResponse
 
+from ...config import config
+from ...templates import templates
 from ...utils.url import add_next_url, get_next_url
-from ...utils.user import User, require_user
+from ...utils.user import User, get_optional_user, require_user
 
 router = APIRouter(prefix="")
 oauth = OAuth()
@@ -28,17 +30,31 @@ async def logout(request: Request, next: Optional[str] = None):
 
 
 @router.get("/register")
-async def register(request: Request, next: Optional[str] = None):
+async def register(
+    request: Request,
+    next: Optional[str] = None,
+    config=config,
+    user: User = Depends(get_optional_user),
+):
+    if user:
+        return RedirectResponse(url="/")
     add_next_url(request, next)
-    return RedirectResponse(url="/login/github")
+    return templates.TemplateResponse("login.pug", context=locals())
 
 
 # TODO: Deal with the next-url item below, maybe build a stack of urls to visit
 # in a session like in previous projects
 @router.get("/login")
-async def login(request: Request, next: Optional[str] = None):
+async def login(
+    request: Request,
+    next: Optional[str] = None,
+    config=config,
+    user: User = Depends(get_optional_user),
+):
+    if user:
+        return RedirectResponse(url="/")
     add_next_url(request, next)
-    return RedirectResponse(url="/login/github")
+    return templates.TemplateResponse("login.pug", context=locals())
 
 
 @router.get("/configure/obsidian")
