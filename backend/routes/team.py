@@ -220,10 +220,13 @@ async def settings_user_search(
     if len(name) < 3:
         return
     user_repo = UserRepo(db)
-    users = list(user_repo.search_username(name))
+    users = list(user_repo.search_username(name, limit=5))
 
     def user_invite_link(user):
-        return f"<a href='{request.url_for('invite_user', team_name=team_name, user_id=user.id)}' class='list-item'>Invite {user.username}</a>"
+        return f"""
+            <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">
+            <span class="icon-text"><span class="icon"><i class="fab fa-{user.oauth_provider.value}"></i></span><span>{user.username}</span></a>
+        """
 
     ret = "\n".join([user_invite_link(x) for x in users])
     return f"""
