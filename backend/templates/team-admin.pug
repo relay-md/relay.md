@@ -35,7 +35,7 @@ span.icon
    .section
     h1
     h1.block.title.is-3 Members
-    h2.subtitle.is-5 Add others to your team
+    h2.subtitle.is-5 List of users subscribed to your team
      nav.pagination(role="navication" aria-label="pagination")
       {% if page %}
       a.pagination-previous(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page-1)}}") Previous
