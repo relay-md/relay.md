@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+from typing import List
+
 from sqlalchemy import func, or_, select
 
+from ..config import config
 from ..models.access_token import AccessToken
 from ..models.document import Document
 from ..models.document_team_topic import DocumentTeamTopic
@@ -172,4 +175,19 @@ class DocumentRepo(DatabaseAbstractRepository):
     def get_my_documents_count(self, user: User):
         return self._db.scalar(
             select(func.count(Document.id)).filter(Document.user_id == user.id)
+        )
+
+    def latest_news(self, size=10) -> List[Document]:
+        if not config.RELAY_NEWS_TEAM_TOPIC_ID:
+            return []
+        return list(
+            self._db.scalars(
+                select(Document)
+                .filter(
+                    Document.team_topics.any(
+                        TeamTopic.id == config.RELAY_NEWS_TEAM_TOPIC_ID
+                    )
+                )
+                .limit(size)
+            )
         )

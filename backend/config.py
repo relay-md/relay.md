@@ -4,6 +4,7 @@
 Allow to load values from environment variables.
 """
 from typing import List, Optional
+from uuid import UUID
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -60,6 +61,9 @@ class Settings(BaseSettings):
     # Early access configs
     ENABLE_EARLY_ACCESS: bool = True
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
+
+    RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID]
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

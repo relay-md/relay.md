@@ -73,6 +73,9 @@ class DatabaseAbstractRepository(AbstractRepository):
     def list(self, **kwargs) -> List[T]:
         return self._db.scalars(select(self.ORM_Model).filter_by(**kwargs))
 
+    def filter(self, *args) -> List[T]:
+        return self._db.scalars(select(self.ORM_Model).filter(*args))
+
     def update(self, item: T, **kwargs) -> T:
         for key, value in kwargs.items():
             if not hasattr(item, key):
