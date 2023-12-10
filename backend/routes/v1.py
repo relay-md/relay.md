@@ -195,7 +195,6 @@ async def post_doc(
         relay_filename=filename,
         relay_to=front.relay_to,
     )
-    print(dict(result=ret_document))
     return dict(result=ret_document)
 
 

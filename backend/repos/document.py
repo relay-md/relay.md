@@ -180,12 +180,14 @@ class DocumentRepo(DatabaseAbstractRepository):
     def latest_news(self, size=10) -> List[Document]:
         if not config.RELAY_NEWS_TEAM_TOPIC_ID:
             return []
-        return self._db.scalars(
-            select(Document)
-            .filter(
-                Document.team_topics.any(
-                    TeamTopic.id == config.RELAY_NEWS_TEAM_TOPIC_ID
+        return list(
+            self._db.scalars(
+                select(Document)
+                .filter(
+                    Document.team_topics.any(
+                        TeamTopic.id == config.RELAY_NEWS_TEAM_TOPIC_ID
+                    )
                 )
+                .limit(size)
             )
-            .limit(size)
         )
