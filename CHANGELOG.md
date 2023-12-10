@@ -2,6 +2,27 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.0 (2023-12-10)
+### Feature
+* Allow to use markdown in pug ([`9d186f0`](https://github.com/knowledgemd/backend/commit/9d186f028f1e5eb1a78a0f05c03c2b0d34f9bc0e))
+* Allow to select oauth provider (google, github) ([`9033933`](https://github.com/knowledgemd/backend/commit/9033933d3f76d3b9e8a5f0c4d669e22c0248a38c))
+* Show oauth provider when listing users ([`692318c`](https://github.com/knowledgemd/backend/commit/692318c6538c0f058892b30afaa1ce063dfdd9d5))
+* Force google users to provide a username ([`777181f`](https://github.com/knowledgemd/backend/commit/777181f20bbd3b350f44b1190af35b2ba9e7f4a6))
+* Oauth via google ([`0d36526`](https://github.com/knowledgemd/backend/commit/0d36526df32293310e3476e3f70e8e6f2672a2fc))
+* **pydantic-v2:** Migration to pydantic v2 ([`3f729b1`](https://github.com/knowledgemd/backend/commit/3f729b108f4eeebd868c30907ecd8ce57ec76a73))
+* List of members in a team ([`4c1a1db`](https://github.com/knowledgemd/backend/commit/4c1a1db14db03962c06e29af9095b48e07fabd12))
+* Invite users to a team ([`e49bd1c`](https://github.com/knowledgemd/backend/commit/e49bd1c162c47622ec50ab8e0ed326588af46fa2))
+* Allow to post documents for members ([`4c525cf`](https://github.com/knowledgemd/backend/commit/4c525cfd85974865a4ae523e3ad860a19cde9a62))
+* Explanation for relay-title ([`61d16da`](https://github.com/knowledgemd/backend/commit/61d16da990eb820ea054e23ab6f111ce8e5e2889))
+* **pagination:** Paginate on separate documents page ([`523f559`](https://github.com/knowledgemd/backend/commit/523f559c33b13d91f0bf20b77e67702af22020ec))
+
+### Fix
+* Remove google login for now ([`6cf732f`](https://github.com/knowledgemd/backend/commit/6cf732fb8f6b6c3a1b8cab3b024b8fcf0ddebee0))
+* Add tos to footer ([`93e5174`](https://github.com/knowledgemd/backend/commit/93e5174b35156bd8a93e707a635110e1af1d38bf))
+* Tests ([`493e450`](https://github.com/knowledgemd/backend/commit/493e450b99180ff23ba6345285904bfb1aacbe74))
+* Typo ([`d013184`](https://github.com/knowledgemd/backend/commit/d013184f2813eaf9250d86c88b66b42274b29c64))
+* Unique constraints on Indices ([`27752bf`](https://github.com/knowledgemd/backend/commit/27752bf69dd7443d40afaa7c0f06c49c6f27ad31))
+
 ## v0.12.0 (2023-12-07)
 ### Feature
 * Explanation for relay-title ([`4db3ad0`](https://github.com/knowledgemd/backend/commit/4db3ad05cdc62d803b6376729f78510647e69873))
