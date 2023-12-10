@@ -3,7 +3,7 @@
 
 from celery import Celery, Task
 
-from .config import config
+from .config import get_config
 from .database import get_session
 
 
@@ -76,4 +76,4 @@ class MyCelery(Celery):
 
 
 celery = MyCelery(__name__)
-celery.conf.update(config.CELERY_CONF.model_dump())
+celery.conf.update(get_config().CELERY_CONF.model_dump())

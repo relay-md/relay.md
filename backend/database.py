@@ -11,7 +11,7 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 
-from .config import config
+from .config import get_config
 
 
 class Base(DeclarativeBase):
@@ -31,9 +31,13 @@ def get_session() -> Iterator[Session]:
             db.close()
 
 
-engine_kwargs = {
-    k: v for k, v in config.SQLALCHEMY_ENGINE_OPTIONS.model_dump().items() if v
-}
-engine = create_engine(config.SQLALCHEMY_DATABASE_URI, **engine_kwargs)
+engine_kwargs = {}
+if get_config().SQLALCHEMY_ENGINE_OPTIONS:
+    engine_kwargs = {
+        k: v
+        for k, v in get_config().SQLALCHEMY_ENGINE_OPTIONS.model_dump().items()
+        if v
+    }
+engine = create_engine(get_config().SQLALCHEMY_DATABASE_URI, **engine_kwargs)
 SessionLocal = sessionmaker(engine)
 _db = None

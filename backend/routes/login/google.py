@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Form, Request, status
 from fastapi.responses import PlainTextResponse
 from starlette.responses import RedirectResponse
 
-from ...config import config
+from ...config import Settings, get_config
 from ...database import Session, get_session
 from ...models.user import OauthProvider
 from ...repos.access_token import AccessTokenRepo
@@ -18,8 +18,8 @@ from . import oauth
 router = APIRouter(prefix="/login/google")
 oauth.register(
     name="google",
-    client_id=config.GOOGLE_CLIENT_ID,
-    client_secret=config.GOOGLE_CLIENT_SECRET,
+    client_id=get_config().GOOGLE_CLIENT_ID,
+    client_secret=get_config().GOOGLE_CLIENT_SECRET,
     client_kwargs={
         "scope": "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
     },
@@ -56,7 +56,7 @@ async def auth_google(request: Request, db: Session = Depends(get_session)):
 
 
 @router.get("/onboarding")
-async def onboarding_google(request: Request, config=config):
+async def onboarding_google(request: Request, config: Settings = Depends(get_config)):
     return templates.TemplateResponse("google-onboarding.pug", context=locals())
 
 

@@ -1,0 +1,237 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.hero.is-link
+ .hero-body(id="tos")
+   .title.is-1 Terms of Service
+   .subtitle.is-3 In simple terms
+.mt-5
+ .columns
+  .column.is-8.is-offset-2
+   .block.box
+    p The full legalese of our terms of service and privacy policy are linked below, but we wanted to lay out our privacy principles in simple terms first. In short, we're privacy nerds—it's why we use offline-first PKM systems to begin with. We believe in owning our own data. To that end:
+    .list
+     .list-item All the data sent to relay.md is data you choose to send. We don't collect analytics in any form, and we don't sell your data.
+     .list-item Clients (e.g. the Obsidian plugin) only ever connect to relay.md servers or affiliated cloud providers. Connections are always encrypted.
+     .list-item Your data is encrypted at transport level
+
+   .block.box
+    p In exchange for the above promises we make to you, we ask a few of our own:
+    .list
+     .list-item Don't use relay.md to abuse others or spread hate.
+     .list-item Don't attempt to circumvent usage limits or abuse our APIs.
+     .list-item Don't share copyrighted material that you don’t own.
+
+   .block.box
+    p We reserve the right to ban you and remove your data from our servers if you violate these agreements.
+    p You can reach head of the team on
+     tt fabian@relay.md
+
+.hero.is-link
+ .hero-body(id="tos")
+   .title.is-1 Terms of Service
+   .subtitle.is-3 In legal terms
+.mt-5
+ .columns.content
+  .column.is-8.is-offset-2
+   .block.box
+    .title Introduction and Scope
+    p Relay.md, a web service accessible at https://relay.md, provides a platform for individuals and teams to collaborate and share Markdown-based documents effectively. These terms and conditions govern the use of Relay.md by users worldwide.
+
+   .block.box
+    .title User Registration and Account Creation
+    p To utilize Relay.md, users must create an account. Authentication is facilitated through a third-party provider of the user's choosing, such as GitHub, Google, or Facebook, using the industry-standard OAuth2 protocol. Additionally, users may be required to provide a username that will be used throughout the platform. Relay.md reserves the right to suspend accounts at any time for any reason, including but not limited to violations of these terms and conditions.
+
+   .block.box
+    .title Service Description and Restrictions
+    p Relay.md enables users to share documents both publicly and privately, with individuals or entire teams. When sharing documents with teams, users can optionally assign a topic to differentiate document types. Documents shared with public teams become publicly accessible on Relay.md and can be subscribed to by anyone. This allows users to integrate these documents into their personal knowledge bases via the API. Private teams, on the other hand, require explicit invitations to join, granting subscribers access to any document shared within the team. API rate limits and usage quotas may apply. Access permissions to private teams are managed by designated team owners and managers. Users are prohibited from abusing the API, attempting to circumvent limits, or using the platform to engage in hate speech, racism, or other unacceptable content.
+
+   .block.box
+    .title Data Protection and Privacy
+    p Relay.md values the privacy of its users and is committed to complying with the General Data Protection Regulation (GDPR). We collect and process personal data only to the extent necessary to provide the service reliably.
+    p For users, we collect the following personal data:
+    ul.ml-5
+     li Username
+     li Name
+     li Email address
+     li Profile picture
+    p This data is used to create and manage user accounts, authenticate users, and provide support. We also store the access times for individual documents to improve our service performance and identify potential security issues.
+    p Documents uploaded to Relay.md are stored on our servers until they are deleted by the user or the team owner. This data is used to deliver the documents to the specified destinations as requested by the uploading user. We do not share user data with third parties without the user's explicit consent.
+    p Relay.md implements appropriate technical and organizational measures to protect user data from unauthorized access, alteration, disclosure, destruction, or other unlawful processing. These measures are subject to regular review and updates to ensure their effectiveness.
+    p Users have the following rights regarding their personal data:
+    ul.ml-5
+     li Access: Users have the right to access their personal data and to receive a copy of it.
+     li Rectification: Users have the right to request that their personal data be rectified if it is inaccurate or incomplete.
+     li Erasure: Users have the right to request that their personal data be erased if it is no longer necessary for the purposes for which it was collected.
+     li Portability: Users have the right to receive their personal data in a structured, commonly used, and machine-readable format and to transmit it to another controller.
+    p Users can exercise these rights by contacting us at info@relay.md
+
+   .block.box
+    .title Terms of Use and User Conduct
+    p Relay.md prohibits the following behaviors on its platform:
+    ul.ml-5
+     li Hate speech, racism, discrimination, or any other form of harassment or abuse
+     li Bullying, threats, or intimidation
+     li Spamming, phishing, or other deceptive or misleading activities
+     li Posting or sharing illegal content, such as copyright infringement or child pornography
+     li Engaging in activities that could harm Relay.md or its users, such as hacking or distributed denial-of-service attacks
+    p If a user violates these terms of use, Relay.md may suspend or terminate the user's account. Relay.md may also take other actions, such as removing content or contacting law enforcement.
+    .title.is-5 Intellectual Property Guidelines
+    p Users are responsible for ensuring that they have the right to share any content that they upload to Relay.md. This includes copyright, trademark, and other intellectual property rights. If a user uploads content that infringes on the intellectual property rights of others, Relay.md may remove the content and take other actions, such as suspending or terminating the user's account.
+    .title.is-5  Consequences of Violation
+    p Relay.md may suspend or terminate a user's account for violating these terms of use. Relay.md may also remove content, contact law enforcement, or take other actions as it deems appropriate.
+
+   .block.box
+    .title Liability and Warranties
+    p Relay.md accepts no liability whatsoever for any damage whatsoever, including but not limited to direct, indirect, consequential, exemplary, incidental, special, or punitive damages, arising from or relating to these terms of use. This includes, but is not limited to, damages for loss of profits, loss of data, costs of procurement of substitute products, or business interruption.
+    .title.is-5 Disclaimer of Warranties
+    p Relay.md makes no warranties or guarantees regarding its service, including but not limited to warranties of merchantability and fitness for a particular purpose. Relay.md does not represent or warrant that the service will be uninterrupted, error-free, or secure, that the service will meet your requirements, or that the service will be compatible with your hardware or software. Relay.md does not warrant that the results that may be obtained from the use of the service will be accurate or reliable.
+    .title.is-5 Remedy of Damanges
+    p You agree that your sole and exclusive remedy for any damages arising from or relating to these terms of use is to cease using Relay.md. You agree to indemnify and hold Relay.md harmless from and against all losses, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or in connection with your use of Relay.md, your violation of these terms of use, or your violation of any rights of a third party.
+
+   .block.box
+    .title Third-party Content and Links
+    p Relay.md may contain links to third-party websites or content. Relay.md does not control these third-party websites or content and is not responsible for them. Relay.md does not endorse or guarantee the accuracy, completeness, or quality of any third-party websites or content. You acknowledge and agree that Relay.md will not be liable for any damages arising from your use of third-party websites or content.
+
+   .block.box
+    .title Amendments and Termination
+    p Relay.md may amend these terms of use at any time. Relay.md will notify users of any amendments by posting them on the Relay.md website. Users are responsible for reviewing the amended terms of use. By continuing to use the Relay.md service after the effective date of any amendments, users agree to the amended terms of use.
+    p Relay.md may terminate a user's account at any time for any reason, including but not limited to violations of these terms of use. Relay.md will notify users of termination by sending an email to the user's registered email address.
+
+   .block.box
+    .title Applicable Law and Jurisdiction
+    p These terms of use are governed by German law. Any dispute arising from these terms of use will be subject to the exclusive jurisdiction of German courts.
+
+   .block.box
+    .title Intellectual Property Rights
+    p Relay.md respects the copyrights and trademarks of others. If you believe that your copyright or trademark has been infringed by any Relay.md user, please notify Relay.md by sending an email to dcma@relay.md Relay.md will promptly investigate the matter and take appropriate action, including removing the infringing content.
+    p Users must not upload documents or data that they do not have the rights to.
+    p Users are responsible for ensuring that they have the right to share any content that they upload to Relay.md. This includes copyright, trademark, and other intellectual property rights. If a user uploads content that infringes on the intellectual property rights of others, Relay.md may remove the content and take other actions, such as suspending or terminating the user's account.
+    p Relay.md owns all intellectual property rights related to its service, including but not limited to copyrights, trademarks, and patents. Users are not authorized to copy, distribute, or modify any Relay.md intellectual property without the express written permission of Relay.md.
+
+   .block.box
+    .title Acknowledgement and Agreement
+    p By using Relay.md, you agree to these terms of use. If you do not agree to these terms of use, you may not use Relay.md.
+
+   .block.box
+    .title Entire Agreement
+    p These terms of use constitute the entire agreement between you and Relay.md regarding the use of Relay.md. They supersede all prior or contemporaneous communications, representations, or agreements, whether oral or written.
+
+   .block.box
+    .title Severability
+    p If any provision of these terms of use is held to be invalid or unenforceable, such provision will be struck from these terms of use and the remaining provisions will remain in full force and effect.
+
+   .block.box
+    .title Waiver
+    p The failure of Relay.md to enforce any provision of these terms of use will not be deemed a waiver of such provision.
+
+   .block.box
+    .title Governing Law
+    p These terms of use are governed by and construed in accordance with the laws of Germany without regard to its conflict of laws provisions.
+
+
+.hero.is-link.mt-8
+ .hero-body(id="privacy")
+   .title.is-1 Privacy Data Policy
+   .subtitle.is-3 What happens with your data
+
+.mt-5
+ .columns.content
+  .column.is-8.is-offset-2
+   .block.box
+    .title Introduction
+    p This Privacy Policy (hereinafter referred to as the "Policy") applies to the website [website address] (hereinafter referred to as the "Website") and all services offered by [website name] (hereinafter referred to as the "Service Provider").
+    p The Service Provider is committed to protecting your privacy and ensuring that your personal data is processed in accordance with applicable laws, including the General Data Protection Regulation (GDPR) and the German Federal Data Protection Act (BDSG).
+
+   .block.box
+    .title Collection of Personal Data
+    p The Service Provider collects personal data from you when you use the Website or the Service. Personal data is any information that can be used to identify you as an individual, such as your name, email address, or IP address.
+    p The Service Provider collects personal data for the following purposes:
+    ul.ml-5
+     li To provide you with the Service;
+     li To improve the Service;
+     li To contact you about the Service;
+     li To comply with legal obligations.
+    p In addition to the data listed above, we use third-party services that we use to provide our Service. For example, we use assets offered by
+    ul.ml-5
+     li Google Fonts
+     li Font Awesome
+     li unpkg.com
+     li jsdelivr.com.
+    p These third-party services may have their own privacy policies that govern their collection and use of your data. We encourage you to review the privacy policies of these third-party services before using our Website.
+
+   .block.box
+    .title Sharing of Personal Data
+    p The Service Provider does not share your personal data with third parties without your explicit consent, except in the following circumstances:
+    With your consent;
+    ul.ml-5
+     li To comply with a legal obligation;
+     li To protect the rights or property of the Service Provider or others;
+     li To enforce the Terms of Service.
+
+   .block.box
+    .title Retention and Disclosure of Personal Data
+    p The Service Provider stores the documents that you upload to our Website for the purpose of providing you with the Service. We also use this data to improve the Service and to contact you about the Service.
+    p When you use our Service to share documents with other people or groups, we may disclose the personal data contained in those documents to those recipients. We will only disclose personal data to third parties in accordance with this Privacy Policy and with your consent.
+    p We take appropriate technical and organizational security measures to protect your personal data from unauthorized access, use, disclosure, alteration, or destruction.
+
+   .block.box
+    .title Transfer of Data to Third Parties
+    p The Service Provider may transfer your personal data to third-party service providers who we engage to process your data on our behalf. These third-party service providers are bound by confidentiality obligations and are required to use your data only for the purposes specified in this Privacy Policy.
+    p The Service Provider may also transfer your personal data to third parties if required to do so by law or if we believe that such disclosure is necessary to protect our rights or property or the rights or property of others.
+
+   .block.box
+    .title Data Retention
+    p The Service Provider will retain your personal data for as long as is necessary for the purposes for which it was collected, unless a longer retention period is required by law or if we believe that such retention is necessary to protect our rights or property or the rights or property of others.
+
+   .block.box
+    .title Security of Personal Data
+    p The Service Provider takes appropriate technical and organizational security measures to protect your personal data from unauthorized access, use, disclosure, alteration, or destruction.
+
+   .block.box
+    .title Your Rights
+    p You have the following rights in respect of your personal data:
+    ul.ml-5
+     li Access to your personal data;
+     li Rectification of your personal data;
+     li Erasure of your personal data;
+     li Restriction of processing of your personal data;
+     li Objection to the processing of your personal data;
+     li Data portability;
+     li Right to lodge a complaint with a supervisory authority.
+    p To exercise these rights, please contact the Service Provider at info@relay.md.
+
+   .block.box
+    .title Changes to this Privacy Policy
+    p The Service Provider may amend this Privacy Policy from time to time. Any changes will be posted on the Website.
+
+   .block.box
+    .title Contact Information
+    p If you have any questions about this Privacy Policy, please contact the Service Provider at info@relay.md.
+
+.hero.is-link.mt-8
+ .hero-body(id="imprint")
+   .title.is-1 Imprint
+   .subtitle.is-3 Who are you dealing with here
+
+.mt-5
+ .columns
+  .column.is-8.is-offset-2
+
+   .block.box
+    .title.is-5 Operator and Contact
+    .subtitle.is-7.mb-0 According to § 5 TMG
+    .subtitle.is-7.mt-0 Responsible for the content of this Page (§55 RStV)
+    :markdown
+     Relay.md by ChainSquad GmbH
+     Registered at the Record<br/>
+     Registered court: Fürth (Bayern/Germany)<br/>
+     Registration Number: HRB 15856<br/>
+     Date of Registration: 21. Oct. 2016<br/>
+     <br/>
+     VAT-identification number (§27 UstG): DE308896775<br/>
+     Hirtenweg 14<br/>
+     91054 Buckenhof
+
+     Authorized to represent
+     The CEO Dr.-Ing. Fabian Schuh
+{% endblock %}
