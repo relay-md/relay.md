@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     ENABLE_EARLY_ACCESS: bool = True
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
 
-    RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID]
+    RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID] = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
