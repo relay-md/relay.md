@@ -1,0 +1,88 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.hero.is-link
+ .hero-body(id="tos")
+   .title.is-1 Terms of Service
+   .subtitle.is-3 In simple terms
+.mt-5
+ .columns
+  .column.is-8.is-offset-2
+   .block.box
+    p The full legalese of our terms of service and privacy policy are linked below, but we wanted to lay out our privacy principles in simple terms first. In short, we're privacy nerds—it's why we use offline-first PKM systems to begin with. We believe in owning our own data. To that end:
+    .list
+     .list-item All the data sent to relay.md is data you choose to send. We don't collect analytics in any form, and we don't sell your data.
+     .list-item Clients (e.g. the Obsidian plugin) only ever connect to relay.md servers or affiliated cloud providers. Connections are always encrypted.
+     .list-item Your data is encrypted at transport level
+
+   .block.box
+    p In exchange for the above promises we make to you, we ask a few of our own:
+    .list
+     .list-item Don't use relay.md to abuse others or spread hate.
+     .list-item Don't attempt to circumvent usage limits or abuse our APIs.
+     .list-item Don't share copyrighted material that you don’t own.
+
+   .block.box
+    p We reserve the right to ban you and remove your data from our servers if you violate these agreements.
+    p You can reach head of the team on
+     tt fabian@relay.md
+
+.hero.is-link.mt-8
+ .hero-body(id="privacy")
+   .title.is-1 Privacy Data Policy
+   .subtitle.is-3 What happens with your data
+
+.mt-5
+ .columns
+  .column.is-8.is-offset-2
+   .block.box
+    .title.is-5 Cookies
+    .subtitle.is-7 What are we storing on your computer
+    p We only store a so called session-token on your computer to be able to authentiation over time and associate your computer with your account.
+
+   .box
+    .title.is-5 Assets
+    .subtitle.is-7 Where do fonts, icons and other assets come from
+    p For sake of user expertise, we use content delivery networks to delvier some assets to you while browsing relay.md. These assets are
+    .list
+     .list-item Google Fonts
+     .list-item FontAwesome icons
+     .list-item Various Styles and Scripts from jsdelivr.net
+     .list-item htmx from unpkg.com
+
+.hero.is-link.mt-8
+ .hero-body(id="imprint")
+   .title.is-1 Imprint
+   .subtitle.is-3 Who are you dealing with here
+
+.mt-5
+ .columns
+  .column.is-8.is-offset-2
+
+   .block.box
+    .title.is-5 Operator and Contact
+    .subtitle.is-7 According to § 5 TMG
+    :markdown
+     Hirtenweg 14<br/>
+     91054 Buckenhof
+
+     Authorized to represent
+     The CEO Dr.-Ing. Fabian Schuh
+
+   .block.box
+    .title.is-5 Legal Record
+    :markdown
+     Registered at the Record<br/>
+     Registered court: Fürth (Bayern/Germany)<br/>
+     Registration Number: HRB 15856<br/>
+     Date of Registration: 21. Oct. 2016<br/>
+     <br/>
+     VAT-identification number (§27 UstG): DE308896775<br/>
+
+   .block.box
+    .title.is-5 Responsible for the content of this Page (§55 RStV)
+    :markdown
+     Hirtenweg 14<br/>
+     91054 Buckenhof<br/>
+     represented by the CEO Dr.-Ing. Fabian Schuh
+
+{% endblock %}

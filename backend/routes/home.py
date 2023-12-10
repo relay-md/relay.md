@@ -88,3 +88,16 @@ async def relay_basics(
     config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("howto-relay.pug", context=dict(**locals()))
+
+
+@router.get(
+    "/tos",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def tos(
+    request: Request,
+    user: User = Depends(get_optional_user),
+    config: Settings = Depends(get_config),
+):
+    return templates.TemplateResponse("tos.pug", context=dict(**locals()))
