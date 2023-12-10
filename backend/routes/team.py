@@ -7,7 +7,7 @@ from fastapi.responses import PlainTextResponse
 from starlette.responses import RedirectResponse
 
 from .. import exceptions
-from ..config import config
+from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..models.team import TeamType
 from ..repos.team import Team, TeamRepo
@@ -37,7 +37,7 @@ async def get_team_topic(team_topic_name: str, db: Session = Depends(get_session
 @router.get("/teams")
 async def get_teams(
     request: Request,
-    config=config,
+    config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
     user: User = Depends(require_user),
 ):
@@ -51,7 +51,7 @@ async def get_teams(
 async def subscribe(
     team_topic_name: str,
     request: Request,
-    config=config,
+    config: Settings = Depends(get_config),
     team_topic: Team = Depends(get_team_topic),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -67,7 +67,7 @@ async def subscribe(
 async def unsubscribe(
     team_topic_name: str,
     request: Request,
-    config=config,
+    config: Settings = Depends(get_config),
     team_topic: Team = Depends(get_team_topic),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -82,7 +82,7 @@ async def unsubscribe(
 async def join(
     team_name: str,
     request: Request,
-    config=config,
+    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -99,7 +99,7 @@ async def invite_user(
     team_name: str,
     user_id: UUID,
     request: Request,
-    config=config,
+    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -132,7 +132,7 @@ async def remove_user(
     team_name: str,
     membership_id: UUID,
     request: Request,
-    config=config,
+    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -163,7 +163,7 @@ async def remove_user(
 async def leave(
     team_name: str,
     request: Request,
-    config=config,
+    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -177,7 +177,7 @@ async def leave(
 @router.get("/team/{team_name}/settings")
 async def settings(
     request: Request,
-    config=config,
+    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -192,8 +192,8 @@ async def settings(
 @router.post("/team/{team_name}/settings/type", response_class=PlainTextResponse)
 async def settings_type_post(
     request: Request,
-    config=config,
     type: str = Form(default=""),
+    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -211,7 +211,7 @@ async def settings_type_post(
 async def settings_user_search(
     request: Request,
     team_name: str,
-    config=config,
+    config: Settings = Depends(get_config),
     name: str = Form(default=""),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),

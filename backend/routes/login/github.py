@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Request
 from starlette.responses import RedirectResponse
 
-from ...config import config
+from ...config import get_config
 from ...database import Session, get_session
 from ...models.user import OauthProvider
 from ...repos.access_token import AccessTokenRepo
@@ -15,8 +15,8 @@ from . import oauth
 router = APIRouter(prefix="/login/github")
 oauth.register(
     name="github",
-    client_id=config.GITHUB_CLIENT_ID,
-    client_secret=config.GITHUB_CLIENT_SECRET,
+    client_id=get_config().GITHUB_CLIENT_ID,
+    client_secret=get_config().GITHUB_CLIENT_SECRET,
     client_kwargs={"scope": "read:user"},
     access_token_url="https://github.com/login/oauth/access_token",
     authorize_url="https://github.com/login/oauth/authorize",

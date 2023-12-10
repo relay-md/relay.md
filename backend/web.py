@@ -7,7 +7,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.sessions import SessionMiddleware
 
 from . import exceptions
-from .config import config
+from .config import get_config
 from .database import Base, engine
 from .routes import document, home, login, subscribe, team
 from .routes.login import github, google
@@ -16,7 +16,7 @@ from .routes.login import github, google
 Base.metadata.create_all(engine)
 
 app = FastAPI(openapi_url=None)
-app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY)
+app.add_middleware(SessionMiddleware, secret_key=get_config().SECRET_KEY)
 
 app.mount(
     "/static",

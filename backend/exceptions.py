@@ -9,7 +9,7 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
 
-from .config import Settings, config
+from .config import Settings, get_config
 from .repos.user import User
 from .templates import templates
 from .utils.user import get_optional_user
@@ -99,7 +99,7 @@ async def web_handle_exception(
     request: Request,
     exc: Exception,
     user: User = Depends(get_optional_user),
-    config: Settings = config,
+    config: Settings = Depends(get_config),
 ):
     # required for top
     user = None
@@ -110,7 +110,7 @@ async def web_unhandled_exception(
     request: Request,
     exc: Exception,
     user: User = Depends(get_optional_user),
-    config: Settings = config,
+    config: Settings = Depends(get_config),
 ):
     # required for top
     user = None
@@ -123,7 +123,7 @@ async def redirect_to_login(
     request: Request,
     exc: Exception,
     user: User = Depends(get_optional_user),
-    config: Settings = config,
+    config: Settings = Depends(get_config),
 ):
     url = request.url_for("login")
     if exc.next_url:

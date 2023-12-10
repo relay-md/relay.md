@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Configuration for pytest"""
-
 import tempfile
 from typing import List
 
@@ -9,6 +8,14 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from backend.config import Settings, SettingsConfigDict
+
+# monekey patching so we load config properly
+Settings.model_config = SettingsConfigDict(
+    env_file="tests/config.env", env_file_encoding="utf-8"
+)
+
+# noqa
 from backend import database, models, repos
 from backend.api import app as api_app
 from backend.repos.document import DocumentRepo
@@ -17,14 +24,11 @@ from backend.repos.team_topic import TeamTopicRepo
 from backend.repos.user import UserRepo
 from backend.repos.user_team_topic import UserTeamTopicRepo
 
-# Temporary file for sqlite
-sqlite_db = (
-    tempfile.NamedTemporaryFile().name
-)  # CHANGES - Do we need the immediete deletion behavior or should we change the file name to "tempfile.mkstemp()"?
-
 
 @pytest.fixture(scope="session")
 def engine():
+    # Temporary file for sqlite
+    sqlite_db = tempfile.NamedTemporaryFile().name
     database.engine = create_engine(
         f"sqlite:///{sqlite_db}",
         echo=False,

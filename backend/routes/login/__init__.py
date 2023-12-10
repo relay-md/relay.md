@@ -5,7 +5,7 @@ from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, Depends, Request
 from starlette.responses import RedirectResponse
 
-from ...config import config
+from ...config import Settings, get_config
 from ...templates import templates
 from ...utils.url import add_next_url, get_next_url
 from ...utils.user import User, get_optional_user, require_user
@@ -33,7 +33,7 @@ async def logout(request: Request, next: Optional[str] = None):
 async def register(
     request: Request,
     next: Optional[str] = None,
-    config=config,
+    config: Settings = Depends(get_config),
     user: User = Depends(get_optional_user),
 ):
     if user:
@@ -48,7 +48,7 @@ async def register(
 async def login(
     request: Request,
     next: Optional[str] = None,
-    config=config,
+    config: Settings = Depends(get_config),
     user: User = Depends(get_optional_user),
 ):
     if user:

@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Form, Request, status
 from starlette.responses import RedirectResponse
 
-from ..config import Settings, config
+from ..config import Settings, get_config
 from ..repos.user import User
 from ..templates import templates
 from ..utils.user import get_optional_user
@@ -33,7 +33,7 @@ async def get_document_from_id(
     request: Request,
     id: str,
     user: User = Depends(get_optional_user),
-    config: Settings = config,
+    config: Settings = Depends(get_config),
 ):
     id_uuid = UUID(id)
     access_token = (

@@ -7,7 +7,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import EmailStr, ValidationError
 
-from ..config import config
+from ..config import get_config
 from ..database import Session, get_session
 
 router = APIRouter(prefix="/mail")
@@ -66,8 +66,8 @@ async def submitmail(
         return "invalid email"
 
     req = requests.post(
-        f"https://{config.MAILCHIMP_API_SERVER}.api.mailchimp.com/3.0/lists/{config.MAILCHIMP_LIST_ID}/members",
-        auth=("key", config.MAILCHIMP_API_KEY),
+        f"https://{get_config().MAILCHIMP_API_SERVER}.api.mailchimp.com/3.0/lists/{get_config().MAILCHIMP_LIST_ID}/members",
+        auth=("key", get_config().MAILCHIMP_API_KEY),
         headers={"content-type": "application/json"},
         json={
             "email_address": email,

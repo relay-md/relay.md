@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import select
 
-from ..config import config
+from ..config import get_config
 from ..models.user import User
 from .base import DatabaseAbstractRepository
 from .team import Team
@@ -50,7 +50,7 @@ class UserRepo(DatabaseAbstractRepository):
         # Automatically subscribe to some team topics
         team_topic_repo = TeamTopicRepo(self._db)
         user_team_topic_repo = UserTeamTopicRepo(self._db)
-        for subscribe_to in config.NEW_USER_SUBSCRIBE_TO:
+        for subscribe_to in get_config().NEW_USER_SUBSCRIBE_TO:
             try:
                 team_topic = team_topic_repo.from_string(subscribe_to)
                 user_team_topic_repo.create_from_kwargs(

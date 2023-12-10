@@ -4,7 +4,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.cors import CORSMiddleware
 
 from . import exceptions
-from .config import config
+from .config import get_config
 from .database import Base, engine
 from .routes import v1
 
@@ -17,7 +17,7 @@ app.include_router(v1.router)
 # Set all CORS enabled origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=config.API_ALLOWED_ORIGINS,
+    allow_origins=get_config().API_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

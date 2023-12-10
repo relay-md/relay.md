@@ -6,7 +6,7 @@ from uuid import UUID
 from minio import Minio
 from minio.commonconfig import CopySource
 
-from ..config import config
+from ..config import get_config
 from .base import AbstractRepository
 
 
@@ -14,10 +14,10 @@ class MinioAbstractRepo(AbstractRepository):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._client = Minio(
-            config.MINIO_ENDPOINT,
-            access_key=config.MINIO_ACCESS_KEY,
-            secret_key=config.MINIO_SECRET_KEY,
-            secure=config.MINIO_SECURE,
+            get_config().MINIO_ENDPOINT,
+            access_key=get_config().MINIO_ACCESS_KEY,
+            secret_key=get_config().MINIO_SECRET_KEY,
+            secure=get_config().MINIO_SECURE,
         )
 
     def create(self, id: UUID, data: Union[bytes, str]) -> None:

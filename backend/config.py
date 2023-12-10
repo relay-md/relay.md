@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # SQL Settings
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///default.db"
-    SQLALCHEMY_ENGINE_OPTIONS: SQLAlchemyEngineOptions = SQLAlchemyEngineOptions()
+    SQLALCHEMY_ENGINE_OPTIONS: Optional[SQLAlchemyEngineOptions] = None
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ECHO: bool = False
 
@@ -63,4 +63,11 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
-config = Settings()
+config = None
+
+
+def get_config():
+    global config
+    if config is None:
+        config = Settings()
+    return config
