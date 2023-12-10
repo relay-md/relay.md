@@ -1,0 +1,28 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5
+ .columns
+  .column.is-8.is-offset-2
+   h1.title.is-1 Welcome to Relay.md
+   p.subtitle Please complete the onboarding process
+
+   .card.block
+    .card-header
+     .card-header-title Username
+    .card-content
+     p.block Please provide a username
+     form(method="POST" action="{{url_for('onboarding_google_post')}}")
+      .field
+       label.label Username
+       .control.has-icons-left.block
+        input.input(type="text" name="username" hx-post="{{url_for('onboarding_google_check_username')}}" hx-trigger="input changed delay:500ms, search" hx-target="#username-validation")
+        span.icon.is-left
+         i.fas.fa-user
+       .div(id="username-validation")
+      .field.is-grouped
+       .control
+        button.button(type=submit).is-link Submit
+       .control
+        button.button(type=submit).is-link.is-light Cancel
+
+{% endblock %}

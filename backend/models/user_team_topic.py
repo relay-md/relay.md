@@ -21,4 +21,9 @@ class UserTeamTopic(Base):
         return f"<{self.__class__.__name__}>"
 
 
-Index("user_team_topics_idx", UserTeamTopic.user_id, UserTeamTopic.team_topic_id)
+Index(
+    "user_team_topics_idx_unique",
+    UserTeamTopic.user_id,
+    UserTeamTopic.team_topic_id,
+    unique=True,
+)

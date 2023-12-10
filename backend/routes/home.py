@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from starlette.responses import HTMLResponse
 
 from ..config import Settings, config
+from ..database import Session, get_session
+from ..repos.document import DocumentRepo
 from ..repos.user import User
 from ..templates import templates
 from ..utils.user import get_optional_user, require_user
@@ -32,6 +34,30 @@ async def profile(
     request: Request, user: User = Depends(require_user), config: Settings = config
 ):
     return templates.TemplateResponse("profile.pug", context=dict(**locals()))
+
+
+@router.get(
+    "/profile/documents",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def my_documents(
+    request: Request,
+    type: str = Query(default="owned"),
+    size: int = Query(default=10),
+    page: int = Query(default=0),
+    user: User = Depends(require_user),
+    config: Settings = config,
+    db: Session = Depends(get_session),
+):
+    repo = DocumentRepo(db)
+    if type == "shared":
+        documents = repo.get_shared_documents_for_user(user, page, size)
+        total = repo.get_shared_documents_for_user_count(user)
+    else:
+        documents = repo.get_my_documents(user, page, size)
+        total = repo.get_my_documents_count(user)
+    return templates.TemplateResponse("documents.pug", context=dict(**locals()))
 
 
 @router.get(

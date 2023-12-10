@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-from collections import namedtuple
 from datetime import datetime
 from typing import List
 from uuid import UUID
@@ -18,7 +17,6 @@ from ..repos.access_token import AccessTokenRepo
 from ..repos.document import DocumentRepo
 from ..repos.document_access import DocumentAccessRepo
 from ..repos.document_body import DocumentBodyRepo
-from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
 from ..schema import (
     DocumentFrontMatter,
@@ -28,39 +26,14 @@ from ..schema import (
     Response,
     VersionResponse,
 )
-from ..utils.document import get_title_from_body
+from ..utils.document import (
+    chech_permissions,
+    get_shareables,
+    get_title_from_body,
+)
 
 router = APIRouter(prefix="/v1")
 api_key_header = APIKeyHeader(name="X-API-Key")
-Shareables = namedtuple("Shareables", "team_topics users is_public")
-
-
-def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Shareables:
-    user_repo = UserRepo(db)
-    team_topic_repo = TeamTopicRepo(db)
-    team_topics = list()
-    users = list()
-    is_public = False
-    for to in front.relay_to:
-        if to.startswith("@"):
-            to_user = user_repo.get_by_kwargs(username=to[1:])
-            if not to_user:
-                raise exceptions.BadRequest(f"User {to} does not exist")
-            users.append(to_user)
-        else:
-            # WARNING: If any of the targets is non-private, the entire document
-            # becomes public!
-            topic, team = to.split("@")
-            team_topic = team_topic_repo.from_string(to)
-            if team_topic.team.is_public:
-                is_public = True
-            if team_topic.team.is_restricted or team_topic.team.is_private:
-                if not user_repo.is_member(user, team_topic.team):
-                    raise exceptions.NotAllowed(
-                        f"You are not allowed to post to {team_topic.team}!"
-                    )
-            team_topics.append(team_topic_repo.from_string(to))
-    return Shareables(team_topics=team_topics, users=users, is_public=is_public)
 
 
 async def get_access_token(
@@ -196,6 +169,7 @@ async def post_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
+    chech_permissions(db, user, shareables, "post-document")
 
     # if the document already has an id, let's raise
     if front.relay_document:
@@ -221,6 +195,7 @@ async def post_doc(
         relay_filename=filename,
         relay_to=front.relay_to,
     )
+    print(dict(result=ret_document))
     return dict(result=ret_document)
 
 
@@ -256,7 +231,7 @@ async def get_doc(
             relay_to=document.shared_with,
             body=body,
         )
-        return Response(result=ret_document).dict(by_alias=True)
+        return Response(result=ret_document).model_dump(by_alias=True)
     elif content_type == "text/markdown":
         response = PlainTextResponse(body)
         response.headers["X-Relay-document"] = str(document.id)
@@ -291,6 +266,7 @@ async def put_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
+    chech_permissions(db, user, shareables, "modify-document")
 
     document_repo.update(
         document,

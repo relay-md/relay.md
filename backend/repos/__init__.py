@@ -4,7 +4,6 @@ from .document import DocumentRepo
 from .document_access import DocumentAccessRepo
 from .document_body import DocumentBodyRepo
 from .team import TeamRepo
-from .team_member import TeamMemberRepo
 from .team_topic import TeamTopicRepo
 from .topic import TopicRepo
 from .user import UserRepo
@@ -19,7 +18,6 @@ __all__ = [
     TopicRepo.__name__,
     TeamTopicRepo.__name__,
     UserRepo.__name__,
-    TeamMemberRepo.__name__,
     DocumentAccessRepo.__name__,
     UserTeamTopicRepo.__name__,
     UserTeamRepo.__name__,

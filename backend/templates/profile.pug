@@ -23,16 +23,16 @@ section.hero.is-link
     td
      span.icon-text
       span.icon
-       i.fas.fa-mailbox
-      span email
-    td {{user.email}}
+       i.fas.fa-user
+      span Name
+    td {{user.name}}
    tr
     td
      span.icon-text
       span.icon
-       i.fas.fa-globe
-      span location
-    td {{user.location}}
+       i.fas.fa-mailbox
+      span email
+    td {{user.email}}
 
 
  section.section
@@ -47,44 +47,5 @@ section.hero.is-link
        i.fas.fa-key
       span
        tt {{access_token.token}}
-   {% endfor %}
-
- section.section
-  h1.title Owned Documents
-  h2.subclass List of registered documents
-  table.table
-   {% for document in user.owned_documents %}
-   tr
-    td
-     span.icon-text
-      span.icon
-       i.fas.fa-clock
-      span
-       tt {{document.created_at}}
-    td
-     span.icon-text
-      span.icon
-       i.fas.fa-file
-      span
-       a(href="/document/{{document.id}}") {{document.filename}}
-   {% endfor %}
-
-  h1.title Non-Owned Documents
-  h2.subclass Documents that have been shared with you
-  table.table
-   {% for document in user.shared_documents %}
-   tr
-    td
-     span.icon-text
-      span.icon
-       i.fas.fa-clock
-      span
-       tt {{document.created_at}}
-    td
-     span.icon-text
-      span.icon
-       i.fas.fa-file
-      span
-       a(href="/document/{{document.id}}") {{document.filename}}
    {% endfor %}
 {% endblock %}

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 
 from ..models.access_token import AccessToken
 from ..models.document import Document
@@ -10,6 +10,8 @@ from ..models.user import User
 from ..models.user_team_topic import UserTeamTopic
 from ..schema import DocumentShareType
 from .base import DatabaseAbstractRepository
+
+# TODO: reduce duplicate code w.r.t. *_count and DocumentShareType
 
 
 class DocumentRepo(DatabaseAbstractRepository):
@@ -69,11 +71,105 @@ class DocumentRepo(DatabaseAbstractRepository):
             self._update_user_latest_document(access_token, ret[-1])
         return ret
 
-    def get_my_documents(self, user: User, page: int = 0, size: int = 10):
-        return self._db.scalars(
+    def get_shared_documents_for_user(
+        self,
+        user: User,
+        page: int = 0,
+        size: int = 10,
+        share_flags: DocumentShareType = DocumentShareType.PUBLIC
+        | DocumentShareType.SHARED_WITH_USER
+        | DocumentShareType.SUBSCRIBED_TEAM,
+    ):
+        query = (
             select(Document)
-            .filter(Document.user_id == user.id)
-            .order_by(Document.last_updated_at.desc())
-            .offset(page * size)
-            .limit(size)
+            .order_by(Document.last_updated_at.asc())
+            .filter(Document.user_id != user.id)  # not owned by us
+        )
+
+        filters = list()
+        if share_flags and share_flags & DocumentShareType.PUBLIC:
+            # Return *public* documents
+            filters.append(Document.is_public.is_(True))
+
+        # Below, we need OUTER JOIN because a document can be shared either by
+        # team topic or by user and we do not want to miss one of them by
+        # requiring the other through an inner join!
+        if share_flags and share_flags & DocumentShareType.SHARED_WITH_USER:
+            # Return documents that have been shared with the user directly
+            query = query.outerjoin(DocumentUser)
+            filters.append(
+                DocumentUser.user_id == user.id,
+            )
+
+        if share_flags and share_flags & DocumentShareType.SUBSCRIBED_TEAM:
+            # Return documents that have been shared with a team the user
+            # subscribed to
+            query = (
+                query.outerjoin(DocumentTeamTopic)
+                .outerjoin(TeamTopic)
+                .outerjoin(UserTeamTopic)
+            )
+            filters.append(
+                UserTeamTopic.user_id == user.id,
+            )
+
+        query = query.filter(or_(*[x for x in filters]))
+        query = query.offset(page * size).limit(size)
+        return list(self._db.scalars(query))
+
+    def get_shared_documents_for_user_count(
+        self,
+        user: User,
+        share_flags: DocumentShareType = DocumentShareType.PUBLIC
+        | DocumentShareType.SHARED_WITH_USER
+        | DocumentShareType.SUBSCRIBED_TEAM,
+    ):
+        query = select(func.count(Document.id)).filter(
+            Document.user_id != user.id
+        )  # not owned by us
+
+        filters = list()
+        if share_flags and share_flags & DocumentShareType.PUBLIC:
+            # Return *public* documents
+            filters.append(Document.is_public.is_(True))
+
+        # Below, we need OUTER JOIN because a document can be shared either by
+        # team topic or by user and we do not want to miss one of them by
+        # requiring the other through an inner join!
+        if share_flags and share_flags & DocumentShareType.SHARED_WITH_USER:
+            # Return documents that have been shared with the user directly
+            query = query.outerjoin(DocumentUser)
+            filters.append(
+                DocumentUser.user_id == user.id,
+            )
+
+        if share_flags and share_flags & DocumentShareType.SUBSCRIBED_TEAM:
+            # Return documents that have been shared with a team the user
+            # subscribed to
+            query = (
+                query.outerjoin(DocumentTeamTopic)
+                .outerjoin(TeamTopic)
+                .outerjoin(UserTeamTopic)
+            )
+            filters.append(
+                UserTeamTopic.user_id == user.id,
+            )
+
+        query = query.filter(or_(*[x for x in filters]))
+        return self._db.scalar(query)
+
+    def get_my_documents(self, user: User, page: int = 0, size: int = 10):
+        return list(
+            self._db.scalars(
+                select(Document)
+                .filter(Document.user_id == user.id)
+                .order_by(Document.last_updated_at.desc())
+                .offset(page * size)
+                .limit(size)
+            )
+        )
+
+    def get_my_documents_count(self, user: User):
+        return self._db.scalar(
+            select(func.count(Document.id)).filter(Document.user_id == user.id)
         )

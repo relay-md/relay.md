@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from sqlalchemy import select
+
+from ..config import config
 from ..models.user import User
 from .base import DatabaseAbstractRepository
 from .team import Team
@@ -32,3 +35,29 @@ class UserRepo(DatabaseAbstractRepository):
 
     def from_string(self, username):
         return self.get_by_kwargs(username=username)
+
+    def search_username(self, name, limit=10):
+        return self._db.scalars(
+            select(User).filter(User.username.like(f"%{name}%")).limit(limit)
+        )
+
+    def create_from_kwargs(self, **kwargs):
+        from ..exceptions import BadRequest, NotAllowed
+        from ..repos.team_topic import TeamTopicRepo
+
+        user = super().create_from_kwargs(**kwargs)
+
+        # Automatically subscribe to some team topics
+        team_topic_repo = TeamTopicRepo(self._db)
+        user_team_topic_repo = UserTeamTopicRepo(self._db)
+        for subscribe_to in config.NEW_USER_SUBSCRIBE_TO:
+            try:
+                team_topic = team_topic_repo.from_string(subscribe_to)
+                user_team_topic_repo.create_from_kwargs(
+                    user_id=user.id, team_topic_id=team_topic.id
+                )
+            except (BadRequest, NotAllowed):
+                # may fail if the team topic does not exist
+                # or creation of topic is not allowed
+                pass
+        return user

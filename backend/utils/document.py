@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
 import re
+from collections import namedtuple
+
+from .. import exceptions
+from ..database import Session
+from ..models.user import User
+from ..repos.team_topic import TeamTopicRepo
+from ..repos.user import UserRepo
+from ..schema import DocumentFrontMatter
+
+Shareables = namedtuple("Shareables", "team_topics users is_public")
 
 
 def get_title_from_body(body: str) -> str:
@@ -18,3 +28,64 @@ def get_title_from_body(body: str) -> str:
         return True
 
     return next(filter(line_allowed_for_headline, lines))
+
+
+def chech_permissions(db: Session, user: User, shareables: Shareables, action: str):
+    user_repo = UserRepo(db)
+    for team_topic in shareables.team_topics:
+        if team_topic.team.is_public:
+            # No further checking, anything goes if public
+            continue
+
+        # If not public, membership is required
+        membership = user_repo.is_member(user, team_topic.team)
+        if not membership:
+            raise exceptions.NotAllowed(
+                f"You are not allowed to post to {team_topic.team}!"
+            )
+
+        # some members are allowed to post in restricted teams
+        if (
+            action == "post-document"
+            and team_topic.team.is_restricted
+            and not membership.can_post_documents
+        ):
+            raise exceptions.NotAllowed(
+                f"You are not allowed to post to {team_topic.team}!"
+            )
+
+        if (
+            action == "modify-document"
+            and team_topic.team.is_restricted
+            and not membership.can_modify_documents
+        ):
+            raise exceptions.NotAllowed(
+                f"You are not allowed to post to {team_topic.team}!"
+            )
+
+
+def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Shareables:
+    """Is used on POST and PUT.
+    Converts string version of relay-to into team_topic instances or user
+    instance.
+    """
+    user_repo = UserRepo(db)
+    team_topic_repo = TeamTopicRepo(db)
+    team_topics = list()
+    users = list()
+    is_public = False
+    for to in front.relay_to:
+        if to.startswith("@"):
+            to_user = user_repo.get_by_kwargs(username=to[1:])
+            if not to_user:
+                raise exceptions.BadRequest(f"User {to} does not exist")
+            users.append(to_user)
+        else:
+            # WARNING: If any of the targets is non-private, the entire document
+            # becomes public!
+            topic, team = to.split("@")
+            team_topic = team_topic_repo.from_string(to)
+            if team_topic.team.is_public:
+                is_public = True
+            team_topics.append(team_topic_repo.from_string(to))
+    return Shareables(team_topics=team_topics, users=users, is_public=is_public)

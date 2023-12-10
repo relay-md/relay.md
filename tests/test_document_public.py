@@ -40,8 +40,8 @@ def test_document_upload(
     other_auth_header,
     patch_document_body_get,
 ):
-    req = api_client.post("/v1/doc", headers=auth_header, data=mocked_up_text)
-    assert req.ok, req.text
+    req = api_client.post("/v1/doc", headers=auth_header, content=mocked_up_text)
+    req.raise_for_status(), req.text
 
     ret = req.json()
     doc_id = ret["result"]["relay-document"]
@@ -51,4 +51,4 @@ def test_document_upload(
 
     # Need a valid auth header, but can be of anyone
     req = api_client.get(f"/v1/doc/{doc_id}", headers=other_auth_header)
-    assert req.ok
+    req.raise_for_status()

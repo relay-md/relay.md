@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 
 class OauthProvider(enum.Enum):
     GITHUB = "github"
+    GOOGLE = "google"
 
 
 class User(Base):
@@ -33,10 +34,10 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(256))
     email: Mapped[str] = mapped_column(String(128), unique=True)
     name: Mapped[str] = mapped_column(String(64))
-    location: Mapped[str] = mapped_column(String(64), nullable=True)
     oauth_provider: OauthProvider = Column(
         Enum(OauthProvider), default=OauthProvider.GITHUB
     )
+    profile_picture_url: Mapped[str] = mapped_column(String(255), nullable=True)
 
     shared_documents: Mapped[List["Document"]] = relationship(  # noqa
         secondary="document_user", back_populates="users"
@@ -52,4 +53,4 @@ class User(Base):
         return f"<{self.__class__.__name__}: @{str(self.username)}>"
 
 
-Index("user_oauth_index", User.username, User.oauth_provider)
+Index("user_oauth_index_unique", User.username, User.oauth_provider, unique=True)
