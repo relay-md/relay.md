@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.14.0 (2023-12-10)
+### Feature
+* **news:** Nicer news page ([`cfd71dd`](https://github.com/knowledgemd/backend/commit/cfd71ddadf96fc94c1efeecb8795daf5faf96c4f))
+* **news:** Initial work on news site ([`a2ca506`](https://github.com/knowledgemd/backend/commit/a2ca506dde8a34ecf87fc89d50524a86a0ea1489))
+
+### Fix
+* **requirements:** Downgrade mysqlclient to make docker build again ([`4dec830`](https://github.com/knowledgemd/backend/commit/4dec830bd9376ef21060f6c1fc232967c3a6ee7c))
+* Add var to tests ([`8238c00`](https://github.com/knowledgemd/backend/commit/8238c004a33e0eb0ee9670d48305eb4251720504))
+
 ## v0.13.1 (2023-12-10)
 ### Fix
 * **requirements:** Pin mysqlclient so it build in docker ([`df97a5b`](https://github.com/knowledgemd/backend/commit/df97a5bd42dfd32a2624120b63161e8928219da8))
