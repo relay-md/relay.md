@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.1 (2023-12-10)
+### Fix
+* **requirements:** Pin mysqlclient so it build in docker ([`df97a5b`](https://github.com/knowledgemd/backend/commit/df97a5bd42dfd32a2624120b63161e8928219da8))
+
 ## v0.13.0 (2023-12-10)
 ### Feature
 * Allow to use markdown in pug ([`9d186f0`](https://github.com/knowledgemd/backend/commit/9d186f028f1e5eb1a78a0f05c03c2b0d34f9bc0e))
