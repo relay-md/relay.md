@@ -13,11 +13,13 @@ clis = [
     "backend.cli.api",
     "backend.cli.setup",
     "backend.cli.team",
+    "backend.cli.team_topic",
     "backend.cli.topic",
     "backend.cli.user",
     "backend.cli.web",
     "backend.cli.document",
     "backend.cli.document_body",
+    "backend.cli.access_token",
 ]
 
 for cli in clis:

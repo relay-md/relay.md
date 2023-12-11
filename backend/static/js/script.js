@@ -29,51 +29,51 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     store = localStorage
   } catch (err) {
-      // Do nothing. The user probably blocks cookies.
+    // Do nothing. The user probably blocks cookies.
   }
   function loadCss() {
     // fix css loading via vite
     // https://github.com/vitejs/vite/issues/8976
     const css = document.createElement('style')
     css.innerHTML = `
-          /* Prevent inconsistencies for positioning */
-          .nightowl-light body{
-          filter: invert(0%);
-          }
+/* Prevent inconsistencies for positioning */
+.nightowl-light body{
+filter: invert(0%);
+}
 
-          .nightowl-dark {
-          /* Firefox fallback. */
-          background-color: #111;
-          }
+.nightowl-dark {
+/* Firefox fallback. */
+background-color: #111;
+}
 
-          .nightowl-dark body {
-          filter: invert(100%) hue-rotate(180deg);
-          }
+.nightowl-dark body {
+filter: invert(100%) hue-rotate(180deg);
+}
 
-          /* Do not invert media (revert the invert). */
-          .nightowl-dark img:not(.brand-logo),
-          .nightowl-dark video,
-          .nightowl-dark iframe,
-          .nightowl-dark .nightowl-daylight
-          {
-          filter: invert(100%) hue-rotate(180deg);
-          }
+/* Do not invert media (revert the invert). */
+.nightowl-dark img:not(.brand-logo),
+.nightowl-dark video,
+.nightowl-dark iframe,
+.nightowl-dark .nightowl-daylight
+{
+filter: invert(100%) hue-rotate(180deg);
+}
 
-          /* Improve contrast on icons. */
-          .nightowl-dark .icon {
-          filter: invert(15%) hue-rotate(180deg);
-          }
+/* Improve contrast on icons. */
+.nightowl-dark .icon {
+filter: invert(15%) hue-rotate(180deg);
+}
 
-          /* Re-enable code block backgrounds. */
-          .nightowl-dark pre {
-          filter: invert(6%);
-          }
+/* Re-enable code block backgrounds. */
+.nightowl-dark pre {
+filter: invert(6%);
+}
 
-          /* Improve contrast on list item markers. */
-          .nightowl-dark li::marker {
-          color: #666;
-          }
-          `
+/* Improve contrast on list item markers. */
+.nightowl-dark li::marker {
+color: #666;
+}
+`
     document.head.appendChild(css)
   }
 
@@ -181,3 +181,70 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+
+
+
+
+/* Get documents per api
+***************************************************************/
+async function get_document(id) {
+  let base_url = "https://api.relay.md/v1/doc/";
+  // For development purpose only:
+  // base_url = "http://localhost:5001/v1/doc/";
+  const response = await fetch(base_url + id, {
+    method: "GET",
+    headers: {
+      "Content-Type": "text/markdown",
+      "X-API-Key": "{{access_token}}"
+    }
+  });
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+
+  if (response.headers.get("content-type") == "application/json") {
+    res = await response.json();
+    throw Error(res.error.message);
+  }
+  return await response.text();
+}
+
+/* Postprocess markdown to something nicer to read
+***************************************************************/
+function post_process_markdown(doc) {
+  var FRONTMATTER_EXPR = /---\n(.*)?\n---/s
+  var body = doc.replace(FRONTMATTER_EXPR, "");
+  var frontmatter = doc.match(FRONTMATTER_EXPR);
+  var metadata = jsyaml.load(frontmatter[1]);
+  showdown.extension('codehighlight', function() {
+    function htmlunencode(text) {
+      return (
+        text
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+      );
+    }
+    return [
+      {
+        type: 'output',
+        filter: function (text, converter, options) {
+          // use new shodown's regexp engine to conditionally parse codeblocks
+          var left  = '<pre><code\\b[^>]*>',
+          right = '</code></pre>',
+          flags = 'g',
+          replacement = function (wholematch, match, left, right) {
+            // unescape match to prevent double escaping
+            match = htmlunencode(match);
+            return '<pre class="hljs"><code>' + hljs.highlightAuto(match).value + right;
+          };
+          return showdown.helper.replaceRecursiveRegExp(text, replacement, left, right, flags);
+        }
+      }
+    ];
+  });
+  var converter = new showdown.Converter({
+    "extensions": ["codehighlight"]
+  });
+  return [converter.makeHtml(body), metadata];
+}
