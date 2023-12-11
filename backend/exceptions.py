@@ -51,6 +51,12 @@ class Unauthorized(BaseAPIException):
     code = status.HTTP_401_UNAUTHORIZED
 
 
+class BillingException(BaseAPIException):
+    """400"""
+
+    code = status.HTTP_400_BAD_REQUEST
+
+
 class LoginRequiredException(BaseAPIException):
     """401"""
 
@@ -140,9 +146,9 @@ def include_app(app):
 
 
 def include_app_web(app):
-    # FIXME: need to deal with making nicer
     app.add_exception_handler(LoginRequiredException, redirect_to_login)
     app.add_exception_handler(NotAllowed, web_handle_exception)
     app.add_exception_handler(NotFound, web_handle_exception)
     app.add_exception_handler(Unauthorized, web_handle_exception)
+    app.add_exception_handler(BillingException, web_handle_exception)
     app.add_exception_handler(Exception, web_unhandled_exception)

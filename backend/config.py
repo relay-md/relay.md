@@ -58,6 +58,11 @@ class Settings(BaseSettings):
     MINIO_SECRET_KEY: Optional[str]
     MINIO_SECURE: bool = True
 
+    # Checkout.com
+    CHECKOUTCOM_CLIENT_ID: str
+    CHECKOUTCOM_CLIENT_SECRET: str
+    CHECKOUTCOM_DESCRIPTION: str = "Payment for Relay.md"
+
     # Early access configs
     ENABLE_EARLY_ACCESS: bool = True
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
