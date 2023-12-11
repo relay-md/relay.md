@@ -2,15 +2,15 @@
 {% block content %}
 section.hero.is-link
  .hero-body
-  p.title
-   span.icon
-    i.fas.fa-user
-  p.subtitle User Profile
+  .title
+   figure.image.is-128x128
+     img.is-rounded(src="{{user.profile_picture_url}}")
+  .subtitle User Profile
 
 .column
  section.section
-  h1.title Account
-  h2.subclass Personal Information of your account
+  .title Account
+  .subtitle Personal Information of your account
   table.table
    tr
     td
@@ -36,8 +36,8 @@ section.hero.is-link
 
 
  section.section
-  h1.title API
-  h2.subclass Access Token
+  .title API
+  .subtitle Access Token
   table.table
    {% for access_token in user.access_tokens %}
    tr

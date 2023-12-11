@@ -40,7 +40,9 @@
           <div class="navbar-item">
             <a class="button is-warning" href="/profile">
               <span class="icon">
-                <i class="fas fa-user"></i>
+                <figure class="image is-24x24">
+                  <img class="is-rounded" src="{{user.profile_picture_url}}" />
+                </figure>
               </span>
               <span><strong>{{ user.username }}</strong></span>
             </a>
