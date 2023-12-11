@@ -1,0 +1,65 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5.mb-5
+ .columns
+  .column.has-text-centered.is-10.is-offset-1
+   h1.title Pricing
+   h3.subtitle Plans for teams of all sizes
+   #pricing.block.box
+    .pricing-table
+     .pricing-plan
+      .plan-header
+       .title.is-5 Free
+       .subtitle.is-6 Open Source and public
+      .plan-price
+       span.plan-price-amount
+         span.plan-price-currency $
+         | 0
+       | /month/member
+      .plan-items
+       .plan-item join and subscribe&nbsp;
+        strong public teams
+       .plan-item publish documents publicly
+       .plan-item obsidian&nbsp;
+        strong integration&nbsp;
+        | via plugin
+       .plan-item 1 access key
+      .plan-footer
+       button.button.is-fullwidth Choose
+     .pricing-plan.is-warning
+      .plan-header
+       .title.is-5 Team
+       .subtitle.is-6 Advanced and Private Collaboration
+      .plan-price
+       span.plan-price-amount
+         span.plan-price-currency $
+         | 3
+       | /month/member
+      .plan-items
+       .plan-item 👈 all features from the left
+       .plan-item manage your own
+        strong private team
+       .plan-item publish documents privately
+       .plan-item fine grained&nbsp;
+        strong access control&nbsp;
+        |to teams
+      .plan-footer
+       button.button.is-fullwidth Choose
+     .pricing-plan.is-danger
+      .plan-header
+       .title.is-5 Enterprice
+       .subtitle.is-6 Premium Customizations
+      .plan-price
+       span.plan-price-amount
+         span.plan-price-currency
+       | Request Quote
+      .plan-items
+       .plan-item 👈 all features from the left
+       .plan-item documents&nbsp;
+        strong versioning
+       .plan-item dedicated &nbsp;
+        strong api endpoint
+       .plan-item direct communication line
+      .plan-footer
+       button.button.is-fullwidth Request Quote
+{% endblock %}

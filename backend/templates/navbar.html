@@ -16,6 +16,9 @@
           <a class="navbar-item" href="/#features">
             Features
           </a>
+          <a class="navbar-item" href="{{url_for('pricing')}}">
+            Pricing
+          </a>
           <a class="navbar-item" href="{{url_for('relay_basics')}}">
             Basics
           </a>
@@ -24,7 +27,7 @@
           </a>
           {% if not config.ENABLE_EARLY_ACCESS or user%}
           <a class="navbar-item" href="{{url_for('get_teams')}}">
-            Teams/Topics
+            Teams
           </a>
           <a class="navbar-item" href="{{url_for('my_documents')}}">
             My Docs

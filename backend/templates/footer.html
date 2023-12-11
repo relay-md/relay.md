@@ -42,9 +42,15 @@
             </a>
             {% if not config.ENABLE_EARLY_ACCESS or user%}
             <a class="navbar-item p-0" href="{{url_for('get_teams')}}">
-              Teams/Topics
+              Teams
             </a>
             {%endif%}
+          </div>
+          <div class="column is-4">
+            <div class="title is-5">Commercial</div>
+            <a class="navbar-item p-0" href="{{url_for('pricing')}}">
+              Pricing
+            </a>
             <a class="navbar-item p-0" href="{{url_for('tos')}}/#tos">
               Terms of Service
             </a>
