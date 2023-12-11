@@ -225,7 +225,20 @@ async def settings_user_search(
     def user_invite_link(user):
         return f"""
             <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">
-            <span class="icon-text"><span class="icon"><i class="fab fa-{user.oauth_provider.value}"></i></span><span>{user.username}</span></a>
+             <div class="list-item-image">
+              <figure class="image is-32x32">
+               <img class="is-rounded" src="{user.profile_picture_url}" />
+              </figure>
+             </div>
+             <div class="list-item-content">
+              <div class="list-item-title">
+               @{user.username}
+              </div>
+              <div class="list-item-description">
+               {user.name}
+              </div>
+             </div>
+            </a>
         """
 
     ret = "\n".join([user_invite_link(x) for x in users])
