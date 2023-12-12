@@ -3,7 +3,6 @@
 from datetime import date
 
 import click
-from rich import print
 from rich.console import Console
 
 from .. import models, repos
@@ -43,6 +42,6 @@ def demo():
     )
 
     invoice_db = billing_repo.create(invoice)
-    print(invoice_db)
-    print(invoice_db.id)
-    print(billing_repo.get_payment_link(invoice))
+    console.print(invoice_db)
+    console.print(invoice_db.id)
+    console.print(billing_repo.get_payment_link(invoice))

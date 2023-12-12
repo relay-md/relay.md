@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 """ DB Storage modat"""
+import enum
 import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
+
+
+class InvoiceStatus(enum.Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+    CANCELED = "canceled"
+    EXPIRED = "expired"
 
 
 class ProductInformation(Base):
@@ -76,6 +84,11 @@ class Invoice(Base):
 
     customer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_person.id"))
     payment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_payment_plan.id"))
+    payment_status: Mapped[InvoiceStatus] = mapped_column(
+        Enum(InvoiceStatus), default=InvoiceStatus.PENDING
+    )
+    payment_failure_reason: Mapped[str] = mapped_column(Text(), nullable=True)
+
     customer: Mapped[PersonalInformation] = relationship()
     payment: Mapped[PaymentPlan] = relationship()
     products: Mapped[List[ProductInformation]] = relationship(

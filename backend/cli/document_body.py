@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import click
-from rich import print
 from rich.console import Console
 
 from .. import models, repos
@@ -28,5 +27,5 @@ def move_nested():
             # file exists, continue
             continue
         except Exception:
-            print(f"copying {file.object_name=}")
+            console.print(f"copying {file.object_name=}")
             repo.copy(file.object_name, repo.get_file_name(file.object_name))

@@ -9,7 +9,6 @@ from starlette.responses import RedirectResponse
 from .. import exceptions
 from ..config import Settings, get_config
 from ..database import Session, get_session
-from ..models.team import TeamType
 from ..repos.team import Team, TeamRepo
 from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
@@ -129,24 +128,6 @@ async def settings(
     team_repo = TeamRepo(db)
     members = team_repo.list_team_members(team, page, size)
     return templates.TemplateResponse("team-admin.pug", context=dict(**locals()))
-
-
-@router.post("/{team_name}/settings/type", response_class=PlainTextResponse)
-async def settings_type_post(
-    request: Request,
-    type: str = Form(default=""),
-    config: Settings = Depends(get_config),
-    team: Team = Depends(get_team),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    team_repo = TeamRepo(db)
-    team_repo.update(team, type=TeamType(type))
-    return """
-        <div class="notification is-success is-light">
-        Change saved successfully
-        </div>
-    """
 
 
 @router.post("/{team_name}/settings/user/search", response_class=PlainTextResponse)

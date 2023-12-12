@@ -9,7 +9,16 @@ from starlette.middleware.sessions import SessionMiddleware
 from . import exceptions
 from .config import get_config
 from .database import Base, engine
-from .routes import document, home, login, subscribe, team, teams, topic
+from .routes import (
+    document,
+    home,
+    login,
+    payment,
+    subscribe,
+    team,
+    teams,
+    topic,
+)
 from .routes.login import github, google
 
 # Create all tables
@@ -35,6 +44,7 @@ app.include_router(document.router)
 app.include_router(team.router)
 app.include_router(teams.router)
 app.include_router(topic.router)
+app.include_router(payment.router)
 
 # TODO:
 # exception handling:

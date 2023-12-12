@@ -23,6 +23,7 @@ from backend.repos.team import TeamRepo
 from backend.repos.team_topic import TeamTopicRepo
 from backend.repos.user import UserRepo
 from backend.repos.user_team_topic import UserTeamTopicRepo
+from backend.web import app as web_app
 
 
 @pytest.fixture(scope="session")
@@ -83,6 +84,11 @@ def dbsession(engine, tables):
 @pytest.fixture(scope="module")
 def api_client():
     yield TestClient(api_app)
+
+
+@pytest.fixture(scope="module")
+def web_client():
+    yield TestClient(web_app)
 
 
 @pytest.fixture()

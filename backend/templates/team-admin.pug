@@ -20,19 +20,6 @@ span.icon
     h1.title.is-1 {{team.name}}
 
    .section
-    h1.title.is-3 Team Privacy
-    h2.subtitle.is-5 Define what kind of Team this is
-    .control.has-icons-left
-     .select
-      select(name="type" hx-post="settings/type" hx-target="#team-type-updated")
-       option(value="public" selected="{{'1' if team.is_public else '0'}}") Public
-       option(value="restricted" selected="{{'1' if team.is_restricted else '0'}}") Restricted
-       option(value="private" selected="{{'1' if team.is_private else '0'}}") Private
-     span.icon.is-left
-      i.fas.fa-globe
-     div(id="team-type-updated")
-
-   .section
     h1
     h1.block.title.is-3 Members
     h2.subtitle.is-5 List of users subscribed to your team

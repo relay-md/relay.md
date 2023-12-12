@@ -35,3 +35,4 @@ prometheus-fastapi-instrumentator==6.1.0
 dateutils>=0.6.12,<0.7
 
 checkout-sdk>=3.0,<3.1
+Adyen>=10.0.1,<10.1
