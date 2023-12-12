@@ -62,6 +62,7 @@ class Settings(BaseSettings):
     CHECKOUTCOM_CLIENT_ID: str
     CHECKOUTCOM_CLIENT_SECRET: str
     CHECKOUTCOM_DESCRIPTION: str = "Payment for Relay.md"
+    CHECKOUTCOM_CHANNEL_ID: str
 
     # Early access configs
     ENABLE_EARLY_ACCESS: bool = True

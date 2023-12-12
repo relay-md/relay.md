@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 from .access_token import AccessToken
+from .billing import (
+    Invoice,
+    PaymentPlan,
+    PersonalInformation,
+    ProductInformation,
+)
 from .document import Document
 from .document_access import DocumentAccess
 from .document_team_topic import DocumentTeamTopic
@@ -23,4 +29,8 @@ __all__ = [
     DocumentUser.__name__,
     UserTeamTopic.__name__,
     UserTeam.__name__,
+    ProductInformation.__name__,
+    PaymentPlan.__name__,
+    PersonalInformation.__name__,
+    Invoice.__name__,
 ]

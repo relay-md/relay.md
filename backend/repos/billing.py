@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-from typing import List
 
 from checkout_sdk.checkout_sdk import CheckoutSdk
 from checkout_sdk.common.common import (
@@ -24,22 +23,19 @@ from checkout_sdk.sessions.sessions import Recurring
 
 from ..config import get_config
 from ..exceptions import BillingException
-from ..schema import (
-    BillingPersonalInformation,
-    BillingProductInformation,
-    BillingRecurringPaymentPlan,
-)
+from ..models.billing import Invoice
+from .base import DatabaseAbstractRepository
 
 log = logging.getLogger(__name__)
 
 
-class BillingRepo:
-    def get_payment_link(self):
-        pass
+class InvoiceRepo(DatabaseAbstractRepository):
+    ORM_Model = Invoice
 
-
-class CheckoutComBillingRepo(BillingRepo):
-    def __init__(self):
+    def get_checkoutcom_payment_link(
+        self,
+        invoice: Invoice,
+    ):
         self.api = (
             CheckoutSdk.builder()
             .secret_key(get_config().CHECKOUTCOM_CLIENT_SECRET)
@@ -47,35 +43,28 @@ class CheckoutComBillingRepo(BillingRepo):
             .environment(Environment.sandbox())
             .build()
         )
-
-    def get_payment_link(
-        self,
-        personal_information: BillingPersonalInformation,
-        products: List[BillingProductInformation],
-        payment_plan: BillingRecurringPaymentPlan,
-    ):
         phone = Phone()
-        phone.country_code = personal_information.phone_country_code
-        phone.number = personal_information.phone_number
+        phone.country_code = invoice.customer.phone_country_code
+        phone.number = invoice.customer.phone_number
 
         address = Address()
-        address.address_line1 = personal_information.address_line1
-        address.address_line2 = personal_information.address_line2
-        address.city = personal_information.city
-        address.state = personal_information.state
-        address.zip = personal_information.zip
-        address.country = personal_information.country
+        address.address_line1 = invoice.customer.address_line1
+        address.address_line2 = invoice.customer.address_line2
+        address.city = invoice.customer.city
+        address.state = invoice.customer.state
+        address.zip = invoice.customer.zip
+        address.country = invoice.customer.country_code
 
         customer_request = CustomerRequest()
-        customer_request.email = personal_information.email
-        customer_request.name = personal_information.name
+        customer_request.email = invoice.customer.email
+        customer_request.name = invoice.customer.name
 
         billing_information = BillingInformation()
         billing_information.address = address
         billing_information.phone = phone
 
         request_products = list()
-        for product in products:
+        for product in invoice.products:
             prod = Product()
             prod.name = product.name
             prod.quantity = product.quantity
@@ -89,16 +78,17 @@ class CheckoutComBillingRepo(BillingRepo):
         request.failure_url = "https://docs.checkout.com/payments/failure"
         request.cancel_url = "https://docs.checkout.com/payments/cancel"
         request.payment_type = "Recurring"
+
         request.payment_plan = Recurring()
-        request.payment_plan.days_between_payments = payment_plan.days_between_payments
-        request.payment_plan.expiry = payment_plan.expiry
-        request.processing_channel_id = "pc_ildl7xfiu4yubf2xhvgst4h2wq"
+        request.payment_plan.days_between_payments = (
+            invoice.payment.days_between_payments
+        )
+        request.payment_plan.expiry = invoice.payment.expiry.strftime("%Y%m%d")
+        request.processing_channel_id = get_config().CHECKOUTCOM_CHANNEL_ID
 
         request.amount = sum([x.quantity * x.price for x in request_products])
 
-        from uuid import uuid4
-
-        request.reference = str(uuid4())
+        request.reference = str(invoice.id)
 
         request.description = get_config().CHECKOUTCOM_DESCRIPTION
 
@@ -135,3 +125,6 @@ class CheckoutComBillingRepo(BillingRepo):
             raise BillingException("Could not process payment")
 
         return response._links.redirect.href
+
+    def get_payment_link(self, invoice: Invoice):
+        return self.get_checkoutcom_payment_link(invoice)

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from datetime import date
+
 import click
 from rich import print
 from rich.console import Console
 
-from .. import repos, schema
+from .. import models, repos
+from ..database import get_session
 
 console = Console()
 
@@ -16,23 +19,30 @@ def billing():
 
 @billing.command()
 def demo():
-    billing_repo = repos.CheckoutComBillingRepo()
-    products = [
-        schema.BillingProductInformation(name="Foobar", quantity=10, price=3000)
-    ]
-    person = schema.BillingPersonalInformation(
+    (db,) = get_session()
+    billing_repo = repos.InvoiceRepo(db)
+    products = [models.ProductInformation(name="Foobar", quantity=10, price=3000)]
+    person = models.PersonalInformation(
         name="Fabian Schuh",
         email="fabian@chainsquad.com",
         address_line1="Address 13, 24 Foobar",
         city="Erlangen",
         state="Bavaria",
         zip="91058",
-        country="DE",
+        country_code="DE",
         phone_country_code="+49",
         phone_number="1706397354",
     )
-    payment_plan = schema.BillingRecurringPaymentPlan(
-        days_between_payments=30, expiry="20261231"
+    payment_plan = models.PaymentPlan(
+        days_between_payments=30, expiry=date(2025, 12, 31)
+    )
+    invoice = models.Invoice(
+        customer=person,
+        products=products,
+        payment=payment_plan,
     )
 
-    print(billing_repo.get_payment_link(person, products, payment_plan))
+    invoice_db = billing_repo.create(invoice)
+    print(invoice_db)
+    print(invoice_db.id)
+    print(billing_repo.get_payment_link(invoice))

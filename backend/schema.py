@@ -75,29 +75,3 @@ class DocumentIdentifierResponse(BaseModel):
 
 class VersionResponse(BaseModel):
     version: str
-
-
-class BillingProductInformation(BaseModel):
-    name: str
-    quantity: int
-    price: int
-
-
-class BillingPersonalInformation(BaseModel):
-    name: str
-    email: str
-    # Address
-    address_line1: str
-    address_line2: Optional[str] = ""
-    city: str
-    state: str
-    zip: str
-    country: str
-    # Phone
-    phone_country_code: str
-    phone_number: str
-
-
-class BillingRecurringPaymentPlan(BaseModel):
-    days_between_payments: int
-    expiry: str
