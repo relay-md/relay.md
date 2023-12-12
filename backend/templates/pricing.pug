@@ -4,7 +4,19 @@
  .columns
   .column.has-text-centered.is-10.is-offset-1
    h1.title Pricing
-   h3.subtitle Plans for teams of all sizes
+   h3.subtitle Chose your Plan and Payment Interval
+   .column.is-4.is-offset-4
+    .level
+     div
+      .title.is-4 Monthly
+      .subtitle.is-6 Flexible Payments
+     .field
+      input#invoice_yearly.switch.is-medium.is-rounded.is-success(checked="checked" type="checkbox" name="yearly" onclick="flipswitch()")
+      label(for='invoice_yearly')
+     div
+      .title.is-4 Yearly
+      .subtitle.is-6 Two months for free
+
    #pricing.block.box
     .pricing-table
      .pricing-plan
@@ -15,7 +27,7 @@
        span.plan-price-amount
          span.plan-price-currency $
          | 0
-       | /month/member
+       span#priceunit /month/member
       .plan-items
        .plan-item join and subscribe&nbsp;
         strong public teams
@@ -25,7 +37,7 @@
         | via plugin
        .plan-item 1 access key
       .plan-footer
-       button.button.is-fullwidth Choose
+       a.button.is-fullwidth#free_choose(href=)
      .pricing-plan.is-warning
       .plan-header
        .title.is-5 Team
@@ -33,18 +45,18 @@
       .plan-price
        span.plan-price-amount
          span.plan-price-currency $
-         | 3
-       | /month/member
+         span#team_price 3
+       span#priceunit /month/member
       .plan-items
        .plan-item 👈 all features from the left
-       .plan-item manage your own
+       .plan-item manage your own&nbsp;
         strong private team
        .plan-item publish documents privately
        .plan-item fine grained&nbsp;
         strong access control&nbsp;
         |to teams
       .plan-footer
-       button.button.is-fullwidth Choose
+       a.button.is-fullwidth#team_choose(href=)
      .pricing-plan.is-danger
       .plan-header
        .title.is-5 Enterprice
@@ -62,4 +74,69 @@
        .plan-item direct communication line
       .plan-footer
        button.button.is-fullwidth Request Quote
+{% endblock %}
+
+{% block javascript %}
+script
+.
+ function flipswitch() {
+   var box = document.getElementById('invoice_yearly');
+   var units = document.querySelectorAll('[id=priceunit]');
+   var team_price = document.getElementById('team_price');
+   var team_choose = document.getElementById('team_choose');
+   var free_choose = document.getElementById('free_choose');
+
+   {% if team %}
+   team_choose.innerHTML = "Choose";
+   free_choose.innerHTML = "Choose";
+   {% else %}
+   team_choose.innerHTML = "Create Private Team";
+   free_choose.innerHTML = "Create Public Team";
+   {% endif %}
+
+   units.forEach((unit) => {
+    if (box.checked) {
+     unit.innerHTML = "/year/member"
+    } else {
+     unit.innerHTML = "/month/member"
+    }
+   });
+
+   if (box.checked) {
+    // YEARLY //////////////////////////////
+    team_price.innerHTML = 3 * 10;
+    // PRIVATE
+    {% if team %}
+    team_choose.setAttribute('href', '{{url_for("team_billing", team_name=team.name).include_query_params(type="private", yearly=1) | safe}}')
+    {% else %}
+    team_choose.setAttribute('href', '{{url_for("team_create").include_query_params(type="private", yearly=1) | safe}}')
+    {% endif %}
+
+    // PUBLIC
+    {% if team %}
+    free_choose.setAttribute('href', '{{url_for("team_billing", team_name=team.name).include_query_params(type="public", yearly=1) | safe}}')
+    {% else %}
+    free_choose.setAttribute('href', '{{url_for("team_create").include_query_params(type="public", yearly=1) | safe}}')
+    {% endif %}
+
+   } else {
+    // MONTHLY /////////////////////////////
+    team_price.innerHTML = 3;
+    // PRIVATE
+    {% if team %}
+    team_choose.setAttribute('href', '{{url_for("team_billing", team_name=team.name).include_query_params(type="private", yearly=0) | safe}}')
+    {% else %}
+    team_choose.setAttribute('href', '{{url_for("team_create").include_query_params(type="private", yearly=0) | safe}}')
+    {% endif %}
+
+    // PUBLIC
+    {% if team %}
+    free_choose.setAttribute('href', '{{url_for("team_billing", team_name=team.name).include_query_params(type="public", yearly=0) | safe}}')
+    {% else %}
+    free_choose.setAttribute('href', '{{url_for("team_create").include_query_params(type="public", yearly=0) | safe}}')
+    {% endif %}
+   }
+ }
+ // Calling the method initially just so we are in sync with what HTML code says
+ flipswitch()
 {% endblock %}
