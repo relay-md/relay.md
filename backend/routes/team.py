@@ -195,8 +195,6 @@ async def settings_user_search(
 async def team_billing(
     request: Request,
     config: Settings = Depends(get_config),
-    type: str = Query(default="public"),
-    yearly: bool = Query(default=False),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),

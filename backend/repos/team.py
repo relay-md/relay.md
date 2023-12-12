@@ -18,3 +18,6 @@ class TeamRepo(DatabaseAbstractRepository):
                 .limit(size)
             )
         )
+
+    def team_name_search(self, team_name):
+        return self._db.scalar(select(Team).filter_by(name=team_name))

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Form, Query, Request
+from fastapi.responses import PlainTextResponse
 
 from ..config import Settings, get_config
 from ..database import Session, get_session
@@ -35,5 +36,33 @@ async def team_create(
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
-    print(type, yearly)
     return templates.TemplateResponse("pricing.pug", context=dict(**locals()))
+
+
+@router.post("/new/validate-team-name", response_class=PlainTextResponse)
+async def team_create_validate_team_name(
+    request: Request,
+    team_name: str = Form(default=""),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    if team_repo.team_name_search(team_name.lower()):
+        return """<p class="help is-danger">A Team with this name already exists!</p>"""
+    else:
+        return ""
+
+
+@router.post("/billing")
+async def team_billing_post(
+    request: Request,
+    config: Settings = Depends(get_config),
+    type: str = Form(default="public"),
+    yearly: bool = Form(default=False),
+    team_name: str = Form(default=""),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    # FIXME: needs implemnetation
+    return str([team_name, type, yearly])
