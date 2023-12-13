@@ -18,6 +18,10 @@ class InvoiceStatus(enum.Enum):
     EXPIRED = "expired"
 
 
+class PaymentProvider(enum.Enum):
+    ADYEN = "adyen"
+
+
 class ProductInformation(Base):
     __tablename__ = "billing_product"
     id: Mapped[uuid.UUID] = mapped_column(
@@ -36,6 +40,7 @@ class PersonalInformation(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     name: Mapped[str] = mapped_column(String(128))
     email: Mapped[str] = mapped_column(String(128))
     # Address
@@ -74,6 +79,23 @@ class InvoiceProducts(Base):
     product_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_product.id"))
 
 
+class RecurringPaymentToken(Base):
+    __tablename__ = "billing_recurring_token"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, autoincrement=True, nullable=False
+    )
+
+    # used as shopperReference
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
+    originalReference: Mapped[str] = mapped_column(String(128))
+    recurringDetailReference: Mapped[str] = mapped_column(String(128))
+    pspReference: Mapped[str] = mapped_column(String(128))
+
+    # used as merchantReference
+    invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_invoice.id"))
+
+
 class Invoice(Base):
     __tablename__ = "billing_invoice"
 
@@ -88,6 +110,11 @@ class Invoice(Base):
         Enum(InvoiceStatus), default=InvoiceStatus.PENDING
     )
     payment_failure_reason: Mapped[str] = mapped_column(Text(), nullable=True)
+    payment_provider: Mapped[PaymentProvider] = mapped_column(
+        Enum(PaymentProvider), default=PaymentProvider.ADYEN
+    )
+
+    payment_provider_reference: Mapped[str] = mapped_column(String(256), nullable=True)
 
     customer: Mapped[PersonalInformation] = relationship()
     payment: Mapped[PaymentPlan] = relationship()

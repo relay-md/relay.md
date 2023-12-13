@@ -4,7 +4,7 @@ import logging
 
 from ..config import get_config
 from ..exceptions import BillingException
-from ..models.billing import Invoice
+from ..models.billing import Invoice, RecurringPaymentToken
 from .base import DatabaseAbstractRepository
 
 log = logging.getLogger(__name__)
@@ -165,8 +165,17 @@ class AdyenPayments(AbstractPaymentGateway):
             mode="hosted",
             themeId=get_config().ADYEN_THEME_ID,
             countryCode=invoice.customer.country_code,
+            telephoneNumber=f"{invoice.customer.phone_country_code}{invoice.customer.phone_number}",
+            # Recurring configurations for subscription:
+            recurringFrequency=invoice.payment.days_between_payments,
+            recurringProcessingModel="Subscription",
+            # shopperInteraction="Ecommerce",
+            shopperReference=str(invoice.customer.user_id),
+            storePaymentMethod=True,
         )
         result = self.adyen.checkout.payments_api.sessions(request)
+        message = result.message
+        invoice.payment_provider_reference = message["id"]
         return result.message["url"]
 
     def get_payment_status(
@@ -198,3 +207,7 @@ class InvoiceRepo(DatabaseAbstractRepository):
 
     def get_payment_status(self, **kwargs):
         return self.payment.get_payment_status(**kwargs)
+
+
+class RecurringPaymentTokenRepo(DatabaseAbstractRepository):
+    ORM_Model = RecurringPaymentToken

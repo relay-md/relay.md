@@ -17,11 +17,16 @@ def billing():
 
 
 @billing.command()
-def demo():
+@click.argument("email")
+def demo(email):
     (db,) = get_session()
     billing_repo = repos.InvoiceRepo(db)
+    user = repos.UserRepo(db).get_by_kwargs(email=email)
+    if not user:
+        raise ValueError("User not found")
     products = [models.ProductInformation(name="Foobar", quantity=10, price=3000)]
     person = models.PersonalInformation(
+        user_id=user.id,
         name="Fabian Schuh",
         email="fabian@chainsquad.com",
         address_line1="Address 13, 24 Foobar",

@@ -19,7 +19,7 @@ from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import BadRequest
 from ..models.billing import InvoiceStatus
-from ..repos.billing import InvoiceRepo
+from ..repos.billing import InvoiceRepo, RecurringPaymentTokenRepo
 from ..repos.user import User
 from ..templates import templates
 from ..utils.user import get_optional_user
@@ -99,13 +99,27 @@ async def adyen_webhook(
     invoice_repo = InvoiceRepo(db)
     for notification in webhook["notificationItems"]:
         item = notification["NotificationRequestItem"]
+        additional_data = item["additionalData"]
         invoice_id = item["merchantReference"]
         invoice = invoice_repo.get_by_id(UUID(invoice_id))
         if not invoice:
             continue
         if item["success"]:
-            invoice.payment_status = InvoiceStatus.COMPLETED
+            invoice_repo.update(invoice, payment_status=InvoiceStatus.COMPLETED)
         else:
-            invoice.payment_failure_reason = item["reason"]
+            invoice_repo.update(invoice, payment_failure_reason=item["reason"])
+
+        # in case we receive subscription data
+        if additional_data.get("recurring.shopperReference"):
+            recurring_repo = RecurringPaymentTokenRepo(db)
+            recurring_repo.create_from_kwargs(
+                user_id=UUID(additional_data.get("recurring.shopperReference")),
+                recurringDetailReference=additional_data.get(
+                    "recurring.recurringDetailReference"
+                ),
+                originalReference=item.get("originalReference"),
+                pspReference=item.get("pspReference"),
+                invoice_id=invoice.id,
+            )
 
     return dict(success=True)

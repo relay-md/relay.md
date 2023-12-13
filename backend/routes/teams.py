@@ -143,6 +143,7 @@ async def team_billing_payment(
         )
     ]
     person = PersonalInformation(
+        user_id=user.id,
         name=user.name,
         email=user.email,
         address_line1=address_line1,
