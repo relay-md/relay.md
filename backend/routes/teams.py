@@ -171,6 +171,8 @@ async def team_billing_payment(
     )
 
     return RedirectResponse(
-        url=invoice_repo.get_payment_link(invoice),
+        # Pay externally, but seems to not support subscriptions via Ayden
+        # url=invoice_repo.get_payment_link(invoice),
+        url=request.url_for("payment_invoice", invoice_id=invoice.id),
         status_code=status.HTTP_302_FOUND,
     )

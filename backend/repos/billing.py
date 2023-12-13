@@ -3,7 +3,7 @@ import abc
 import logging
 
 from ..config import get_config
-from ..exceptions import BillingException
+from ..exceptions import BadRequest, BillingException
 from ..models.billing import Invoice, RecurringPaymentToken
 from .base import DatabaseAbstractRepository
 
@@ -17,6 +17,10 @@ class AbstractPaymentGateway:
 
     @abc.abstractmethod
     def get_payment_status(self, **kwargs):
+        pass
+
+    @abc.abstractmethod
+    def get_payment_session(self, **kwargs):
         pass
 
 
@@ -141,6 +145,9 @@ class CheckoutComPayments(AbstractPaymentGateway):
     def get_payment_status(self, **kwargs):
         return "completed"
 
+    def get_payment_session(self, **kwargs):
+        pass
+
 
 class AdyenPayments(AbstractPaymentGateway):
     def __init__(self, *args, **kwargs):
@@ -167,16 +174,54 @@ class AdyenPayments(AbstractPaymentGateway):
             countryCode=invoice.customer.country_code,
             telephoneNumber=f"{invoice.customer.phone_country_code}{invoice.customer.phone_number}",
             # Recurring configurations for subscription:
-            recurringFrequency=invoice.payment.days_between_payments,
-            recurringProcessingModel="Subscription",
+            # recurringFrequency=invoice.payment.days_between_payments,
+            # recurringProcessingModel="Subscription",
             # shopperInteraction="Ecommerce",
             shopperReference=str(invoice.customer.user_id),
             storePaymentMethod=True,
         )
         result = self.adyen.checkout.payments_api.sessions(request)
+        if result.status_code != 201:
+            log.error(result.message)
+            raise BillingException("Payment Provider refused session")
         message = result.message
         invoice.payment_provider_reference = message["id"]
         return result.message["url"]
+
+    def get_payment_session(self, invoice: Invoice):
+        request = dict(
+            amount=dict(
+                value=sum([x.quantity * x.price for x in invoice.products]),
+                currency="EUR",
+            ),
+            merchantAccount=get_config().ADYEN_MERCHANT_ACCOUNT,
+            returnUrl=get_config().ADYEN_RETURN_URL,
+            reference=str(invoice.id),
+            countryCode=invoice.customer.country_code,
+            # Recurring configurations for subscription:
+            recurringFrequency=invoice.payment.days_between_payments,
+            recurringProcessingModel="Subscription",
+            lineItems=[
+                {
+                    "quantity": 1,
+                    "amountIncludingTax": 5000,
+                    "description": "Sunglasses",
+                },
+                {
+                    "quantity": 1,
+                    "amountIncludingTax": 5000,
+                    "description": "Headphones",
+                },
+            ],
+            shopperInteraction="Ecommerce",
+            shopperReference=str(invoice.customer.user_id),
+            storePaymentMethod=True,
+        )
+        result = self.adyen.checkout.payments_api.sessions(request)
+        if result.status_code != 201:
+            log.error(result.message)
+            raise BadRequest("Payment Provider refused session")
+        return result.message
 
     def get_payment_status(
         self,
@@ -201,8 +246,10 @@ class InvoiceRepo(DatabaseAbstractRepository):
         else:
             self.payment = AdyenPayments()
 
+    def get_payment_session(self, invoice: Invoice):
+        return self.payment.get_payment_session(invoice)
+
     def get_payment_link(self, invoice: Invoice):
-        # return self.get_checkoutcom_payment_link(invoice)
         return self.payment.get_payment_link(invoice)
 
     def get_payment_status(self, **kwargs):

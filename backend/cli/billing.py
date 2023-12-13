@@ -49,4 +49,4 @@ def demo(email):
     invoice_db = billing_repo.create(invoice)
     console.print(invoice_db)
     console.print(invoice_db.id)
-    console.print(billing_repo.get_payment_link(invoice))
+    console.print(billing_repo.get_payment_session(invoice))

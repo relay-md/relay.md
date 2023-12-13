@@ -510,8 +510,6 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
      .title.is-5 Team Subscription
      .title.is-5 {{price_total}} € / {{price_interval}}
 
-    p {{invoice}}
-
     .field.is-grouped.is-grouped-multiline
       .control
        .tags.has-addons
@@ -544,6 +542,4 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
           .control
             button.button.is-primary
               | Go to Payment
-
-
 {% endblock %}
