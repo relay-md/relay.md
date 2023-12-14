@@ -24,7 +24,11 @@ def demo(email):
     user = repos.UserRepo(db).get_by_kwargs(email=email)
     if not user:
         raise ValueError("User not found")
-    products = [models.ProductInformation(name="Foobar", quantity=10, price=3000)]
+    products = [
+        models.ProductInformation(
+            name="Foobar", quantity=10, price=3000, description="Team subscription"
+        )
+    ]
     person = models.PersonalInformation(
         name="Fabian Schuh",
         email="fabian@chainsquad.com",
@@ -49,4 +53,5 @@ def demo(email):
     invoice_db = billing_repo.create(invoice)
     console.print(invoice_db)
     console.print(invoice_db.id)
-    console.print(billing_repo.get_payment_session(invoice))
+    # console.print(billing_repo.get_payment_session(invoice))
+    console.print(billing_repo.get_payment_link(invoice))

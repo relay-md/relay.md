@@ -139,11 +139,13 @@ async def team_billing_payment(
     invoice_repo = InvoiceRepo(db)
     products = [
         ProductInformation(
-            name="Team Subscription", quantity=1, price=int(price_total * 100)
+            name="Team Subscription",
+            quantity=1,
+            price=int(price_total * 100),
+            description=f"Team: {team_name}",
         )
     ]
     person = PersonalInformation(
-        user_id=user.id,
         name=user.name,
         email=user.email,
         address_line1=address_line1,
@@ -165,6 +167,7 @@ async def team_billing_payment(
             days_between_payments=30, expiry=now + timedelta(days=365 * 10)
         )
     invoice = invoice_repo.create_from_kwargs(
+        user_id=user.id,
         customer=person,
         products=products,
         payment=payment_plan,

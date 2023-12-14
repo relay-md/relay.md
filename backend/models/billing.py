@@ -27,7 +27,10 @@ class ProductInformation(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
+    # E.g. Team Subscription
     name: Mapped[str] = mapped_column(String(64))
+    # E.g. Name
+    description: Mapped[str] = mapped_column(String(64))
     quantity: Mapped[int] = mapped_column()
     price: Mapped[int] = mapped_column()
 
@@ -124,3 +127,7 @@ class Invoice(Base):
 
     def __repr__(self):
         return f"{self.__class__.__name__}(customer={self.customer},products={self.products}, payment={self.payment})"
+
+    @property
+    def total_amount(self):
+        return sum([x.quantity * x.price for x in self.products])

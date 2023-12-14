@@ -102,7 +102,7 @@ class CheckoutComPayments(AbstractPaymentGateway):
         request.payment_plan.expiry = invoice.payment.expiry.strftime("%Y%m%d")
         request.processing_channel_id = get_config().CHECKOUTCOM_CHANNEL_ID
 
-        request.amount = sum([x.quantity * x.price for x in request_products])
+        request.amount = invoice.total_amount
 
         request.reference = str(invoice.id)
 
@@ -163,7 +163,7 @@ class AdyenPayments(AbstractPaymentGateway):
     def get_payment_link(self, invoice: Invoice):
         request = dict(
             amount=dict(
-                value=sum([x.quantity * x.price for x in invoice.products]),
+                value=invoice.total_amount,
                 currency="EUR",
             ),
             merchantAccount=get_config().ADYEN_MERCHANT_ACCOUNT,
@@ -175,10 +175,18 @@ class AdyenPayments(AbstractPaymentGateway):
             telephoneNumber=f"{invoice.customer.phone_country_code}{invoice.customer.phone_number}",
             # Recurring configurations for subscription:
             # recurringFrequency=invoice.payment.days_between_payments,
-            # recurringProcessingModel="Subscription",
             # shopperInteraction="Ecommerce",
             shopperReference=str(invoice.user_id),
             storePaymentMethod=True,
+            recurringProcessingModel="Subscription",
+            mandate=dict(
+                amount=invoice.total_amount,
+                amountRule="exact",
+                billingAttemptsRule="on",
+                billingDay="1",
+                endsAt="2030-12-31",  # FIXME:
+                frequency="monthly",
+            ),
         )
         result = self.adyen.checkout.payments_api.sessions(request)
         if result.status_code != 201:
@@ -186,34 +194,44 @@ class AdyenPayments(AbstractPaymentGateway):
             raise BillingException("Payment Provider refused session")
         message = result.message
         invoice.payment_provider_reference = message["id"]
+        from rich import print
+
+        print(result.message)
         return result.message["url"]
 
     def get_payment_session(self, invoice: Invoice):
         request = dict(
             amount=dict(
-                value=sum([x.quantity * x.price for x in invoice.products]),
+                value=invoice.total_amount,
                 currency="EUR",
             ),
             merchantAccount=get_config().ADYEN_MERCHANT_ACCOUNT,
             returnUrl=get_config().ADYEN_RETURN_URL,
             reference=str(invoice.id),
             countryCode=invoice.customer.country_code,
-            # Recurring configurations for subscription:
-            recurringFrequency=invoice.payment.days_between_payments,
-            recurringProcessingModel="Subscription",
             lineItems=[
-                {
-                    "quantity": 1,
-                    "amountIncludingTax": 5000,
-                    "description": "Sunglasses",
-                },
-                {
-                    "quantity": 1,
-                    "amountIncludingTax": 5000,
-                    "description": "Headphones",
-                },
+                dict(
+                    id=str(p.id),
+                    amountIncludingTax=p.price,
+                    quantity=p.quantity,
+                    brand=p.name,
+                    description=p.description,
+                )
+                for p in invoice.products
             ],
-            shopperInteraction="Ecommerce",
+            # Recurring configurations for subscription:
+            enableRecurring=True,
+            recurringProcessingModel="Subscription",
+            mandate=dict(
+                amount=invoice.total_amount,
+                amountRule="exact",
+                billingAttemptsRule="on",
+                billingDay="1",
+                endsAt="2030-12-31",  # FIXME:
+                frequency="monthly",
+            ),
+            mode="hosted",
+            themeId=get_config().ADYEN_THEME_ID,
             shopperReference=str(invoice.user_id),
             storePaymentMethod=True,
         )
@@ -221,6 +239,9 @@ class AdyenPayments(AbstractPaymentGateway):
         if result.status_code != 201:
             log.error(result.message)
             raise BadRequest("Payment Provider refused session")
+        from rich import print
+
+        print(result.message)
         return result.message
 
     def get_payment_status(
