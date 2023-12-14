@@ -287,7 +287,7 @@ class AdyenPayments(AbstractPaymentGateway):
 
     def subscription_payment(self, invoice: Invoice):
         # FIXME: is this always the best choice: "0"
-        token = invoice.recurring_payment_tokens[0]
+        token = invoice.user.recurring_payment_tokens[0]
         request = dict(
             paymentMethod=dict(
                 type="scheme", storedPaymentMethodId=token.recurringDetailReference

@@ -9,6 +9,7 @@ from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
+from .user import User
 
 
 class InvoiceStatus(enum.Enum):
@@ -94,9 +95,6 @@ class RecurringPaymentToken(Base):
     recurringDetailReference: Mapped[str] = mapped_column(String(128))
     pspReference: Mapped[str] = mapped_column(String(128))
 
-    # used as merchantReference
-    invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_invoice.id"))
-
 
 class Invoice(Base):
     __tablename__ = "billing_invoice"
@@ -119,12 +117,12 @@ class Invoice(Base):
 
     payment_provider_reference: Mapped[str] = mapped_column(String(256), nullable=True)
 
+    user: Mapped[User] = relationship()
     customer: Mapped[PersonalInformation] = relationship()
     payment: Mapped[PaymentPlan] = relationship()
     products: Mapped[List[ProductInformation]] = relationship(
         secondary="billing_invoice_products"
     )
-    recurring_payment_tokens: Mapped[List[RecurringPaymentToken]] = relationship()
 
     def __repr__(self):
         return f"{self.__class__.__name__}(customer={self.customer},products={self.products}, payment={self.payment})"
