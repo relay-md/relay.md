@@ -151,10 +151,9 @@ def test_create_invoice_recurring(
     dbsession.refresh(invoice)
 
     recurring_repo = repos.billing.RecurringPaymentTokenRepo(dbsession)
-    token = recurring_repo.get_by_kwargs(invoice_id=invoice.id)
+    token = recurring_repo.get_by_kwargs(user_id=account.id)
     assert token
     assert token.user_id == account.id
     assert token.recurringDetailReference == "M5N7TQ4TG5PFWR50"
     assert token.originalReference == "DZ4DPSHB4WD2WN82"
     assert token.pspReference == "M5N7TQ4TG5PFWR50"
-    assert token.invoice_id == invoice.id

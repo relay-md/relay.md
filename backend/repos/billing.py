@@ -279,7 +279,6 @@ class AdyenPayments(AbstractPaymentGateway):
                         "originalReference", item.get("pspReference")
                     ),
                     pspReference=item.get("pspReference"),
-                    invoice_id=invoice.id,
                 )
                 # Uniq entries only
                 if not recurring_repo.get_by_kwargs(**recurring_item):
