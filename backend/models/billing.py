@@ -124,6 +124,7 @@ class Invoice(Base):
     products: Mapped[List[ProductInformation]] = relationship(
         secondary="billing_invoice_products"
     )
+    recurring_payment_tokens: Mapped[List[RecurringPaymentToken]] = relationship()
 
     def __repr__(self):
         return f"{self.__class__.__name__}(customer={self.customer},products={self.products}, payment={self.payment})"

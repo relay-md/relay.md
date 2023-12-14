@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 import abc
 import logging
+from uuid import UUID
 
 from ..config import get_config
+from ..database import Session
 from ..exceptions import BadRequest, BillingException
-from ..models.billing import Invoice, RecurringPaymentToken
+from ..models.billing import (
+    Invoice,
+    InvoiceStatus,
+    RecurringPaymentToken,
+)
 from .base import DatabaseAbstractRepository
 
 log = logging.getLogger(__name__)
@@ -194,9 +200,6 @@ class AdyenPayments(AbstractPaymentGateway):
             raise BillingException("Payment Provider refused session")
         message = result.message
         invoice.payment_provider_reference = message["id"]
-        from rich import print
-
-        print(result.message)
         return result.message["url"]
 
     def get_payment_session(self, invoice: Invoice):
@@ -220,28 +223,17 @@ class AdyenPayments(AbstractPaymentGateway):
                 for p in invoice.products
             ],
             # Recurring configurations for subscription:
-            enableRecurring=True,
             recurringProcessingModel="Subscription",
-            mandate=dict(
-                amount=invoice.total_amount,
-                amountRule="exact",
-                billingAttemptsRule="on",
-                billingDay="1",
-                endsAt="2030-12-31",  # FIXME:
-                frequency="monthly",
-            ),
-            mode="hosted",
-            themeId=get_config().ADYEN_THEME_ID,
+            shopperInteraction="Ecommerce",
             shopperReference=str(invoice.user_id),
             storePaymentMethod=True,
         )
         result = self.adyen.checkout.payments_api.sessions(request)
         if result.status_code != 201:
             log.error(result.message)
-            raise BadRequest("Payment Provider refused session")
-        from rich import print
-
-        print(result.message)
+            raise BadRequest(
+                f"Payment Provider refused session for {result.message['refusalReason']}"
+            )
         return result.message
 
     def get_payment_status(
@@ -254,6 +246,75 @@ class AdyenPayments(AbstractPaymentGateway):
             session_id, query_parameters=request
         )
         return result.message["status"]
+
+    def process_webhook(self, db: Session, webhook):
+        for notification in webhook["notificationItems"]:
+            item = notification["NotificationRequestItem"]
+            event_code = item["eventCode"]
+            additional_data = item["additionalData"]
+            invoice_id = item["merchantReference"]
+            invoice_repo = InvoiceRepo(db)
+            invoice = invoice_repo.get_by_id(UUID(invoice_id))
+            if not invoice:
+                continue
+
+            # payment was authorized
+            if event_code == "AUTHORISATION":
+                log.info(f"Payment was authorized for {invoice.id=}")
+                if item["success"]:
+                    invoice_repo.update(invoice, payment_status=InvoiceStatus.COMPLETED)
+                else:
+                    invoice_repo.update(invoice, payment_failure_reason=item["reason"])
+
+            # in case we receive subscription data
+            if event_code == "RECURRING_CONTRACT":
+                log.info(f"Payment Subscription contract was created for {invoice.id=}")
+                recurring_repo = RecurringPaymentTokenRepo(db)
+                recurring_item = dict(
+                    user_id=UUID(additional_data.get("recurring.shopperReference")),
+                    recurringDetailReference=additional_data.get(
+                        "recurring.recurringDetailReference"
+                    ),
+                    originalReference=item.get(
+                        "originalReference", item.get("pspReference")
+                    ),
+                    pspReference=item.get("pspReference"),
+                    invoice_id=invoice.id,
+                )
+                # Uniq entries only
+                if not recurring_repo.get_by_kwargs(**recurring_item):
+                    recurring_repo.create_from_kwargs(**recurring_item)
+
+    def subscription_payment(self, invoice: Invoice):
+        # FIXME: is this always the best choice: "0"
+        token = invoice.recurring_payment_tokens[0]
+        request = dict(
+            paymentMethod=dict(
+                type="scheme", storedPaymentMethodId=token.recurringDetailReference
+            ),
+            shopperReference=str(invoice.user_id),
+            shopperInteraction="ContAuth",
+            recurringProcessingModel="Subscription",
+            amount=dict(
+                value=invoice.total_amount,
+                currency="EUR",
+            ),
+            merchantAccount=get_config().ADYEN_MERCHANT_ACCOUNT,
+            returnUrl=get_config().ADYEN_RETURN_URL,
+            reference=str(invoice.id),
+            # countryCode=invoice.customer.country_code,
+        )
+        result = self.adyen.checkout.payments_api.payments(request)
+        if result.status_code != 200:
+            raise BadRequest(
+                f"Payment Provider refused session for {result.message['refusalReason']}"
+            )
+        message = result.message
+        if message.get("resultCode") == "Authorised":
+            # FIXME: do seomthing in the db to indicate subsequent payments are
+            # fine now too
+            pass
+        return result.message
 
 
 class InvoiceRepo(DatabaseAbstractRepository):
@@ -275,6 +336,12 @@ class InvoiceRepo(DatabaseAbstractRepository):
 
     def get_payment_status(self, **kwargs):
         return self.payment.get_payment_status(**kwargs)
+
+    def process_webhook(self, webhook):
+        return self.payment.process_webhook(self._db, webhook)
+
+    def subscription_payment(self, invoice: Invoice):
+        return self.payment.subscription_payment(invoice)
 
 
 class RecurringPaymentTokenRepo(DatabaseAbstractRepository):

@@ -18,8 +18,7 @@ from starlette.responses import HTMLResponse
 from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import BadRequest
-from ..models.billing import InvoiceStatus
-from ..repos.billing import InvoiceRepo, RecurringPaymentTokenRepo
+from ..repos.billing import InvoiceRepo
 from ..repos.user import User
 from ..templates import templates
 from ..utils.user import get_optional_user
@@ -57,6 +56,7 @@ async def payment_invoice(
     request: Request,
     config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
+    user: User = Depends(get_optional_user),
 ):
     invoice_repo = InvoiceRepo(db)
     invoice = invoice_repo.get_by_id(invoice_id)
@@ -98,6 +98,34 @@ async def payment_success(
 
 
 @router.get(
+    "/failed",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def payment_failed(
+    request: Request,
+    config: Settings = Depends(get_config),
+    db: Session = Depends(get_session),
+    user: User = Depends(get_optional_user),
+):
+    return templates.TemplateResponse("payment-failed.pug", context=dict(**locals()))
+
+
+@router.get(
+    "/error",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def payment_error(
+    request: Request,
+    config: Settings = Depends(get_config),
+    db: Session = Depends(get_session),
+    user: User = Depends(get_optional_user),
+):
+    return templates.TemplateResponse("payment-error.pug", context=dict(**locals()))
+
+
+@router.get(
     "/adyen/success",
     response_class=HTMLResponse,
     tags=["web"],
@@ -118,6 +146,7 @@ async def adyen_success(
     )
     if status != "completed":
         raise BadRequest(f"Payment went wrong? Status is {status}")
+    # FIXME: we can deal with other statuses now too!
     return RedirectResponse(url=request.url_for("payment_success"))
 
 
@@ -136,32 +165,9 @@ async def adyen_webhook(
     webhook = await request.json()
     print(webhook)
     invoice_repo = InvoiceRepo(db)
+    invoice_repo.process_webhook(webhook)
     try:
-        for notification in webhook["notificationItems"]:
-            item = notification["NotificationRequestItem"]
-            additional_data = item["additionalData"]
-            invoice_id = item["merchantReference"]
-            invoice = invoice_repo.get_by_id(UUID(invoice_id))
-            if not invoice:
-                continue
-            if item["success"]:
-                invoice_repo.update(invoice, payment_status=InvoiceStatus.COMPLETED)
-            else:
-                invoice_repo.update(invoice, payment_failure_reason=item["reason"])
-
-            # in case we receive subscription data
-            if additional_data.get("recurring.shopperReference"):
-                recurring_repo = RecurringPaymentTokenRepo(db)
-                recurring_repo.create_from_kwargs(
-                    user_id=UUID(additional_data.get("recurring.shopperReference")),
-                    recurringDetailReference=additional_data.get(
-                        "recurring.recurringDetailReference"
-                    ),
-                    originalReference=item.get("originalReference"),
-                    pspReference=item.get("pspReference"),
-                    invoice_id=invoice.id,
-                )
+        invoice_repo.process_webhook(webhook)
     except Exception as e:
         return dict(error=dict(message=str(e)))
-
     return dict(success=True, message="[accepted]")

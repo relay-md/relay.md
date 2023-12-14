@@ -1,0 +1,11 @@
+{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.column.is-6.is-offset-3.has-text-centered
+ .block.mt-5
+  p
+   img.status-image(src="{{ url_for('static', path='img/error.svg') }}")
+ .block
+  p.status-message An error occured. No Payment was made. Please try again.
+ .block
+   a.button(href='/') Return Home
+{% endblock %}

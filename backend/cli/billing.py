@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date
+from uuid import UUID
 
 import click
 from rich.console import Console
@@ -55,3 +56,14 @@ def demo(email):
     console.print(invoice_db.id)
     # console.print(billing_repo.get_payment_session(invoice))
     console.print(billing_repo.get_payment_link(invoice))
+
+
+@billing.command()
+@click.argument("invoice_id", type=UUID)
+def claim(invoice_id: UUID):
+    db = next(get_session())
+    invoice_repo = repos.InvoiceRepo(db)
+    invoice = invoice_repo.get_by_id(invoice_id)
+    if not invoice:
+        raise ValueError("Unknown Invoice")
+    console.print(invoice_repo.subscription_payment(invoice))
