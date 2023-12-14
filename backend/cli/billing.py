@@ -26,7 +26,6 @@ def demo(email):
         raise ValueError("User not found")
     products = [models.ProductInformation(name="Foobar", quantity=10, price=3000)]
     person = models.PersonalInformation(
-        user_id=user.id,
         name="Fabian Schuh",
         email="fabian@chainsquad.com",
         address_line1="Address 13, 24 Foobar",
@@ -41,6 +40,7 @@ def demo(email):
         days_between_payments=30, expiry=date(2025, 12, 31)
     )
     invoice = models.Invoice(
+        user_id=user.id,
         customer=person,
         products=products,
         payment=payment_plan,

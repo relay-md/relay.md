@@ -40,7 +40,6 @@ class PersonalInformation(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     name: Mapped[str] = mapped_column(String(128))
     email: Mapped[str] = mapped_column(String(128))
     # Address
@@ -103,6 +102,7 @@ class Invoice(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
 
     customer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_person.id"))
     payment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_payment_plan.id"))

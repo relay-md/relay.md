@@ -177,7 +177,7 @@ class AdyenPayments(AbstractPaymentGateway):
             # recurringFrequency=invoice.payment.days_between_payments,
             # recurringProcessingModel="Subscription",
             # shopperInteraction="Ecommerce",
-            shopperReference=str(invoice.customer.user_id),
+            shopperReference=str(invoice.user_id),
             storePaymentMethod=True,
         )
         result = self.adyen.checkout.payments_api.sessions(request)
@@ -214,7 +214,7 @@ class AdyenPayments(AbstractPaymentGateway):
                 },
             ],
             shopperInteraction="Ecommerce",
-            shopperReference=str(invoice.customer.user_id),
+            shopperReference=str(invoice.user_id),
             storePaymentMethod=True,
         )
         result = self.adyen.checkout.payments_api.sessions(request)
