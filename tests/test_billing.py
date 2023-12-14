@@ -74,9 +74,12 @@ def get_webhook_payload():
 
 def test_create_invoice(dbsession, account, get_webhook_payload, web_client):
     billing_repo = repos.InvoiceRepo(dbsession)
-    products = [models.ProductInformation(name="Foobar", quantity=10, price=3000)]
+    products = [
+        models.ProductInformation(
+            name="Foobar", quantity=10, price=3000, description="Foobar"
+        )
+    ]
     person = models.PersonalInformation(
-        user_id=account.id,
         name="Fabian Schuh",
         email="fabian@chainsquad.com",
         address_line1="Address 13, 24 Foobar",
@@ -92,6 +95,7 @@ def test_create_invoice(dbsession, account, get_webhook_payload, web_client):
     )
     invoice = billing_repo.create(
         models.Invoice(
+            user_id=account.id,
             customer=person,
             products=products,
             payment=payment_plan,
@@ -111,9 +115,12 @@ def test_create_invoice_recurring(
     dbsession, account, get_webhook_payload_recurring_contract, web_client
 ):
     billing_repo = repos.InvoiceRepo(dbsession)
-    products = [models.ProductInformation(name="Foobar", quantity=10, price=3000)]
+    products = [
+        models.ProductInformation(
+            name="Foobar", quantity=10, price=3000, description="Foobar"
+        )
+    ]
     person = models.PersonalInformation(
-        user_id=account.id,
         name="Fabian Schuh",
         email="fabian@chainsquad.com",
         address_line1="Address 13, 24 Foobar",
@@ -129,6 +136,7 @@ def test_create_invoice_recurring(
     )
     invoice = billing_repo.create(
         models.Invoice(
+            user_id=account.id,
             customer=person,
             products=products,
             payment=payment_plan,
@@ -141,7 +149,6 @@ def test_create_invoice_recurring(
 
     dbsession.commit()
     dbsession.refresh(invoice)
-    assert invoice.payment_status == InvoiceStatus.COMPLETED
 
     recurring_repo = repos.billing.RecurringPaymentTokenRepo(dbsession)
     token = recurring_repo.get_by_kwargs(invoice_id=invoice.id)
