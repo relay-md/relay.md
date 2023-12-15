@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 from collections import namedtuple
+from typing import List
 
 from .. import exceptions
 from ..database import Session
 from ..models.permissions import Permissions
+from ..models.team_topic import TeamTopic
 from ..models.user import User
 from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
@@ -31,20 +33,27 @@ def get_title_from_body(body: str) -> str:
     return next(filter(line_allowed_for_headline, lines))
 
 
-def chech_permissions(db: Session, user: User, shareables: Shareables, action: str):
+def check_document_read_permissions(
+    db: Session, user: User, team_topics: List[TeamTopic]
+):
     user_repo = UserRepo(db)
-    for team_topic in shareables.team_topics:
+    for team_topic in team_topics:
         team = team_topic.team
-        if team_topic.team.is_public:
-            # No further checking, anything goes if public
-            continue
-
-        # If not public, membership is required
         membership = user_repo.is_member(user, team_topic.team)
-        if not membership:
+
+        if not team.can(Permissions.can_post, user, membership):
             raise exceptions.NotAllowed(
                 f"You are not allowed to post to {team_topic.team}!"
             )
+
+
+def check_document_write_permissions(
+    db: Session, user: User, shareables: Shareables, action: str
+):
+    user_repo = UserRepo(db)
+    for team_topic in shareables.team_topics:
+        team = team_topic.team
+        membership = user_repo.is_member(user, team_topic.team)
 
         # some members are allowed to post in restricted teams
         if action == "post-document" and not team.can(
