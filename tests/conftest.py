@@ -164,15 +164,17 @@ def default_team_topics(dbsession, account):
     team_topic_repo = repos.TeamTopicRepo(dbsession)
     user_team_repo = repos.UserTeamRepo(dbsession)
 
-    team = team_repo.create_from_kwargs(
+    team_repo.create_from_kwargs(
         name="_",
         user_id=account.id,
-        allow_create_topics=True,
         type=models.team.TeamType.PUBLIC,
     )
 
     team = team_repo.create_from_kwargs(
-        name="myteam", user_id=account.id, type=models.team.TeamType.PRIVATE
+        name="myteam",
+        user_id=account.id,
+        type=models.team.TeamType.PRIVATE,
+        public_permissions=0,
     )
     topic = topic_repo.create_from_kwargs(name="mytopic")
     team_topic_repo.create_from_kwargs(team_id=team.id, topic_id=topic.id)
@@ -215,7 +217,7 @@ def create_document(account, team_topic_repo, user_repo, document_repo):
     ):
         tts = list()
         for tt_name in team_topics:
-            tts.append(team_topic_repo.from_string(tt_name))
+            tts.append(team_topic_repo.from_string(tt_name, account))
         us = list()
         for user in users:
             us.append(user_repo.from_string(user))
@@ -233,7 +235,7 @@ def create_document(account, team_topic_repo, user_repo, document_repo):
 @pytest.fixture
 def subscribe_to_team_topic(account, team_topic_repo, user_team_topic_repo):
     def func(team_topic: str, acc=account):
-        t = team_topic_repo.from_string(team_topic)
+        t = team_topic_repo.from_string(team_topic, account)
         return user_team_topic_repo.create_from_kwargs(
             team_topic_id=t.id,
             user_id=acc.id,
@@ -251,8 +253,8 @@ def create_team(team_repo, account):
 
 
 @pytest.fixture
-def create_team_topic(team_topic_repo):
+def create_team_topic(team_topic_repo, account):
     def func(name: str):
-        return team_topic_repo.from_string(name)
+        return team_topic_repo.from_string(name, account)
 
     return func

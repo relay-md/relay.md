@@ -43,23 +43,11 @@ span.icon
          th
           span.icon
            i.fas.fa-user-plus
-         th
-          span.icon
-           i.fas.fa-file-plus
-         th
-          span.icon
-           i.fas.fa-user-times
-         th
-          span.icon
-           i.fas.fa-edit
          th control
        {% for member in members %}
        tr
         td {{member.user.username}}
-        td {{bool_icon(member.can_invite_users)}}
-        td {{bool_icon(member.can_post_documents)}}
-        td {{bool_icon(member.can_delete_documents)}}
-        td {{bool_icon(member.can_modify_documents)}}
+        td {{bool_icon(member.permissions)}}
         td
          a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
           span.icon.is-small

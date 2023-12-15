@@ -27,7 +27,6 @@
      th Owner
      th Creation Date
      th Type
-     th Create Topics
      th Control
     tbody
      {% for team in teams %}
@@ -63,20 +62,9 @@
        {% if team.is_public %}
        span.icon
         i.fas.fa-globe
-       {% elif team.is_restricted %}
-       span.icon
-        i.fas.fa-shield
        {% else %}
        span.icon
         i.fas.fa-lock
-       {% endif %}
-      td
-       {% if team.allow_create_topics %}
-       span.icon
-        i.fas.fa-check
-       {% else %}
-       span.icon
-        i.fas.fa-times
        {% endif %}
       {% if user %}
       td

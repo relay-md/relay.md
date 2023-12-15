@@ -29,7 +29,7 @@ async def join(
     db: Session = Depends(get_session),
 ):
     repo = UserTeamRepo(db)
-    if team.is_private or team.is_restricted:
+    if team.is_private:
         raise exceptions.NotAllowed(f"Team {team.name} is private or restricted!")
     repo.create_from_kwargs(user_id=user.id, team_id=team.id)
     return RedirectResponse(url=request.url_for("get_teams"))
@@ -54,7 +54,7 @@ async def invite_user(
         raise exceptions.BadRequest("Invalid user id!")
     membership = user_repo.is_member(user, team)
     user_team_repo = UserTeamRepo(db)
-    if (team.is_private or team.is_restricted) and not membership:
+    if (team.is_private) and not membership:
         # TODO: check that we are allowed to invite people
         raise exceptions.NotAllowed(
             f"Team {team.name} is private or restricted and you are not member!"
@@ -86,7 +86,7 @@ async def remove_user(
     if not membership_to_remove:
         raise exceptions.BadRequest("Invalid membership id!")
     membership = user_repo.is_member(user, team)
-    if (team.is_private or team.is_restricted) and not membership:
+    if (team.is_private) and not membership:
         # TODO: check that we are allowed to invite people
         raise exceptions.NotAllowed(
             f"Team {team.name} is private or restricted and you are not member!"

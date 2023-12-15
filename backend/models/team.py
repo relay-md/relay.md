@@ -10,7 +10,32 @@ from sqlalchemy import Date, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
+from .permissions import (
+    MemberPermissions,
+    OwnerPermissions,
+    Permissions,
+    PublicPermissions,
+)
 from .user import User
+from .user_team import UserTeam
+
+DEFAULT_OWNER_PERMISSIONS = (
+    OwnerPermissions.can_read
+    | OwnerPermissions.can_post
+    | OwnerPermissions.can_modify
+    | OwnerPermissions.can_create_topics
+    | OwnerPermissions.can_invite
+)
+
+DEFAULT_MEMBER_PERMISSIONS = (
+    MemberPermissions.can_read
+    | MemberPermissions.can_post
+    | MemberPermissions.can_modify
+    | MemberPermissions.can_create_topics
+    | MemberPermissions.can_invite
+)
+
+DEFAULT_PUBLIC_PERMISSIONS = PublicPermissions.can_read | PublicPermissions.can_join
 
 
 class TeamType(enum.Enum):
@@ -38,10 +63,15 @@ class Team(Base):
     # description: Mapped[str] = mapped_column(Text())
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
+    owner_permissions: Mapped[int] = mapped_column(default=DEFAULT_OWNER_PERMISSIONS)
+    member_permissions: Mapped[int] = mapped_column(default=DEFAULT_MEMBER_PERMISSIONS)
+    public_permissions: Mapped[int] = mapped_column(default=DEFAULT_PUBLIC_PERMISSIONS)
+
     # Owner
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
+
+    # FIXME: replace by permissions:
     type: Mapped[TeamType] = mapped_column(Enum(TeamType), default=TeamType.PUBLIC)
-    allow_create_topics: Mapped[bool] = mapped_column(default=True)
 
     user: Mapped["User"] = relationship()  # noqa
     members: Mapped[List["User"]] = relationship(
@@ -55,15 +85,12 @@ class Team(Base):
 
     @property
     def is_private(self):
-        return self.type == TeamType.PRIVATE
+        return self.public_permissions == 0
 
     @property
     def is_public(self):
-        return self.type == TeamType.PUBLIC
-
-    @property
-    def is_restricted(self):
-        return self.type == TeamType.RESTRICTED
+        print(self.public_permissions)
+        return self.public_permissions != 0
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.name}>"
@@ -78,3 +105,16 @@ class Team(Base):
         now = date.today()
         if now < self.paid_until:
             return True
+
+    def can(self, action: Permissions, user: User, membership: UserTeam = None):
+        if self.user_id == user.id:
+            # owner
+            return (action & self.owner_permissions) == action
+        if membership:
+            # member
+            membership_action = membership.can(action)
+            if membership_action is not None:
+                return membership_action
+            return (action & self.member_permissions) == action
+        # public
+        return (action & self.public_permissions) == action

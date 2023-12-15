@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import select
 
+from ..models.permissions import Permissions
 from ..models.team import Team
 from ..models.team_topic import TeamTopic
 from ..models.topic import Topic
+from ..models.user import User
 from ..repos.team import TeamRepo
 from ..repos.topic import TopicRepo
 from .base import DatabaseAbstractRepository
@@ -12,7 +14,7 @@ from .base import DatabaseAbstractRepository
 class TeamTopicRepo(DatabaseAbstractRepository):
     ORM_Model = TeamTopic
 
-    def from_string(self, team_topic_str: str) -> TeamTopic:
+    def from_string(self, team_topic_str: str, user: User = None) -> TeamTopic:
         # import here due to cicular dependencies
         from ..exceptions import BadRequest, NotAllowed
 
@@ -35,7 +37,7 @@ class TeamTopicRepo(DatabaseAbstractRepository):
         if not team:
             # Teams cannot be created this way!
             raise BadRequest(f"Team '{team_name}' does not exist!")
-        if not team.allow_create_topics:
+        if not team.can(Permissions.can_create_topics, user):
             raise NotAllowed(f"Topic creation is not allowed for team {team.name}")
 
         topic_repo = TopicRepo(self._db)
