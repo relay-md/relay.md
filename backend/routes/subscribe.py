@@ -5,7 +5,6 @@ from email_validator import EmailNotValidError, validate_email
 from fastapi import APIRouter, Depends, Form
 from fastapi.exceptions import HTTPException
 from fastapi.responses import HTMLResponse
-from pydantic import EmailStr, ValidationError
 
 from ..config import get_config
 from ..database import Session, get_session
@@ -61,8 +60,9 @@ async def submitmail(
         )
 
     try:
-        email = EmailStr(email)
-    except ValidationError:
+        email = validate_email(email, check_deliverability=False)
+        email = email.normalized
+    except EmailNotValidError:
         return "invalid email"
 
     req = requests.post(
