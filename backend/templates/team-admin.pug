@@ -17,16 +17,16 @@ span.icon
  .columns
   .column.is-8.is-offset-2
    .section
-    h1.title.is-1 {{team.name}}
-    table.table
-     tr
-      td Paid until
-      td {{team.paid_until}}
+    .title.is-1 {{team.name}}
+    {% if team.is_active and not team.is_public %}
+    .subtitle paid until {{team.paid_until}}
+    {% endif %}
 
    .section
     h1
     h1.block.title.is-3 Members
     h2.subtitle.is-5 List of users subscribed to your team
+     {% if members %}
      nav.pagination(role="navication" aria-label="pagination")
       {% if page %}
       a.pagination-previous(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page-1)}}") Previous
@@ -65,6 +65,9 @@ span.icon
           span.icon.is-small
            i.fas.fa-trash
        {% endfor %}
+      {% else %}
+      p No members have joined yet.
+      {% endif %}
 
    .section
     h1.block.title.is-3 Invite Users
@@ -75,7 +78,7 @@ span.icon
       i.fas.fa-search
     div(id="users")
 
-   {% if team.is_public %}
+   {% if team.is_public or not team.paid_until %}
    .section.box.is-danger
     h1.block.title.is-3 Membership
     h2.subtitle.is-5 Upgrade to Private Member
