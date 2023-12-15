@@ -10,7 +10,7 @@ from starlette.responses import RedirectResponse
 from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import NotAllowed
-from ..models.billing import PersonalInformation, ProductInformation
+from ..models.billing import OrderItem, PersonalInformation
 from ..models.team import TeamType
 from ..repos.billing import InvoiceRepo
 from ..repos.team import TeamRepo
@@ -134,7 +134,7 @@ async def team_billing_payment(
 
     invoice_repo = InvoiceRepo(db)
     products = [
-        ProductInformation(
+        OrderItem(
             name="Team Subscription",
             quantity=quantity,
             price=int(price_total * 100),

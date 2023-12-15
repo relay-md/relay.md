@@ -26,7 +26,7 @@ def demo(email):
     if not user:
         raise ValueError("User not found")
     products = [
-        models.ProductInformation(
+        models.OrderItem(
             name="Foobar", quantity=10, price=3000, description="Team subscription"
         )
     ]

@@ -79,7 +79,7 @@ def test_create_invoice(
     team = create_team("private_team")
     billing_repo = repos.InvoiceRepo(dbsession)
     products = [
-        models.ProductInformation(
+        models.OrderItem(
             name="Foobar",
             quantity=10,
             price=3000,
@@ -126,7 +126,7 @@ def test_create_invoice_recurring(
     team = create_team("private_team")
     billing_repo = repos.InvoiceRepo(dbsession)
     products = [
-        models.ProductInformation(
+        models.OrderItem(
             name="Foobar",
             quantity=10,
             price=3000,

@@ -23,11 +23,14 @@ class PaymentProvider(enum.Enum):
     ADYEN = "adyen"
 
 
-class ProductInformation(Base):
+class OrderItem(Base):
     __tablename__ = "billing_product"
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
+    # Reference to the invoice
+    invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_invoice.id"))
+
     # E.g. Team Subscription
     name: Mapped[str] = mapped_column(String(64))
     # E.g. Name
@@ -63,15 +66,6 @@ class PersonalInformation(Base):
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, email={self.email})"
-
-
-class InvoiceProducts(Base):
-    __tablename__ = "billing_invoice_products"
-    id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, nullable=False
-    )
-    invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_invoice.id"))
-    product_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_product.id"))
 
 
 class RecurringPaymentToken(Base):
@@ -112,9 +106,7 @@ class Invoice(Base):
 
     user: Mapped[User] = relationship()
     customer: Mapped[PersonalInformation] = relationship()
-    products: Mapped[List[ProductInformation]] = relationship(
-        secondary="billing_invoice_products"
-    )
+    products: Mapped[List[OrderItem]] = relationship()
 
     def __repr__(self):
         return f"{self.__class__.__name__}(customer={self.customer},products={self.products}, payment={self.payment})"
