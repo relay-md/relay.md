@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, Form, Query, Request, status
 from fastapi.responses import PlainTextResponse
@@ -10,11 +10,7 @@ from starlette.responses import RedirectResponse
 from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import NotAllowed
-from ..models.billing import (
-    PaymentPlan,
-    PersonalInformation,
-    ProductInformation,
-)
+from ..models.billing import PersonalInformation, ProductInformation
 from ..models.team import TeamType
 from ..repos.billing import InvoiceRepo
 from ..repos.team import TeamRepo
@@ -132,15 +128,15 @@ async def team_billing_payment(
 
     price_total = get_price(yearly=yearly, private=True)
     if yearly:
-        pass
+        quantity = 12
     else:
-        pass
+        quantity = 1
 
     invoice_repo = InvoiceRepo(db)
     products = [
         ProductInformation(
             name="Team Subscription",
-            quantity=1,
+            quantity=quantity,
             price=int(price_total * 100),
             description=f"Team: {team_name}",
         )
@@ -157,20 +153,11 @@ async def team_billing_payment(
         phone_country_code=phone_country_code,
         phone_number=phone,
     )
-    now = datetime.utcnow()
-    if yearly:
-        payment_plan = PaymentPlan(
-            days_between_payments=365, expiry=now + timedelta(days=365 * 10)
-        )
-    else:
-        payment_plan = PaymentPlan(
-            days_between_payments=30, expiry=now + timedelta(days=365 * 10)
-        )
+    datetime.utcnow()
     invoice = invoice_repo.create_from_kwargs(
         user_id=user.id,
         customer=person,
         products=products,
-        payment=payment_plan,
     )
 
     return RedirectResponse(

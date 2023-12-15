@@ -3,10 +3,10 @@
 """
 import enum
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import List
 
-from sqlalchemy import Enum, ForeignKey, String
+from sqlalchemy import Date, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -50,6 +50,8 @@ class Team(Base):
     topics: Mapped[List["Topic"]] = relationship(  # noqa
         secondary="team_topics", back_populates="teams"
     )
+
+    paid_until: Mapped[date] = mapped_column(Date(), nullable=True)
 
     @property
     def is_private(self):

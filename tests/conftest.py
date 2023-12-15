@@ -244,17 +244,8 @@ def subscribe_to_team_topic(account, team_topic_repo, user_team_topic_repo):
 
 @pytest.fixture
 def create_team(team_repo, account):
-    def func(
-        name: str,
-        type: models.team.TeamType = models.team.TeamType.PUBLIC,
-        allow_create_topics: bool = False,
-    ):
-        return team_repo.create_from_kwargs(
-            name=name,
-            user_id=account.id,
-            type=type,
-            allow_create_topics=allow_create_topics,
-        )
+    def func(name: str, **kwargs):
+        return team_repo.create_from_kwargs(name=name, user_id=account.id, **kwargs)
 
     return func
 

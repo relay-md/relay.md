@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
+from sqlalchemy import Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -35,6 +35,10 @@ class ProductInformation(Base):
     quantity: Mapped[int] = mapped_column()
     price: Mapped[int] = mapped_column()
 
+    # In case this pays for a team, we link the team here
+    team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team.id"), nullable=True)
+    team: Mapped["Team"] = relationship()  # noqa
+
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, quantity={self.quantity}, price={self.price})"
 
@@ -59,18 +63,6 @@ class PersonalInformation(Base):
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, email={self.email})"
-
-
-class PaymentPlan(Base):
-    __tablename__ = "billing_payment_plan"
-    id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
-    )
-    days_between_payments: Mapped[int] = mapped_column()
-    expiry: Mapped[datetime] = mapped_column(DateTime())
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}(days_between_payments={self.days_between_payments})"
 
 
 class InvoiceProducts(Base):
@@ -106,7 +98,6 @@ class Invoice(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
 
     customer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_person.id"))
-    payment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_payment_plan.id"))
     payment_status: Mapped[InvoiceStatus] = mapped_column(
         Enum(InvoiceStatus), default=InvoiceStatus.PENDING
     )
@@ -117,9 +108,10 @@ class Invoice(Base):
 
     payment_provider_reference: Mapped[str] = mapped_column(String(256), nullable=True)
 
+    paid_at: Mapped[datetime] = mapped_column(nullable=True)
+
     user: Mapped[User] = relationship()
     customer: Mapped[PersonalInformation] = relationship()
-    payment: Mapped[PaymentPlan] = relationship()
     products: Mapped[List[ProductInformation]] = relationship(
         secondary="billing_invoice_products"
     )

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from datetime import date
+from datetime import datetime, timedelta
 from uuid import UUID
 
 import pytest
 
 from backend import models, repos
 from backend.models.billing import InvoiceStatus
+from backend.utils.dates import last_day_of_month
 
 
 @pytest.fixture
@@ -72,11 +73,18 @@ def get_webhook_payload():
     return func
 
 
-def test_create_invoice(dbsession, account, get_webhook_payload, web_client):
+def test_create_invoice(
+    dbsession, account, get_webhook_payload, web_client, create_team
+):
+    team = create_team("private_team")
     billing_repo = repos.InvoiceRepo(dbsession)
     products = [
         models.ProductInformation(
-            name="Foobar", quantity=10, price=3000, description="Foobar"
+            name="Foobar",
+            quantity=10,
+            price=3000,
+            description="Foobar",
+            team_id=team.id,
         )
     ]
     person = models.PersonalInformation(
@@ -90,15 +98,11 @@ def test_create_invoice(dbsession, account, get_webhook_payload, web_client):
         phone_country_code="+49",
         phone_number="1706397354",
     )
-    payment_plan = models.PaymentPlan(
-        days_between_payments=30, expiry=date(2025, 12, 31)
-    )
     invoice = billing_repo.create(
         models.Invoice(
             user_id=account.id,
             customer=person,
             products=products,
-            payment=payment_plan,
         )
     )
 
@@ -109,15 +113,25 @@ def test_create_invoice(dbsession, account, get_webhook_payload, web_client):
     dbsession.commit()
     dbsession.refresh(invoice)
     assert invoice.payment_status == InvoiceStatus.COMPLETED
+    dbsession.refresh(team)
+
+    assert team.paid_until == last_day_of_month(
+        datetime.utcnow() + timedelta(days=30 * 10)
+    )
 
 
 def test_create_invoice_recurring(
-    dbsession, account, get_webhook_payload_recurring_contract, web_client
+    dbsession, account, get_webhook_payload_recurring_contract, web_client, create_team
 ):
+    team = create_team("private_team")
     billing_repo = repos.InvoiceRepo(dbsession)
     products = [
         models.ProductInformation(
-            name="Foobar", quantity=10, price=3000, description="Foobar"
+            name="Foobar",
+            quantity=10,
+            price=3000,
+            description="Foobar",
+            team_id=team.id,
         )
     ]
     person = models.PersonalInformation(
@@ -131,15 +145,11 @@ def test_create_invoice_recurring(
         phone_country_code="+49",
         phone_number="1706397354",
     )
-    payment_plan = models.PaymentPlan(
-        days_between_payments=30, expiry=date(2025, 12, 31)
-    )
     invoice = billing_repo.create(
         models.Invoice(
             user_id=account.id,
             customer=person,
             products=products,
-            payment=payment_plan,
         )
     )
 

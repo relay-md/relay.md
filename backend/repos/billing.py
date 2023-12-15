@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import abc
 import logging
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from ..config import get_config
@@ -11,7 +12,9 @@ from ..models.billing import (
     InvoiceStatus,
     RecurringPaymentToken,
 )
+from ..utils.dates import last_day_of_month
 from .base import DatabaseAbstractRepository
+from .team import TeamRepo
 
 log = logging.getLogger(__name__)
 
@@ -29,129 +32,12 @@ class AbstractPaymentGateway:
     def get_payment_session(self, **kwargs):
         pass
 
+    @abc.abstractmethod
+    def process_webhook(self, webhook):
+        pass
 
-class CheckoutComPayments(AbstractPaymentGateway):
-    def __init__(self, *args, **kwargs):
-        from checkout_sdk.checkout_sdk import CheckoutSdk
-        from checkout_sdk.environment import Environment
-
-        super().__init__(*args, **kwargs)
-        self.api = (
-            CheckoutSdk.builder()
-            .secret_key(get_config().CHECKOUTCOM_CLIENT_SECRET)
-            .public_key(get_config().CHECKOUTCOM_CLIENT_ID)
-            .environment(Environment.sandbox())
-            .build()
-        )
-
-    def get_payment_link(self, invoice: Invoice):
-        from checkout_sdk.common.common import (
-            Address,
-            CustomerRequest,
-            Phone,
-            Product,
-        )
-        from checkout_sdk.common.enums import PaymentSourceType
-        from checkout_sdk.exception import (
-            CheckoutApiException,
-            CheckoutArgumentException,
-            CheckoutAuthorizationException,
-        )
-        from checkout_sdk.payments.hosted.hosted_payments import (
-            HostedPaymentsSessionRequest,
-        )
-        from checkout_sdk.payments.payments_previous import (
-            BillingInformation,
-        )
-        from checkout_sdk.sessions.sessions import Recurring
-
-        phone = Phone()
-        phone.country_code = invoice.customer.phone_country_code
-        phone.number = invoice.customer.phone_number
-
-        address = Address()
-        address.address_line1 = invoice.customer.address_line1
-        address.address_line2 = invoice.customer.address_line2
-        address.city = invoice.customer.city
-        address.state = invoice.customer.state
-        address.zip = invoice.customer.zip
-        address.country = invoice.customer.country_code
-
-        customer_request = CustomerRequest()
-        customer_request.email = invoice.customer.email
-        customer_request.name = invoice.customer.name
-
-        billing_information = BillingInformation()
-        billing_information.address = address
-        billing_information.phone = phone
-
-        request_products = list()
-        for product in invoice.products:
-            prod = Product()
-            prod.name = product.name
-            prod.quantity = product.quantity
-            prod.price = product.price
-            request_products.append(prod)
-
-        request = HostedPaymentsSessionRequest()
-        request.currency = "EUR"  # Currency.EUR
-        request.billing = billing_information
-        request.success_url = "https://docs.checkout.com/payments/success"
-        request.failure_url = "https://docs.checkout.com/payments/failure"
-        request.cancel_url = "https://docs.checkout.com/payments/cancel"
-        request.payment_type = "Recurring"
-
-        request.payment_plan = Recurring()
-        request.payment_plan.days_between_payments = (
-            invoice.payment.days_between_payments
-        )
-        request.payment_plan.expiry = invoice.payment.expiry.strftime("%Y%m%d")
-        request.processing_channel_id = get_config().CHECKOUTCOM_CHANNEL_ID
-
-        request.amount = invoice.total_amount
-
-        request.reference = str(invoice.id)
-
-        request.description = get_config().CHECKOUTCOM_DESCRIPTION
-
-        request.customer = customer_request
-        request.products = request_products
-
-        # https://www.checkout.com/docs/payments/accept-payments/create-a-payment-link/manage-payment-links#Payment_methods
-        request.allow_payment_methods = [
-            PaymentSourceType.CARD,
-            PaymentSourceType.GIROPAY,
-            PaymentSourceType.IDEAL,
-            PaymentSourceType.PAYPAL,
-            PaymentSourceType.SOFORT,
-            # PaymentSourceType.SEPA,
-            # PaymentSourceType.KLARNA,
-        ]
-
-        try:
-            response = self.api.hosted_payments.create_hosted_payments_page_session(
-                request
-            )
-        except CheckoutApiException as err:
-            # API error
-            log.error(err.http_metadata)
-            log.error(err.error_details)
-            log.error(err.error_type)
-            raise BillingException("Could not process payment")
-        except CheckoutArgumentException as err:
-            log.error(err)
-            raise BillingException("Could not process payment")
-
-        except CheckoutAuthorizationException as err:
-            log.error(err)
-            raise BillingException("Could not process payment")
-
-        return response._links.redirect.href
-
-    def get_payment_status(self, **kwargs):
-        return "completed"
-
-    def get_payment_session(self, **kwargs):
+    @abc.abstractmethod
+    def subscription_payment(self, invoice: Invoice):
         pass
 
 
@@ -262,7 +148,7 @@ class AdyenPayments(AbstractPaymentGateway):
             if event_code == "AUTHORISATION":
                 log.info(f"Payment was authorized for {invoice.id=}")
                 if item["success"]:
-                    invoice_repo.update(invoice, payment_status=InvoiceStatus.COMPLETED)
+                    invoice_repo.succeed_invoice_payment(invoice)
                 else:
                     invoice_repo.update(invoice, payment_failure_reason=item["reason"])
 
@@ -321,11 +207,7 @@ class InvoiceRepo(DatabaseAbstractRepository):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if get_config().PAYMENT_PROVIDER == "checkoutcom":
-            self.payment = CheckoutComPayments()
-        else:
-            self.payment = AdyenPayments()
+        self.payment = AdyenPayments()
 
     def get_payment_session(self, invoice: Invoice):
         return self.payment.get_payment_session(invoice)
@@ -341,6 +223,20 @@ class InvoiceRepo(DatabaseAbstractRepository):
 
     def subscription_payment(self, invoice: Invoice):
         return self.payment.subscription_payment(invoice)
+
+    def succeed_invoice_payment(self, invoice: Invoice):
+        # update each product if neede
+        team_repo = TeamRepo(self._db)
+        for product in invoice.products:
+            if product.team_id:
+                months = product.quantity
+                # always fill next month
+                now = datetime.utcnow()
+                paid_until = last_day_of_month(now + timedelta(days=months * 30))
+                team_repo.update(product.team, paid_until=paid_until)
+        return self.update(
+            invoice, payment_status=InvoiceStatus.COMPLETED, paid_at=datetime.utcnow()
+        )
 
 
 class RecurringPaymentTokenRepo(DatabaseAbstractRepository):
