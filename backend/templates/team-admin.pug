@@ -18,6 +18,10 @@ span.icon
   .column.is-8.is-offset-2
    .section
     h1.title.is-1 {{team.name}}
+    table.table
+     tr
+      td Paid until
+      td {{team.paid_until}}
 
    .section
     h1
@@ -70,5 +74,16 @@ span.icon
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
+
+   {% if team.is_public %}
+   .section.box.is-danger
+    h1.block.title.is-3 Membership
+    h2.subtitle.is-5 Upgrade to Private Member
+    a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
+     span.icon.is-medium
+      🎉
+     span Upgrade to Private Team
+    div(id="users")
+   {% endif %}
 
 {% endblock %}

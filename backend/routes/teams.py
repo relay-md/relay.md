@@ -139,6 +139,7 @@ async def team_billing_payment(
             quantity=quantity,
             price=int(price_total * 100),
             description=f"Team: {team_name}",
+            team_id=team.id,
         )
     ]
     person = PersonalInformation(

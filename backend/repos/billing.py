@@ -225,10 +225,13 @@ class InvoiceRepo(DatabaseAbstractRepository):
         return self.payment.subscription_payment(invoice)
 
     def succeed_invoice_payment(self, invoice: Invoice):
+        log.info(f"Invoice {invoice.id} was just paid successfully")
         # update each product if neede
         team_repo = TeamRepo(self._db)
         for product in invoice.products:
+            log.info(f" Invoice item {product.id} was just paid successfully")
             if product.team_id:
+                log.info(f" Team {product.team.name} was just paid successfully")
                 months = product.quantity
                 # always fill next month
                 now = datetime.utcnow()

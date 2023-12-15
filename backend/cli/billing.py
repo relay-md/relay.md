@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import date
 from uuid import UUID
 
 import click
@@ -41,14 +40,10 @@ def demo(email):
         phone_country_code="+49",
         phone_number="1706397354",
     )
-    payment_plan = models.PaymentPlan(
-        days_between_payments=30, expiry=date(2025, 12, 31)
-    )
     invoice = models.Invoice(
         user_id=user.id,
         customer=person,
         products=products,
-        payment=payment_plan,
     )
 
     invoice_db = billing_repo.create(invoice)
@@ -67,3 +62,39 @@ def claim(invoice_id: UUID):
     if not invoice:
         raise ValueError("Unknown Invoice")
     console.print(invoice_repo.subscription_payment(invoice))
+
+
+@billing.command()
+@click.argument("invoice_id", type=UUID)
+def authorize(invoice_id: UUID):
+    webhook = {
+        "live": "false",
+        "notificationItems": [
+            {
+                "NotificationRequestItem": {
+                    "additionalData": {
+                        "authCode": "1234",
+                        "totalFraudScore": "10",
+                        "NAME2": "VALUE2",
+                        "NAME1": "VALUE1",
+                        "fraudCheck-6-ShopperIpUsage": "10",
+                    },
+                    "amount": {"currency": "EUR", "value": 10100},
+                    "eventCode": "AUTHORISATION",
+                    "eventDate": "2023-12-13T12:24:53+01:00",
+                    "merchantAccountCode": "ChainSquadGmbH",
+                    "merchantReference": str(invoice_id),
+                    "pspReference": "ZCLWCV5MP8JSTC82",
+                    "reason": "1234:7777:12/2012",
+                    "success": "true",
+                }
+            }
+        ],
+    }
+
+    import logging
+
+    logging.basicConfig(level=logging.DEBUG)
+    db = next(get_session())
+    invoice_repo = repos.InvoiceRepo(db)
+    print(invoice_repo.process_webhook(webhook))

@@ -109,7 +109,7 @@ class Invoice(Base):
     products: Mapped[List[OrderItem]] = relationship()
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(customer={self.customer},products={self.products}, payment={self.payment})"
+        return f"{self.__class__.__name__}(customer={self.customer},products={self.products})"
 
     @property
     def total_amount(self):
