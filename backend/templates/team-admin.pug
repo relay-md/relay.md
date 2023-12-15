@@ -19,7 +19,7 @@ table.table
  tr
   td {{perm.name | replace("_", "-")}}
   td
-   a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm, type=type)}}")
+   a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm, type=type) | safe}}")
     {% if perm in Permissions(team_perms) %}
     i.fa.fa-check
     {% else %}
@@ -29,16 +29,15 @@ table.table
 {% endmacro %}
 
 {% macro member_permissions(member) %}
+{% if not member.permissions %}
+{% set perms = team.member_permissions %}
+{% else %}
+{% set perms = member.permissions %}
+{% endif %}
 {% for perm in Permissions %}
 {% if perm.name != "can_join" %}
-td
- {% if not member.permissions %}
- {% set perms = team.member_permissions %}
- {% else %}
- {% set perms = member.permissions %}
- {% endif %}
-
- a(href="{{url_for('toggle_member_perms', team_name=team.name).include_query_params(perm=perm, member_id=member.id)}}")
+td.has-text-light
+ a(class="{% if not member.permissions %}has-text-light{% endif %}" href="{{url_for('toggle_member_perms', team_name=team.name).include_query_params(perm=perm, member_id=member.id) | safe}}")
   {% if perm in Permissions(perms) %}
   i.fa.fa-check
   {% else %}
@@ -46,6 +45,9 @@ td
   {% endif %}
 {% endif %}
 {% endfor %}
+td.has-text-light
+ a(class="{% if not member.permissions %}has-text-light{% endif %}" href="{{url_for('toggle_member_perms', team_name=team.name).include_query_params(member_id=member.id) | safe}}")
+  i.fa.fa-redo
 {% endmacro %}
 
 {% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
@@ -92,46 +94,53 @@ td
    .section
     .block.title.is-3 Members
     .subtitle.is-5 List of users subscribed to your team
-     {% if members %}
-     nav.pagination(role="navication" aria-label="pagination")
-      {% if page %}
-      a.pagination-previous(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page-1)}}") Previous
-      {% endif %}
-      {% if documents | length == size %}
-      a.pagination-next(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page+1)}}") Next Page
-      {% endif %}
-      table.table
-       thead
-        tr
-         th
-          span.icon
-           i.fas.fa-user
-         th
-          span.icon
-           i.fas.fa-user-plus
-         td(data-tooltip="Join")
-          i.fas.fa-sign-in
-         td(data-tooltip="Read")
-          i.fas.fa-glasses
-         td(data-tooltip="Post")
-          i.fas.fa-pencil
-         td(data-tooltip="Modify")
-          i.fas.fa-edit
-         td(data-tooltip="Create Topics")
-          i.fas.fa-plus
-         th control
-       {% for member in members %}
+    p.block
+     |Customize your members permissions. By default,&nbsp;
+     span.is-underlined Team permissions apply!
+    {% if members %}
+    nav.block.pagination(role="navication" aria-label="pagination")
+     {% if page %}
+     a.pagination-previous(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page-1) | safe}}") Previous
+     {% endif %}
+     {% if documents | length == size %}
+     a.pagination-next(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page+1) |safe}}") Next Page
+     {% endif %}
+     table.table
+      thead
        tr
-        td {{member.user.username}}
-        td {{ member_permissions(member) }}
+        th
+         span.icon
+          i.fas.fa-user
         td
-         a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
-          span.icon.is-small
-           i.fas.fa-trash
-       {% endfor %}
-      {% else %}
-      p No members have joined yet.
-      {% endif %}
+        td(data-tooltip="Read")
+         i.fas.fa-glasses
+        td(data-tooltip="Post")
+         i.fas.fa-pencil
+        td(data-tooltip="Modify")
+         i.fas.fa-edit
+        td(data-tooltip="Create Topics")
+         i.fas.fa-plus
+        td(data-tooltip="Invite")
+         i.fas.fa-user-plus
+        td(data-tooltip="Reset to Team permissions")
+         i.fas.fa-redo
+        td
+        td(data-tooltip="Remove")
+          i.fas.fa-trash
+      {% for member in members %}
+      tr
+       td {{member.user.username}}
+       td
+       {{ member_permissions(member) }}
+       td
+       td
+        a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
+         span.icon.is-small
+          i.fas.fa-trash
+      {% endfor %}
+     {% else %}
+     p No members have joined yet.
+     {% endif %}
 
    .section
     .block.title.is-3 Invite Users

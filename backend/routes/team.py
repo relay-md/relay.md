@@ -156,7 +156,7 @@ async def toggle_member_perms(
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
     member_id: UUID = Query(default=None),
-    perm: int = Query(default=0),
+    perm: int = Query(default=None),
 ):
     if team.user_id != user.id:
         raise exceptions.NotAllowed(f"Team {team.name} is not your team!")
@@ -164,9 +164,14 @@ async def toggle_member_perms(
     membership = user_team_repo.get_by_id(member_id)
     if not membership:
         raise exceptions.BadRequest("Member not found")
-    user_team_repo.update(
-        membership, permissions=(membership.permissions or 0) ^ Permissions(perm)
-    )
+    if perm:
+        user_team_repo.update(
+            membership,
+            permissions=(membership.permissions or team.member_permissions)
+            ^ Permissions(perm),
+        )
+    else:
+        user_team_repo.update(membership, permissions=0)
     return RedirectResponse(url=request.url_for("settings", team_name=team.name))
 
 
