@@ -2,6 +2,7 @@
 span.icon
  i{{name}}
 {% endmacro %}
+
 {% macro bool_icon(flag) %}
 {% if flag %}
 span.icon
@@ -11,6 +12,42 @@ span.icon
  i.fas.fa-times
 {% endif %}
 {% endmacro %}
+
+{% macro permissions(type, team_perms) %}
+table.table
+ {% for perm in Permissions %}
+ tr
+  td {{perm.name | replace("_", "-")}}
+  td
+   a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm, type=type)}}")
+    {% if perm in Permissions(team_perms) %}
+    i.fa.fa-check
+    {% else %}
+    i.fa.fa-times
+    {% endif %}
+ {% endfor %}
+{% endmacro %}
+
+{% macro member_permissions(member) %}
+{% for perm in Permissions %}
+{% if perm.name != "can_join" %}
+td
+ {% if not member.permissions %}
+ {% set perms = team.member_permissions %}
+ {% else %}
+ {% set perms = member.permissions %}
+ {% endif %}
+
+ a(href="{{url_for('toggle_member_perms', team_name=team.name).include_query_params(perm=perm, member_id=member.id)}}")
+  {% if perm in Permissions(perms) %}
+  i.fa.fa-check
+  {% else %}
+  i.fa.fa-times
+  {% endif %}
+{% endif %}
+{% endfor %}
+{% endmacro %}
+
 {% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 .mt-5.mb-5
@@ -23,9 +60,38 @@ span.icon
     {% endif %}
 
    .section
-    h1
-    h1.block.title.is-3 Members
-    h2.subtitle.is-5 List of users subscribed to your team
+    .block.title.is-3 Permissions
+    .subtitle.is-5 Customize Team Permissions
+    p.block Click the check marks/crosses to flip the corresponding permission.
+    table.table.block
+     tr
+      th
+       .icon-text
+        .span.icon
+         i.fa.fa-user
+        span Owner
+      th
+       .icon-text
+        .span.icon
+         i.fa.fa-shield
+        span Member
+      th
+       .icon-text
+        .span.icon
+         i.fa.fa-globe
+        span Public
+     tr
+      td
+       {{permissions("owner", team.owner_permissions)}}
+      td
+       {{permissions("member", team.member_permissions)}}
+      td
+       {{permissions("public", team.public_permissions)}}
+
+
+   .section
+    .block.title.is-3 Members
+    .subtitle.is-5 List of users subscribed to your team
      {% if members %}
      nav.pagination(role="navication" aria-label="pagination")
       {% if page %}
@@ -43,11 +109,21 @@ span.icon
          th
           span.icon
            i.fas.fa-user-plus
+         td(data-tooltip="Join")
+          i.fas.fa-sign-in
+         td(data-tooltip="Read")
+          i.fas.fa-glasses
+         td(data-tooltip="Post")
+          i.fas.fa-pencil
+         td(data-tooltip="Modify")
+          i.fas.fa-edit
+         td(data-tooltip="Create Topics")
+          i.fas.fa-plus
          th control
        {% for member in members %}
        tr
         td {{member.user.username}}
-        td {{bool_icon(member.permissions)}}
+        td {{ member_permissions(member) }}
         td
          a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
           span.icon.is-small
@@ -58,8 +134,8 @@ span.icon
       {% endif %}
 
    .section
-    h1.block.title.is-3 Invite Users
-    h2.subtitle.is-5 Add others to your team
+    .block.title.is-3 Invite Users
+    .subtitle.is-5 Add others to your team
     .control.has-icons-left
      input.input(type="tags" id="invite-users" name="name" hx-post="settings/user/search" hx-trigger="input changed delay:500ms, search" hx-target="#users")
      span.icon.is-left
@@ -68,8 +144,8 @@ span.icon
 
    {% if team.is_public or not team.paid_until %}
    .section.box.is-danger
-    h1.block.title.is-3 Membership
-    h2.subtitle.is-5 Upgrade to Private Member
+    .block.title.is-3 Membership
+    .subtitle.is-5 Upgrade to Private Member
     a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
      span.icon.is-medium
       🎉

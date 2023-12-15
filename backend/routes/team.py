@@ -9,6 +9,7 @@ from starlette.responses import RedirectResponse
 from .. import exceptions
 from ..config import Settings, get_config
 from ..database import Session, get_session
+from ..models.permissions import Permissions
 from ..repos.team import Team, TeamRepo
 from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
@@ -115,6 +116,60 @@ async def leave(
     return RedirectResponse(url=request.url_for("get_teams"))
 
 
+@router.get("/{team_name}/toggle/perm")
+async def toggle_team_perms(
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+    type: str = Query(default=""),
+    perm: int = Query(default=0),
+):
+    if team.user_id != user.id:
+        raise exceptions.NotAllowed(f"Team {team.name} is not your team!")
+    if not type:
+        raise exceptions.BadRequest("Need a 'type'!")
+    team_repo = TeamRepo(db)
+    if type == "owner":
+        team_repo.update(
+            team, owner_permissions=team.owner_permissions ^ Permissions(perm)
+        )
+    elif type == "member":
+        team_repo.update(
+            team, member_permissions=team.member_permissions ^ Permissions(perm)
+        )
+    elif type == "public":
+        team_repo.update(
+            team, public_permissions=team.public_permissions ^ Permissions(perm)
+        )
+    else:
+        raise exceptions.BadRequest(f"Invalid value for {type=}")
+    return RedirectResponse(url=request.url_for("settings", team_name=team.name))
+
+
+@router.get("/{team_name}/toggle/perm/member")
+async def toggle_member_perms(
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+    member_id: UUID = Query(default=None),
+    perm: int = Query(default=0),
+):
+    if team.user_id != user.id:
+        raise exceptions.NotAllowed(f"Team {team.name} is not your team!")
+    user_team_repo = UserTeamRepo(db)
+    membership = user_team_repo.get_by_id(member_id)
+    if not membership:
+        raise exceptions.BadRequest("Member not found")
+    user_team_repo.update(
+        membership, permissions=(membership.permissions or 0) ^ Permissions(perm)
+    )
+    return RedirectResponse(url=request.url_for("settings", team_name=team.name))
+
+
 @router.get("/{team_name}/settings")
 async def settings(
     request: Request,
@@ -127,7 +182,9 @@ async def settings(
 ):
     team_repo = TeamRepo(db)
     members = team_repo.list_team_members(team, page, size)
-    return templates.TemplateResponse("team-admin.pug", context=dict(**locals()))
+    return templates.TemplateResponse(
+        "team-admin.pug", context=dict(**locals(), Permissions=Permissions)
+    )
 
 
 @router.post("/{team_name}/settings/user/search", response_class=PlainTextResponse)

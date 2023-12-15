@@ -11,6 +11,7 @@ from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import NotAllowed
 from ..models.billing import OrderItem, PersonalInformation
+from ..models.permissions import Permissions
 from ..repos.billing import InvoiceRepo
 from ..repos.team import TeamRepo
 from ..repos.user import UserRepo
@@ -31,7 +32,9 @@ async def get_teams(
     user_repo = UserRepo(db)
     team_repo = TeamRepo(db)
     teams = team_repo.list()
-    return templates.TemplateResponse("teams.pug", context=dict(**locals()))
+    return templates.TemplateResponse(
+        "teams.pug", context=dict(**locals(), Permissions=Permissions)
+    )
 
 
 @router.get("/new")

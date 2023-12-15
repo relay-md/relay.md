@@ -74,7 +74,6 @@ class Team(Base):
 
     @property
     def is_public(self):
-        print(self.public_permissions)
         return self.public_permissions != 0
 
     def __repr__(self):

@@ -21,7 +21,8 @@ class UserTeam(Base):
     user: Mapped["User"] = relationship(viewonly=True)  # noqa
     team: Mapped["Team"] = relationship(viewonly=True)  # noqa
 
-    permissions: Mapped[int] = mapped_column(nullable=True)
+    # None means the parent (team) permissions are relevant.
+    permissions: Mapped[int] = mapped_column(nullable=True, default=None)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}>"
