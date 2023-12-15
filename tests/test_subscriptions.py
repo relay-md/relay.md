@@ -4,7 +4,6 @@ from typing import List
 import pytest
 
 from backend.models.permissions import Permissions
-from backend.models.team import TeamType
 
 
 @pytest.fixture
@@ -117,7 +116,8 @@ def test_cannot_subscribe_private_team(
     subscribe_to_team_topic,
 ):
     create_team(
-        "test", public_permissions=Permissions.can_create_topics, type=TeamType.PRIVATE
+        "test",
+        public_permissions=0,
     )
     create_team_topic("unit@test")
 

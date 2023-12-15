@@ -11,7 +11,6 @@ from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import NotAllowed
 from ..models.billing import OrderItem, PersonalInformation
-from ..models.team import TeamType
 from ..repos.billing import InvoiceRepo
 from ..repos.team import TeamRepo
 from ..repos.user import UserRepo
@@ -79,15 +78,13 @@ async def team_billing_post(
     if team and team.user_id != user.id:
         raise NotAllowed("This team exists already and it is not yours!")
 
-    team_type = TeamType(type)
     if not team:
-        team = team_repo.create_from_kwargs(
-            name=team_name, user_id=user.id, type=team_type
-        )
-    else:
-        team_repo.update(team, type=team_type)
+        team = team_repo.create_from_kwargs(name=team_name, user_id=user.id)
 
-    if team_type == TeamType.PUBLIC:
+    if type == "private":
+        # make the team private (or rather, non public)
+        team_repo.update(team, public_permissions=0)
+    else:
         return RedirectResponse(
             url=request.url_for("settings", team_name=team_name),
             status_code=status.HTTP_302_FOUND,

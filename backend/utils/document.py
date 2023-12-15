@@ -55,7 +55,6 @@ def check_document_write_permissions(
         team = team_topic.team
         membership = user_repo.is_member(user, team_topic.team)
 
-        # some members are allowed to post in restricted teams
         if action == "post-document" and not team.can(
             Permissions.can_post, user, membership
         ):

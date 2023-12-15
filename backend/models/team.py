@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """ DB Storage models
 """
-import enum
 import uuid
 from datetime import date, datetime
 from typing import List
 
-from sqlalchemy import Date, Enum, ForeignKey, String
+from sqlalchemy import Date, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -38,17 +37,6 @@ DEFAULT_MEMBER_PERMISSIONS = (
 DEFAULT_PUBLIC_PERMISSIONS = PublicPermissions.can_read | PublicPermissions.can_join
 
 
-class TeamType(enum.Enum):
-    # anyone can view and submit
-    PUBLIC = "public"
-
-    # anyone can view, but only some are approved to submit
-    RESTRICTED = "restricted"
-
-    # only approved members can view and submit
-    PRIVATE = "private"
-
-
 class Team(Base):
     """A database model that identifies symbols"""
 
@@ -69,9 +57,6 @@ class Team(Base):
 
     # Owner
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
-
-    # FIXME: replace by permissions:
-    type: Mapped[TeamType] = mapped_column(Enum(TeamType), default=TeamType.PUBLIC)
 
     user: Mapped["User"] = relationship()  # noqa
     members: Mapped[List["User"]] = relationship(

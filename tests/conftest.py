@@ -167,13 +167,11 @@ def default_team_topics(dbsession, account):
     team_repo.create_from_kwargs(
         name="_",
         user_id=account.id,
-        type=models.team.TeamType.PUBLIC,
     )
 
     team = team_repo.create_from_kwargs(
         name="myteam",
         user_id=account.id,
-        type=models.team.TeamType.PRIVATE,
         public_permissions=0,
     )
     topic = topic_repo.create_from_kwargs(name="mytopic")
