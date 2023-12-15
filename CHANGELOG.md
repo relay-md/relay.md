@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.14.1 (2023-12-15)
+### Fix
+* Email validation ([`773082e`](https://github.com/knowledgemd/backend/commit/773082e8feb0f7458c56d6fd269f235ccfe206bd))
+
 ## v0.14.0 (2023-12-10)
 ### Feature
 * **news:** Nicer news page ([`cfd71dd`](https://github.com/knowledgemd/backend/commit/cfd71ddadf96fc94c1efeecb8795daf5faf96c4f))
