@@ -74,6 +74,11 @@ class Settings(BaseSettings):
     ADYEN_THEME_ID: Optional[str] = ""
     ADYEN_RETURN_URL: str = "http://localhost:5000/payment/adyen/success"
 
+    STRIPE_API_KEY: Optional[str] = ""
+    STRIPE_API_PRIVATE_KEY: Optional[str] = ""
+    STRIPE_RETURN_URL_SUCCESS: str = "http://localhost:5000/payment/success"
+    STRIPE_RETURN_URL_CANCEL: str = "http://localhost:5000/payment/failed"
+
     # Early access configs
     ENABLE_EARLY_ACCESS: bool = True
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]

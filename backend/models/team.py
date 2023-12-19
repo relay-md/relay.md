@@ -86,6 +86,8 @@ class Team(Base):
         # FIXME: needs implementation in API and Teams
         if self.is_public:
             return True
+        if not self.paid_until:
+            return False
         now = date.today()
         if now < self.paid_until:
             return True

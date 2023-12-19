@@ -13,7 +13,7 @@ from .routes import (
     document,
     home,
     login,
-    payment,
+    stripe,
     subscribe,
     team,
     teams,
@@ -44,7 +44,7 @@ app.include_router(document.router)
 app.include_router(team.router)
 app.include_router(teams.router)
 app.include_router(topic.router)
-app.include_router(payment.router)
+app.include_router(stripe.router)
 
 # TODO:
 # exception handling:
