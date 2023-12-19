@@ -134,8 +134,14 @@ class AdyenPayments(AbstractPaymentGateway):
         return result.message["status"]
 
     def process_webhook(self, db: Session, webhook):
+        from Adyen.util import is_valid_hmac_notification
+
         for notification in webhook["notificationItems"]:
             item = notification["NotificationRequestItem"]
+            if get_config().ADYEN_HMAC_KEY and not is_valid_hmac_notification(
+                item, get_config().ADYEN_HMAC_KEY
+            ):
+                raise BadRequest("Invalid HMAC")
             event_code = item["eventCode"]
             additional_data = item["additionalData"]
             invoice_id = item["merchantReference"]
