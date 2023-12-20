@@ -57,6 +57,7 @@ class Settings(BaseSettings):
     MINIO_ACCESS_KEY: Optional[str]
     MINIO_SECRET_KEY: Optional[str]
     MINIO_SECURE: bool = True
+    MINIO_BUCKET: str = "documents"
 
     PAYMENT_PROVIDER: str = "adyen"
     PAYMENT_BASIC_AUTH_WHITELIST: List[Tuple[str, str]] = [("foo", "bar")]
