@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """billing-support
 
-Revision ID: be8cec3185c6
+Revision ID: 9fc631b0e606
 Revises: 82fe12ff1726
-Create Date: 2023-12-20 11:02:01.881085
+Create Date: 2023-12-20 11:31:34.522979
 
 """
 import sqlalchemy as sa
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import mysql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "be8cec3185c6"
+revision = "9fc631b0e606"
 down_revision = "82fe12ff1726"
 branch_labels = None
 depends_on = None
@@ -48,9 +48,6 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("payment_failure_reason", sa.Text(), nullable=True),
-        sa.Column(
-            "payment_provider", sa.Enum("ADYEN", name="paymentprovider"), nullable=False
-        ),
         sa.Column("payment_provider_reference", sa.String(length=256), nullable=True),
         sa.Column("paid_at", sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(
@@ -87,8 +84,8 @@ def upgrade() -> None:
     op.add_column("team", sa.Column("member_permissions", sa.Integer(), nullable=False))
     op.add_column("team", sa.Column("public_permissions", sa.Integer(), nullable=False))
     op.add_column("team", sa.Column("paid_until", sa.Date(), nullable=True))
-    op.drop_column("team", "type")
     op.drop_column("team", "allow_create_topics")
+    op.drop_column("team", "type")
     op.add_column("user_team", sa.Column("permissions", sa.Integer(), nullable=True))
     op.drop_column("user_team", "can_modify_documents")
     op.drop_column("user_team", "can_invite_users")
@@ -139,16 +136,16 @@ def downgrade() -> None:
     op.add_column(
         "team",
         sa.Column(
-            "allow_create_topics",
-            mysql.TINYINT(display_width=1),
-            autoincrement=False,
-            nullable=False,
+            "type", mysql.ENUM("PUBLIC", "RESTRICTED", "PRIVATE"), nullable=False
         ),
     )
     op.add_column(
         "team",
         sa.Column(
-            "type", mysql.ENUM("PUBLIC", "RESTRICTED", "PRIVATE"), nullable=False
+            "allow_create_topics",
+            mysql.TINYINT(display_width=1),
+            autoincrement=False,
+            nullable=False,
         ),
     )
     op.drop_column("team", "paid_until")
