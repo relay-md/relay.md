@@ -119,7 +119,6 @@ async def web_unhandled_exception(
     config: Settings = Depends(get_config),
 ):
     # required for top
-    user = None
     return templates.TemplateResponse(
         "exception-unhandled.html", context=dict(**locals())
     )

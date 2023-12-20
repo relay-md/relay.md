@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import stripe
 
 from ..config import get_config
-from ..exceptions import BadRequest
 from ..models.billing import Invoice, InvoiceStatus
 from ..utils.dates import last_day_of_month
 from .base import DatabaseAbstractRepository
@@ -81,6 +80,8 @@ class StripePayments(AbstractPaymentGateway):
             invoice_id = session["client_reference_id"]
             invoice = invoice_repo.get_by_id(invoice_id)
             if not invoice:
+                from ..exceptions import BadRequest
+
                 raise BadRequest("Invalid invoice ID")
             invoice_repo.succeed_invoice_payment(invoice)
         elif event["type"] == "checkout.session.expired":
