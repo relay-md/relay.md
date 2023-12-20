@@ -59,24 +59,11 @@ class Settings(BaseSettings):
     MINIO_SECURE: bool = True
     MINIO_BUCKET: str = "documents"
 
-    PAYMENT_PROVIDER: str = "adyen"
     PAYMENT_BASIC_AUTH_WHITELIST: List[Tuple[str, str]] = [("foo", "bar")]
-
-    # Checkout.com
-    CHECKOUTCOM_CLIENT_ID: Optional[str] = ""
-    CHECKOUTCOM_CLIENT_SECRET: Optional[str] = ""
-    CHECKOUTCOM_DESCRIPTION: str = "Payment for Relay.md"
-    CHECKOUTCOM_CHANNEL_ID: Optional[str] = ""
-
-    ADYEN_API_KEY: Optional[str] = ""
-    ADYEN_MERCHANT_ACCOUNT: Optional[str] = ""
-    ADYEN_CLIENT_KEY: Optional[str] = ""
-    ADYEN_HMAC_KEY: Optional[str] = ""
-    ADYEN_THEME_ID: Optional[str] = ""
-    ADYEN_RETURN_URL: str = "http://localhost:5000/payment/adyen/success"
 
     STRIPE_API_KEY: Optional[str] = ""
     STRIPE_API_PRIVATE_KEY: Optional[str] = ""
+    STRIPE_WEBHOOK_SECRET: Optional[str] = ""
     STRIPE_RETURN_URL_SUCCESS: str = "http://localhost:5000/payment/success"
     STRIPE_RETURN_URL_CANCEL: str = "http://localhost:5000/payment/failed"
 

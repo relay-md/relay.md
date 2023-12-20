@@ -133,15 +133,15 @@ async def toggle_team_perms(
     team_repo = TeamRepo(db)
     if type == "owner":
         team_repo.update(
-            team, owner_permissions=team.owner_permissions ^ Permissions(perm)
+            team, owner_permissions=(team.owner_permissions ^ Permissions(perm)).value
         )
     elif type == "member":
         team_repo.update(
-            team, member_permissions=team.member_permissions ^ Permissions(perm)
+            team, member_permissions=(team.member_permissions ^ Permissions(perm)).value
         )
     elif type == "public":
         team_repo.update(
-            team, public_permissions=team.public_permissions ^ Permissions(perm)
+            team, public_permissions=(team.public_permissions ^ Permissions(perm)).value
         )
     else:
         raise exceptions.BadRequest(f"Invalid value for {type=}")
@@ -165,10 +165,12 @@ async def toggle_member_perms(
     if not membership:
         raise exceptions.BadRequest("Member not found")
     if perm:
+        new_perms = (membership.permissions or team.member_permissions) ^ Permissions(
+            perm
+        )
         user_team_repo.update(
             membership,
-            permissions=(membership.permissions or team.member_permissions)
-            ^ Permissions(perm),
+            permissions=new_perms.value,
         )
     else:
         user_team_repo.update(membership, permissions=0)

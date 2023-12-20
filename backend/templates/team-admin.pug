@@ -19,7 +19,7 @@ table.table
  tr
   td {{perm.name | replace("_", "-")}}
   td
-   a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm, type=type) | safe}}")
+   a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm.value, type=type) | safe}}")
     {% if perm in Permissions(team_perms) %}
     i.fa.fa-check
     {% else %}
@@ -37,7 +37,7 @@ table.table
 {% for perm in Permissions %}
 {% if perm.name != "can_join" %}
 td.has-text-light
- a(class="{% if not member.permissions %}has-text-light{% endif %}" href="{{url_for('toggle_member_perms', team_name=team.name).include_query_params(perm=perm, member_id=member.id) | safe}}")
+ a(class="{% if not member.permissions %}has-text-light{% endif %}" href="{{url_for('toggle_member_perms', team_name=team.name).include_query_params(perm=perm.value, member_id=member.id) | safe}}")
   {% if perm in Permissions(perms) %}
   i.fa.fa-check
   {% else %}
@@ -57,7 +57,7 @@ td.has-text-light
   .column.is-8.is-offset-2
    .section
     .title.is-1 {{team.name}}
-    {% if team.is_active and not team.is_public %}
+    {% if team.is_active %}
     .subtitle paid until {{team.paid_until}}
     {% endif %}
 
@@ -151,7 +151,7 @@ td.has-text-light
       i.fas.fa-search
     div(id="users")
 
-   {% if team.is_public or not team.paid_until %}
+   {% if not team.is_active %}
    .section.box.is-danger
     .block.title.is-3 Membership
     .subtitle.is-5 Upgrade to Private Member

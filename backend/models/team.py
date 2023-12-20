@@ -51,9 +51,15 @@ class Team(Base):
     # description: Mapped[str] = mapped_column(Text())
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
-    owner_permissions: Mapped[int] = mapped_column(default=DEFAULT_OWNER_PERMISSIONS)
-    member_permissions: Mapped[int] = mapped_column(default=DEFAULT_MEMBER_PERMISSIONS)
-    public_permissions: Mapped[int] = mapped_column(default=DEFAULT_PUBLIC_PERMISSIONS)
+    owner_permissions: Mapped[int] = mapped_column(
+        default=DEFAULT_OWNER_PERMISSIONS.value
+    )
+    member_permissions: Mapped[int] = mapped_column(
+        default=DEFAULT_MEMBER_PERMISSIONS.value
+    )
+    public_permissions: Mapped[int] = mapped_column(
+        default=DEFAULT_PUBLIC_PERMISSIONS.value
+    )
 
     # Owner
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))

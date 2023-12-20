@@ -129,8 +129,10 @@ async def team_billing_payment(
     price_total = get_price(yearly=yearly, private=True)
     if yearly:
         quantity = 12
+        stripe_key = "team-yearly"
     else:
         quantity = 1
+        stripe_key = "team-monthly"
 
     invoice_repo = InvoiceRepo(db)
     products = [
@@ -140,6 +142,7 @@ async def team_billing_payment(
             price=int(price_total * 100),
             description=f"Team: {team_name}",
             team_id=team.id,
+            stripe_key=stripe_key,
         )
     ]
     person = PersonalInformation(
