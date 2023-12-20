@@ -3,63 +3,209 @@
 .mt-5.mb-5
  .columns
   .column.has-text-centered.is-10.is-offset-1
+   h1.title Team Name
+   {% if not team %}
+   h3.subtitle Choose your Team Name
+   .block.box
+    .field
+     .control.has-icons-left
+      input.input#team_name(type="string" placeholder="Team Name" name="team_name" hx-post="{{url_for('team_create_validate_team_name')}}" hx-trigger="input changed delay:500ms, search" hx-target="#validate-team-name")
+      span.icon.is-left
+       i.fas.fa-globe
+     p(id="validate-team-name")
+   {% else %}
+   h3.subtitle Your Team Name
+   .block.box.p-5
+    .title
+     tt {{team.name}}
+   {% endif %}
+
+ .columns
+  .column.has-text-centered.is-10.is-offset-1
    h1.title Pricing
-   h3.subtitle Plans for teams of all sizes
+   h3.subtitle Chose your Plan and Payment Interval
+   .column.is-4.is-offset-4
+    .level
+     div
+      .title.is-4 Monthly
+      .subtitle.is-6 Flexible Payments
+     .field
+      input#invoice_yearly.switch.is-medium.is-rounded.is-success(checked="checked" type="checkbox" name="yearly" onclick="flipswitch()")
+      label(for='invoice_yearly')
+     div
+      .title.is-4 Yearly
+      .subtitle.is-6 Two months for free
+
    #pricing.block.box
     .pricing-table
-     .pricing-plan
-      .plan-header
-       .title.is-5 Free
-       .subtitle.is-6 Open Source and public
-      .plan-price
-       span.plan-price-amount
-         span.plan-price-currency $
-         | 0
-       | /month/member
-      .plan-items
-       .plan-item join and subscribe&nbsp;
-        strong public teams
-       .plan-item publish documents publicly
-       .plan-item obsidian&nbsp;
-        strong integration&nbsp;
-        | via plugin
-       .plan-item 1 access key
-      .plan-footer
-       button.button.is-fullwidth Choose
-     .pricing-plan.is-warning
-      .plan-header
-       .title.is-5 Team
-       .subtitle.is-6 Advanced and Private Collaboration
-      .plan-price
-       span.plan-price-amount
-         span.plan-price-currency $
-         | 3
-       | /month/member
-      .plan-items
-       .plan-item 👈 all features from the left
-       .plan-item manage your own
-        strong private team
-       .plan-item publish documents privately
-       .plan-item fine grained&nbsp;
-        strong access control&nbsp;
-        |to teams
-      .plan-footer
-       button.button.is-fullwidth Choose
-     .pricing-plan.is-danger
-      .plan-header
-       .title.is-5 Enterprice
-       .subtitle.is-6 Premium Customizations
-      .plan-price
-       span.plan-price-amount
-         span.plan-price-currency
-       | Request Quote
-      .plan-items
-       .plan-item 👈 all features from the left
-       .plan-item documents&nbsp;
-        strong versioning
-       .plan-item dedicated &nbsp;
-        strong api endpoint
-       .plan-item direct communication line
-      .plan-footer
-       button.button.is-fullwidth Request Quote
+
+      .pricing-plan
+       form#billing_form(action="{{url_for('team_billing_post')}}" method="POST")
+        input#input_yearly(type="hidden" name="yearly")
+        input#input_type(type="hidden" name="type" value="public")
+        input#input_team_name(type="hidden" name="team_name")
+        .plan-header
+         .title.is-5 Free
+         .subtitle.is-6 Open Source and public
+        .plan-price
+         span.plan-price-amount
+           span.plan-price-currency $
+           | 0
+         span#priceunit /month/member
+        .plan-items
+         .plan-item join and subscribe&nbsp;
+          strong public teams
+         .plan-item publish documents publicly
+         .plan-item obsidian&nbsp;
+          strong integration&nbsp;
+          | via plugin
+         .plan-item 1 access key
+        .plan-footer
+         input.button.is-fullwidth#free_choose(type="submit")
+
+      .pricing-plan.is-warning
+       form#billing_form(action="{{url_for('team_billing_post')}}" method="POST")
+        input#input_yearly(type="hidden" name="yearly")
+        input#input_type(type="hidden" name="type" value="private")
+        input#input_team_name(type="hidden" name="team_name")
+        .plan-header
+         .title.is-5 Team
+         .subtitle.is-6 Advanced and Private Collaboration
+        .plan-price
+         span.plan-price-amount
+           span.plan-price-currency $
+           span#team_price 3
+         span#priceunit /month/member
+        .plan-items
+         .plan-item 👈 all features from the left
+         .plan-item manage your own&nbsp;
+          strong private team
+         .plan-item publish documents privately
+         .plan-item fine grained&nbsp;
+          strong access control&nbsp;
+          |to teams
+        .plan-footer
+         input.button.is-fullwidth#team_choose(type="submit")
+
+      .pricing-plan.is-danger
+       .plan-header
+        .title.is-5 Enterprice
+        .subtitle.is-6 Premium Customizations
+       .plan-price
+        span.plan-price-amount
+          span.plan-price-currency
+        | Request Quote
+       .plan-items
+        .plan-item 👈 all features from the left
+        .plan-item documents&nbsp;
+         strong versioning
+        .plan-item dedicated &nbsp;
+         strong api endpoint
+        .plan-item direct communication line
+       .plan-footer
+        // FIXME: Needs implementation
+        button.button.is-fullwidth Request Quote
+
+.container
+  h2.title.section-subtitle.dark-text.text-bold.has-text-centered.is-2.pt-20.pb-20
+    | You have some questions ?
+    // FIXME: Needs adding text
+  .columns
+    .column.is-4.is-offset-2
+      .content
+        p.title.is-5 1. How do i get started?
+        p
+          | Lorem ipsum dolor sit amet, accusata voluptatibus per eu, probo
+          | summo argumentum ea vel. Pri nonumy sententiae ex, eam adhuc
+          | regione tibique te. Et sit alii vero harum, ne his viderer
+          | consectetuer.
+      .content
+        p.title.is-5 3. Where can i get training?
+        p
+          | Lorem ipsum dolor sit amet, accusata voluptatibus per eu, probo
+          | summo argumentum ea vel. Pri nonumy sententiae ex, eam adhuc
+          | regione tibique te. Et sit alii vero harum, ne his viderer
+          | consectetuer.
+      .content
+        p.title.is-5 5. Are updates mandatory?
+        p
+          | Lorem ipsum dolor sit amet, accusata voluptatibus per eu, probo
+          | summo argumentum ea vel. Pri nonumy sententiae ex, eam adhuc
+          | regione tibique te. Et sit alii vero harum, ne his viderer
+          | consectetuer.
+    .column.is-4
+      .content
+        p.title.is-5 2. How can i add people to my team?
+        p
+          | Lorem ipsum dolor sit amet, accusata voluptatibus per eu, probo
+          | summo argumentum ea vel. Pri nonumy sententiae ex, eam adhuc
+          | regione tibique te. Et sit alii vero harum, ne his viderer
+          | consectetuer.
+      .content.pb-40
+        p.title.is-5  4. Do you have a refund policy?
+        p
+          | Lorem ipsum dolor sit amet, accusata voluptatibus per eu, probo
+          | summo argumentum ea vel. Pri nonumy sententiae ex, eam adhuc
+          | regione tibique te. Et sit alii vero harum, ne his viderer
+          | consectetuer.
+
+{% endblock %}
+
+{% block javascript %}
+script
+.
+ {% if team %}
+ document.querySelectorAll('[id=input_team_name]').forEach((tag) => {
+  tag.setAttribute("value", "{{team.name}}")
+ })
+ {% else %}
+ function store_team_name(e) {
+   // Set all team_name hidden tags
+   document.querySelectorAll('[id=input_team_name]').forEach((tag) => {
+    tag.setAttribute("value", e.target.value)
+   })
+ }
+ team_name_input = document.getElementById("team_name")
+ team_name_input.addEventListener('input', store_team_name);
+ team_name_input.addEventListener('propertychange', store_team_name);
+ {% endif %}
+
+ function flipswitch() {
+   var box = document.getElementById('invoice_yearly');
+   var units = document.querySelectorAll('[id=priceunit]');
+   var team_price = document.getElementById('team_price');
+   var team_choose = document.getElementById('team_choose');
+   var free_choose = document.getElementById('free_choose');
+
+   {% if team %}
+   team_choose.setAttribute("value", "Choose");
+   free_choose.setAttribute("value", "Choose");
+   // Set all team_name hidden tags
+   {% else %}
+   team_choose.setAttribute("value", "Create Private Team");
+   free_choose.setAttribute("value", "Create Public Team");
+   {% endif %}
+
+   units.forEach((unit) => {
+    if (box.checked) {
+     unit.innerHTML = "/year/member"
+    } else {
+     unit.innerHTML = "/month/member"
+    }
+   });
+
+   document.querySelectorAll('[id=input_yearly]').forEach((tag) => {
+    tag.setAttribute("value", box.checked)
+   })
+
+   if (box.checked) {
+    // YEARLY //////////////////////////////
+    team_price.innerHTML = 3 * 10;
+   } else {
+    // MONTHLY /////////////////////////////
+    team_price.innerHTML = 3;
+   }
+ }
+ // Calling the method initially just so we are in sync with what HTML code says
+ flipswitch()
 {% endblock %}

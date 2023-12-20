@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 from collections import namedtuple
+from typing import List
 
 from .. import exceptions
 from ..database import Session
+from ..models.permissions import Permissions
+from ..models.team_topic import TeamTopic
 from ..models.user import User
 from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
@@ -30,34 +33,37 @@ def get_title_from_body(body: str) -> str:
     return next(filter(line_allowed_for_headline, lines))
 
 
-def chech_permissions(db: Session, user: User, shareables: Shareables, action: str):
+def check_document_read_permissions(
+    db: Session, user: User, team_topics: List[TeamTopic]
+):
     user_repo = UserRepo(db)
-    for team_topic in shareables.team_topics:
-        if team_topic.team.is_public:
-            # No further checking, anything goes if public
-            continue
-
-        # If not public, membership is required
+    for team_topic in team_topics:
+        team = team_topic.team
         membership = user_repo.is_member(user, team_topic.team)
-        if not membership:
+
+        if not team.can(Permissions.can_post, user, membership):
             raise exceptions.NotAllowed(
                 f"You are not allowed to post to {team_topic.team}!"
             )
 
-        # some members are allowed to post in restricted teams
-        if (
-            action == "post-document"
-            and team_topic.team.is_restricted
-            and not membership.can_post_documents
+
+def check_document_write_permissions(
+    db: Session, user: User, shareables: Shareables, action: str
+):
+    user_repo = UserRepo(db)
+    for team_topic in shareables.team_topics:
+        team = team_topic.team
+        membership = user_repo.is_member(user, team_topic.team)
+
+        if action == "post-document" and not team.can(
+            Permissions.can_post, user, membership
         ):
             raise exceptions.NotAllowed(
                 f"You are not allowed to post to {team_topic.team}!"
             )
 
-        if (
-            action == "modify-document"
-            and team_topic.team.is_restricted
-            and not membership.can_modify_documents
+        if action == "modify-document" and not team.can(
+            Permissions.can_modify, user, membership
         ):
             raise exceptions.NotAllowed(
                 f"You are not allowed to post to {team_topic.team}!"
@@ -84,8 +90,8 @@ def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Share
             # WARNING: If any of the targets is non-private, the entire document
             # becomes public!
             topic, team = to.split("@")
-            team_topic = team_topic_repo.from_string(to)
+            team_topic = team_topic_repo.from_string(to, user)
             if team_topic.team.is_public:
                 is_public = True
-            team_topics.append(team_topic_repo.from_string(to))
+            team_topics.append(team_topic)
     return Shareables(team_topics=team_topics, users=users, is_public=is_public)

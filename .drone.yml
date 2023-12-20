@@ -2,7 +2,6 @@
 ################
 # Build & Test #
 ################
-
 kind: pipeline
 type: docker
 name: run_tests
@@ -13,6 +12,66 @@ steps:
     commands:
       - pip3 install --upgrade tox
       - tox -e py38,lint
+
+---
+#############################
+# Testing build and deploy
+#############################
+kind: pipeline
+type: docker
+name: Build and deploy for prod
+
+trigger:
+  branch:
+    - develop
+  status:
+    # Only runs if the first pipeline was fully successful
+    - success
+depends_on:
+  # Must run after the first pipeline
+  - run_tests
+
+steps:
+  - name: docker
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: CI_REGISTRY_USER
+      password:
+        from_secret: CI_REGISTRY_PASSWORD
+      repo: registry.infra.chainsquad.com/relay.md/backend
+      registry: registry.infra.chainsquad.com
+      tags:
+        - "develop.${DRONE_BUILD_NUMBER}"
+
+  - name: clone jobs
+    image: alpine/git
+    environment:
+      # drone secrets add --image=<image> <repo> SSH_KEY @/path/to/.ssh/id_rsa
+      DEPLOY_KEY:
+        from_secret: DEPLOY_KEY
+    commands:
+      # https://stackoverflow.com/a/52812550
+      - mkdir $HOME/.ssh && echo "$DEPLOY_KEY" > $HOME/.ssh/id_rsa && chmod 600 $HOME/.ssh/id_rsa
+      - echo "Host *" >> ~/.ssh/config
+      - echo " StrictHostKeyChecking no" >> ~/.ssh/config
+      - git clone ssh://git@git.chainsquad.com:2222/knowledgemd/jobs.git
+
+  - name: deploy
+    depends_on:
+      - clone jobs
+      - docker
+    image: hashicorp/nomad
+    environment:
+      NOMAD_ADDR: https://nomad.infra.chainsquad.com
+      NOMAD_TOKEN:
+        from_secret: NOMAD_TOKEN
+      NOMAD_VAR_registry_auth:
+        from_secret: NOMAD_VAR_registry_auth
+      NOMAD_VAR_api_image_version: "develop.${DRONE_BUILD_NUMBER}"
+    commands:
+      - wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
+      - nomad job run -ca-cert lets-encrypt-r3.pem -detach jobs/relaymd-testing.hcl
 
 ---
 ################
@@ -37,12 +96,12 @@ steps:
       - semantic-release publish
 
 ---
-################
-# Docker & deploy
-################
+#############################
+# Production build and deploy
+#############################
 kind: pipeline
 type: docker
-name: build_and_deploy
+name: Build and deploy for prod
 
 trigger:
   event:

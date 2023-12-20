@@ -90,3 +90,6 @@ release:
 db_update:
 	alembic revision --autogenerate -m "${MESSAGE}"
 	alembic upgrade head
+
+favicon.ico:
+	convert backend/static/img/logo.png -define icon:auto-resize=64,48,32,16 -trim -transparent white -border 2 backend/static/img/favicon.ico

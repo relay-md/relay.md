@@ -1,27 +1,40 @@
 # -*- coding: utf-8 -*-
 """ DB Storage models
 """
-import enum
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import List
 
-from sqlalchemy import Enum, ForeignKey, String
+from sqlalchemy import Date, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
+from .permissions import (
+    MemberPermissions,
+    OwnerPermissions,
+    Permissions,
+    PublicPermissions,
+)
 from .user import User
+from .user_team import UserTeam
 
+DEFAULT_OWNER_PERMISSIONS = (
+    OwnerPermissions.can_read
+    | OwnerPermissions.can_post
+    | OwnerPermissions.can_modify
+    | OwnerPermissions.can_create_topics
+    | OwnerPermissions.can_invite
+)
 
-class TeamType(enum.Enum):
-    # anyone can view and submit
-    PUBLIC = "public"
+DEFAULT_MEMBER_PERMISSIONS = (
+    MemberPermissions.can_read
+    | MemberPermissions.can_post
+    | MemberPermissions.can_modify
+    | MemberPermissions.can_create_topics
+    | MemberPermissions.can_invite
+)
 
-    # anyone can view, but only some are approved to submit
-    RESTRICTED = "restricted"
-
-    # only approved members can view and submit
-    PRIVATE = "private"
+DEFAULT_PUBLIC_PERMISSIONS = PublicPermissions.can_read | PublicPermissions.can_join
 
 
 class Team(Base):
@@ -38,10 +51,18 @@ class Team(Base):
     # description: Mapped[str] = mapped_column(Text())
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
+    owner_permissions: Mapped[int] = mapped_column(
+        default=DEFAULT_OWNER_PERMISSIONS.value
+    )
+    member_permissions: Mapped[int] = mapped_column(
+        default=DEFAULT_MEMBER_PERMISSIONS.value
+    )
+    public_permissions: Mapped[int] = mapped_column(
+        default=DEFAULT_PUBLIC_PERMISSIONS.value
+    )
+
     # Owner
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
-    type: Mapped[TeamType] = mapped_column(Enum(TeamType), default=TeamType.PUBLIC)
-    allow_create_topics: Mapped[bool] = mapped_column(default=True)
 
     user: Mapped["User"] = relationship()  # noqa
     members: Mapped[List["User"]] = relationship(
@@ -51,17 +72,39 @@ class Team(Base):
         secondary="team_topics", back_populates="teams"
     )
 
+    paid_until: Mapped[date] = mapped_column(Date(), nullable=True)
+
     @property
     def is_private(self):
-        return self.type == TeamType.PRIVATE
+        return self.public_permissions == 0
 
     @property
     def is_public(self):
-        return self.type == TeamType.PUBLIC
-
-    @property
-    def is_restricted(self):
-        return self.type == TeamType.RESTRICTED
+        return self.public_permissions != 0
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.name}>"
+
+    @property
+    def is_active(self):
+        """Is the team paid? Else, if becomes inactive, no posting, reading
+        etc.."""
+        if not self.paid_until:
+            return False
+        now = date.today()
+        if now < self.paid_until:
+            return True
+        return False
+
+    def can(self, action: Permissions, user: User, membership: UserTeam = None):
+        if self.user_id == user.id:
+            # owner
+            return (action & self.owner_permissions) == action
+        if membership:
+            # member
+            membership_action = membership.can(action)
+            if membership_action is not None:
+                return membership_action
+            return (action & self.member_permissions) == action
+        # public
+        return (action & self.public_permissions) == action

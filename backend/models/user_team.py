@@ -7,6 +7,7 @@ from sqlalchemy import ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
+from .permissions import Permissions
 
 
 class UserTeam(Base):
@@ -20,13 +21,17 @@ class UserTeam(Base):
     user: Mapped["User"] = relationship(viewonly=True)  # noqa
     team: Mapped["Team"] = relationship(viewonly=True)  # noqa
 
-    can_invite_users: Mapped[bool] = mapped_column(default=False)
-    can_post_documents: Mapped[bool] = mapped_column(default=False)
-    can_delete_documents: Mapped[bool] = mapped_column(default=False)
-    can_modify_documents: Mapped[bool] = mapped_column(default=False)
+    # None means the parent (team) permissions are relevant.
+    permissions: Mapped[int] = mapped_column(nullable=True, default=None)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}>"
+
+    def can(self, action: Permissions):
+        if self.permissions:
+            return (action & self.permissions) == action
+        # will be checked further on team.py
+        return None
 
 
 Index("user_team_idx_unique", UserTeam.user_id, UserTeam.team_id, unique=True)

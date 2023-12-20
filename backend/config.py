@@ -3,7 +3,7 @@
 
 Allow to load values from environment variables.
 """
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -57,6 +57,15 @@ class Settings(BaseSettings):
     MINIO_ACCESS_KEY: Optional[str]
     MINIO_SECRET_KEY: Optional[str]
     MINIO_SECURE: bool = True
+    MINIO_BUCKET: str = "documents"
+
+    PAYMENT_BASIC_AUTH_WHITELIST: List[Tuple[str, str]] = [("foo", "bar")]
+
+    STRIPE_API_KEY: Optional[str] = ""
+    STRIPE_API_PRIVATE_KEY: Optional[str] = ""
+    STRIPE_WEBHOOK_SECRET: Optional[str] = ""
+    STRIPE_RETURN_URL_SUCCESS: str = "http://localhost:5000/payment/success"
+    STRIPE_RETURN_URL_CANCEL: str = "http://localhost:5000/payment/failed"
 
     # Early access configs
     ENABLE_EARLY_ACCESS: bool = True

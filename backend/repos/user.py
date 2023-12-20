@@ -52,7 +52,7 @@ class UserRepo(DatabaseAbstractRepository):
         user_team_topic_repo = UserTeamTopicRepo(self._db)
         for subscribe_to in get_config().NEW_USER_SUBSCRIBE_TO:
             try:
-                team_topic = team_topic_repo.from_string(subscribe_to)
+                team_topic = team_topic_repo.from_string(subscribe_to, user)
                 user_team_topic_repo.create_from_kwargs(
                     user_id=user.id, team_topic_id=team_topic.id
                 )

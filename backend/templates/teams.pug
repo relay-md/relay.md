@@ -14,10 +14,6 @@
      span Public
     span.text-icon
      span.icon
-      i.fas.fa-shield
-     span Restricted
-    span.text-icon
-     span.icon
       i.fas.fa-lock
      span Private
    table.table.is-fullwidth.block
@@ -27,7 +23,16 @@
      th Owner
      th Creation Date
      th Type
-     th Create Topics
+     td(data-tooltip="Join")
+      i.fas.fa-sign-in
+     td(data-tooltip="Read")
+      i.fas.fa-glasses
+     td(data-tooltip="Post")
+      i.fas.fa-pencil
+     td(data-tooltip="Modify")
+      i.fas.fa-edit
+     td(data-tooltip="Create Topics")
+      i.fas.fa-plus
      th Control
     tbody
      {% for team in teams %}
@@ -63,22 +68,19 @@
        {% if team.is_public %}
        span.icon
         i.fas.fa-globe
-       {% elif team.is_restricted %}
-       span.icon
-        i.fas.fa-shield
        {% else %}
        span.icon
         i.fas.fa-lock
        {% endif %}
-      td
-       {% if team.allow_create_topics %}
-       span.icon
-        i.fas.fa-check
-       {% else %}
-       span.icon
-        i.fas.fa-times
-       {% endif %}
       {% if user %}
+      {% for perm in [Permissions.can_join, Permissions.can_read, Permissions.can_post, Permissions.can_modify, Permissions.can_create_topics] %}
+      td
+       {% if perm in Permissions(team.public_permissions) %}
+       i.fa.fa-check
+        {% else %}
+       i.fa.fa-times
+       {% endif %}
+      {% endfor %}
       td
        .field.has-addons
         {% if not team.is_private %}
