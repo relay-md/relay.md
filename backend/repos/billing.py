@@ -86,8 +86,7 @@ class StripePayments(AbstractPaymentGateway):
         elif event["type"] == "checkout.session.expired":
             session = event["data"]["object"]
         else:
-            print("Unhandled event type {}".format(event["type"]))
-        print(event)
+            log.error("Unhandled event type {}".format(event["type"]))
 
 
 class InvoiceRepo(DatabaseAbstractRepository):

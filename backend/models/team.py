@@ -89,14 +89,12 @@ class Team(Base):
     def is_active(self):
         """Is the team paid? Else, if becomes inactive, no posting, reading
         etc.."""
-        # FIXME: needs implementation in API and Teams
-        if self.is_public:
-            return True
         if not self.paid_until:
             return False
         now = date.today()
         if now < self.paid_until:
             return True
+        return False
 
     def can(self, action: Permissions, user: User, membership: UserTeam = None):
         if self.user_id == user.id:
