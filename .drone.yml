@@ -19,7 +19,7 @@ steps:
 #############################
 kind: pipeline
 type: docker
-name: Build and deploy for prod
+name: Build and deploy for develop
 
 trigger:
   branch:
