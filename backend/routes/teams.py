@@ -23,7 +23,7 @@ async def get_teams(
 ):
     user_repo = UserRepo(db)
     team_repo = TeamRepo(db)
-    teams = team_repo.list()
+    teams = team_repo.list_with_count_members()
     return templates.TemplateResponse(
         "teams.pug", context=dict(**locals(), Permissions=Permissions)
     )

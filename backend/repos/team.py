@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from ..models.team import Team
 from ..models.user_team import UserTeam
@@ -21,3 +21,12 @@ class TeamRepo(DatabaseAbstractRepository):
 
     def team_name_search(self, team_name):
         return self._db.scalar(select(Team).filter_by(name=team_name))
+
+    def list_with_count_members(self):
+        member_count = func.count(UserTeam.team_id)
+        return self._db.execute(
+            select(Team, member_count)
+            .outerjoin(UserTeam)
+            .group_by(UserTeam.team_id)
+            .order_by(member_count.desc())
+        )

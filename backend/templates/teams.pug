@@ -16,7 +16,7 @@
      span Private
 
    .columns.is-multiline
-    {% for team in teams %}
+    {% for team, member_count in teams %}
     {% if team.name != "_" %}
     .column.is-6
      a(href="{{url_for('show_team', team_name=team.name)}}").card-content.box
@@ -32,7 +32,10 @@
          {% endif %}
        .media-content
         .title.is-4 {{team.name}}
-        .subtitle.is-6 {{team.headline | default("")}}
+        .subtitle.is-6.mb-1 {{team.headline | default("")}}
+        nav.level
+         .level-left
+          .level-item {{member_count}} members
     {% endif %}
     {% endfor %}
 {% endblock %}
