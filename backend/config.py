@@ -64,8 +64,8 @@ class Settings(BaseSettings):
     STRIPE_API_KEY: Optional[str] = ""
     STRIPE_API_PRIVATE_KEY: Optional[str] = ""
     STRIPE_WEBHOOK_SECRET: Optional[str] = ""
-    STRIPE_RETURN_URL_SUCCESS: str = "http://localhost:5000/payment/success"
-    STRIPE_RETURN_URL_CANCEL: str = "http://localhost:5000/payment/failed"
+    STRIPE_RETURN_URL_SUCCESS: str = "https://relay.md/payment/success"
+    STRIPE_RETURN_URL_CANCEL: str = "https://relay.md/payment/failed"
 
     # Early access configs
     ENABLE_EARLY_ACCESS: bool = True
