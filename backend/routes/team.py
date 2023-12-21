@@ -49,7 +49,22 @@ async def join(
     if team.is_private:
         raise exceptions.NotAllowed(f"Team {team.name} is private!")
     repo.create_from_kwargs(user_id=user.id, team_id=team.id)
-    return RedirectResponse(url=request.url_for("get_teams"))
+    return RedirectResponse(url=request.url_for("show_team", team_name=team_name))
+
+
+@router.get("/{team_name}/leave")
+async def leave(
+    team_name: str,
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    repo = UserTeamRepo(db)
+    user_team = repo.get_by_kwargs(user_id=user.id, team_id=team.id)
+    repo.delete(user_team)
+    return RedirectResponse(url=request.url_for("show_team", team_name=team_name))
 
 
 @router.get("/{team_name}/invite/{user_id}")
@@ -115,21 +130,6 @@ async def remove_user(
         )
     user_team_repo.delete(membership_to_remove)
     return RedirectResponse(url=request.url_for("settings", team_name=team_name))
-
-
-@router.get("/{team_name}/leave")
-async def leave(
-    team_name: str,
-    request: Request,
-    config: Settings = Depends(get_config),
-    team: Team = Depends(get_team),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    repo = UserTeamRepo(db)
-    user_team = repo.get_by_kwargs(user_id=user.id, team_id=team.id)
-    repo.delete(user_team)
-    return RedirectResponse(url=request.url_for("get_teams"))
 
 
 @router.get("/{team_name}/toggle/perm")
