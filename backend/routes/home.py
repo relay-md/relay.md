@@ -24,7 +24,7 @@ async def welcome(
     user: User = Depends(get_optional_user),
     config: Settings = Depends(get_config),
 ):
-    return templates.TemplateResponse("welcome.html", context=dict(**locals()))
+    return templates.TemplateResponse("welcome.pug", context=dict(**locals()))
 
 
 @router.get(

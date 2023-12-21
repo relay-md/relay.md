@@ -3,11 +3,12 @@
 .mt-5
  .columns
   .column.is-8.is-offset-2
-   h1.title.is-1 Installing the relay.md Obisidan plugin
-   p.subtitle You can install this plugin from the community plugins, manually,
-    | or using the BRAT plugin. Please note that in order to use the plugin, you
-    | need an account on relay.md and have to obtain your access key from the
-    | profile page.
+   section.m-3
+    h1.title.is-1 Installing the relay.md Obisidan plugin
+    p.subtitle You can install this plugin from the community plugins, manually,
+     | or using the BRAT plugin. Please note that in order to use the plugin, you
+     | need an account on relay.md and have to obtain your access key from the
+     | profile page.
 
    .card.block
     .card-header
@@ -31,20 +32,26 @@
        | you’d like to install relay.md using BRAT:
      .list.block
       .list-item
-       .tag.is-dark 1.
-       | &nbsp;  Install the BRAT plugin.
+       .list-item-image
+        .tag.is-dark 1.
+       .list-item-content Install the BRAT plugin.
       .list-item
-       .tag.is-dark 2.
-       | &nbsp; Run the BRAT: Add a beta plugin for testing command and paste in
-       tt.tag.is-light https://github.com/relay-md/relay-md-obsidian-plugin/
+       .list-item-image
+        .tag.is-dark 2.
+       div
+        | Run the BRAT: Add a beta plugin for testing command and paste in
+        br
+        tt https://github.com/relay-md/relay-md-obsidian-plugin/
       .list-item
-       .tag.is-dark 3.
-       | &nbsp; Click the &nbsp;
-       span.button(disabled).is-small Add Plugin
-       | button
+       .list-item-image
+        .tag.is-dark 3.
+       | Click the&nbsp;
+       tt.is-light.button(disabled) Add Plugin
+       |&nbsp; button
       .list-item
-       .tag.is-dark 4.
-       | &nbsp; Navigate to Community Plugins in Obsidian settings, click the&nbsp;
+       .list-item-image
+        .tag.is-dark 4.
+       | Navigate to Community Plugins in Obsidian settings, click the &nbsp;
        span.icon-text.is-small
         span.icon
          i.fas.fa-sync
@@ -61,26 +68,40 @@
      p.block To install manually, you'll need to:
      .list.block
       .list-item
-       .tag.is-dark 1.
-       | &nbsp; Download the latest release.
+       .list-item-image
+        .tag.is-dark 1.
+       .list-item-content Download the latest release.
       .list-item
-       .tag.is-dark 2.
-       | &nbsp; Find the folder named &nbsp;
+       .list-item-image
+        .tag.is-dark 2.
+       | Find the folder named&nbsp;
        tt.tag.is-light .obsidian/plugins
-       | in your vault and open it.
+       | &nbsp;in your vault and open it.
       .list-item
-       .tag.is-dark 3.
-       | &nbsp; In that folder, create a new folder named
+       .list-item-image
+        .tag.is-dark 3.
+       | In that folder, create a new folder named&nbsp;
        tt.tag.is-light relay-md
       .list-item
-       .tag.is-dark 4.
-       | &nbsp; Copy the files from the latest release and paste them into the folder you created.
+       .list-item-image
+        .tag.is-dark 4.
+       | Copy the files from the latest release and paste them into the folder you created.
       .list-item
-       .tag.is-dark 5.
-       | &nbsp; Navigate to Community Plugins in Obsidian settings, click the refresh button, find
-       span.tag.is-light
-        tt relay.md
-       |, and enable it.
+       .list-item-image
+        .tag.is-dark 5.
+       div
+        | Navigate to Community Plugins in Obsidian settings, click the&nbsp;
+        span.icon-text.is-small
+         span.icon
+          i.fas.fa-sync
+         span Refresh
+        | &nbsp;button, find
+        span.tag.is-light
+         tt relay.md
+        |, and enable it.
+        span.tag.is-light
+         tt relay.md
+        |, and enable it.
 
      p.block After installing via either method you should have relay.md panes
      | available in both the left and right sidebars of Obsidian. Use the links in

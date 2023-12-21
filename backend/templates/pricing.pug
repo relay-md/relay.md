@@ -1,6 +1,7 @@
 {% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 .mt-5.mb-5
+ {% if user %}
  .columns
   .column.has-text-centered.is-10.is-offset-1
    h1.title Team Name
@@ -19,6 +20,7 @@
     .title
      tt {{team.name}}
    {% endif %}
+ {% endif %}
 
  .columns
   .column.has-text-centered.is-10.is-offset-1
@@ -61,7 +63,11 @@
           | via plugin
          .plan-item 1 access key
         .plan-footer
+         {% if user %}
          input.button.is-fullwidth#free_choose(type="submit")
+         {% else %}
+         a.button.is-fullwidth#free_choose(href="{{url_for('login')}}") Login to proceed
+         {% endif %}
 
       .pricing-plan.is-warning
        form#billing_form(action="{{url_for('team_billing_post')}}" method="POST")
@@ -85,7 +91,11 @@
           strong access control&nbsp;
           |to teams
         .plan-footer
+         {% if user %}
          input.button.is-fullwidth#team_choose(type="submit")
+         {% else %}
+         a.button.is-fullwidth#team_choose(href="{{url_for('login')}}") Login to proceed
+         {% endif %}
 
       .pricing-plan.is-danger
        .plan-header
@@ -166,8 +176,10 @@ script
    })
  }
  team_name_input = document.getElementById("team_name")
- team_name_input.addEventListener('input', store_team_name);
- team_name_input.addEventListener('propertychange', store_team_name);
+ if (team_name_input) {
+  team_name_input.addEventListener('input', store_team_name);
+  team_name_input.addEventListener('propertychange', store_team_name);
+ }
  {% endif %}
 
  function flipswitch() {
@@ -177,7 +189,7 @@ script
    var team_choose = document.getElementById('team_choose');
    var free_choose = document.getElementById('free_choose');
 
-   {% if team %}
+   {% if team and user %}
    team_choose.setAttribute("value", "Choose");
    free_choose.setAttribute("value", "Choose");
    // Set all team_name hidden tags
