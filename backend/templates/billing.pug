@@ -17,12 +17,12 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
       .field-body
         .field
           p.control.is-expanded.has-icons-left
-           input.input(type='text' placeholder='Address Line' name="address_line1")
+           input.input(type='text' placeholder='Address Line' name="address_line1" value="{{customer.address_line1 if customer}}")
            span.icon.is-small.is-left
              i.fas.fa-address-card
         .field
           p.control.is-expanded.has-icons-left
-           input.input(type='text' placeholder='Address Line' name="address_line2")
+           input.input(type='text' placeholder='Address Line' name="address_line2" value="{{customer.address_line2 if customer}}")
            span.icon.is-small.is-left
             i.fas.fa-address-card
     .field.is-horizontal
@@ -31,17 +31,17 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
       .field-body
         .field
           p.control.is-expanded.has-icons-left
-           input.input(type='text' placeholder='City' name="city")
+           input.input(type='text' placeholder='City' name="city" value="{{customer.city if customer}}")
            span.icon.is-small.is-left
             i.fas.fa-city
         .field
           p.control.is-expanded.has-icons-left
-           input.input(type='text' placeholder='Zip code' name="zip")
+           input.input(type='text' placeholder='Zip code' name="zip" value="{{customer.zip if customer}}")
            span.icon.is-small.is-left
             i.fas.fa-map-pin
         .field
           p.control.is-expanded.has-icons-left
-           input.input(type='text' placeholder='State' name='state')
+           input.input(type='text' placeholder='State' name='state' value="{{customer.state if customer}}")
            span.icon.is-small.is-left
             i.fas.fa-address-card
     .field.is-horizontal
@@ -52,7 +52,7 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
           p.control.is-expanded.has-icons-left
            span.select.is-fullwidth
              // country codes (ISO 3166) and Dial codes.
-             select(name='country_code' id='')
+             select(name='country_code' id='country_code' value="{{customer.country_code if customer }}")
                option(value='AD') Andorra
                option(value='AE') United Arab Emirates
                option(value='AG') Antigua &amp; Barbuda
@@ -251,7 +251,7 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
                option(value='TW') Taiwan
                option(value='UA') Ukraine
                option(value='UG') Uganda
-               option(value='US' selected='selected') USA
+               option(value='US') USA
                option(value='UY') Uruguay
                option(value='UZ') Uzbekistan
                option(value='VA') Vatican City
@@ -278,7 +278,7 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
            p.control
             span.select
              // country codes (ISO 3166) and Dial codes.
-             select(name='phone_country_code' id='')
+             select(name='phone_country_code' id='phone_country_code' value="{{customer.phone_country_code if customer}}")
                option(data-countrycode='AD' value='376') Andorra (+376)
                option(data-countrycode='AE' value='971') United Arab Emirates (+971)
                option(data-countrycode='AG' value='1268') Antigua &amp; Barbuda (+1268)
@@ -494,7 +494,7 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
                option(data-countrycode='ZM' value='260') Zambia (+260)
                option(data-countrycode='ZW' value='263') Zimbabwe (+263)
             p.control.is-expanded
-              input.input(type='tel' name="phone" placeholder='Your phone number')
+             input.input(type='tel' name="phone" placeholder='Your phone number' value="{{customer.phone_number if customer}}")
           p.help Do not enter the first zero
 
  .hero.is-info
@@ -505,41 +505,56 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
  .section
 
   .columns
-   .column.is-11
-    .level
-     .title.is-5 Team Subscription
-     .title.is-5 {{price_total}} € / {{price_interval}}
+   .column.is-9.is-offset-1.box
+    .block
+     .level
+      .title.is-5 Team Subscription
+      .title.is-5 {{price_total}} € / {{price_interval}}
 
-    .field.is-grouped.is-grouped-multiline
-      .control
-       .tags.has-addons
-        .tag.is-medium.is-dark Name
-        .tag.is-medium.is-link {{team.name}}
+     .field.is-grouped.is-grouped-multiline
+       .control
+        .tags.has-addons
+         .tag.is-medium.is-dark Name
+         .tag.is-medium.is-link {{team.name}}
 
-      .control
-       .tags.has-addons
-        .tag.is-medium.is-dark Type
-        .tag.is-medium.is-info private
+       .control
+        .tags.has-addons
+         .tag.is-medium.is-dark Type
+         .tag.is-medium.is-info private
 
-      .control
-       .tags.has-addons
-        .tag.is-medium.is-dark Payment
-        {% if yearly %}
-        .tag.is-medium.is-danger yearly
-        {% else %}
-        .tag.is-medium.is-danger montly
-        {% endif %}
+       .control
+        .tags.has-addons
+         .tag.is-medium.is-dark Payment
+         {% if yearly %}
+         .tag.is-medium.is-danger yearly
+         {% else %}
+         .tag.is-medium.is-danger montly
+         {% endif %}
 
- .section
-  .columns
-   .column.is-11
-    .field.is-horizontal
-    .field.is-horizontal
-      .field-label
-        // Left empty for spacing
-      .field-body
-        .field
-          .control
-            button.button.is-primary
-              | Go to Payment
+    .block
+     .control
+      button.button.is-danger.is-light.is-fullwidth.icon-text.is-medium
+       .span.icon
+        i.fas.fa-money-bill
+       .span Proceed to Payment
+{% endblock %}
+
+
+{% block javascript %}
+script
+.
+ const country_code_tag = document.getElementById('country_code');
+ const country_code = country_code_tag.getAttribute("value");
+ if (country_code) {
+  var options = document.querySelectorAll('option[value="' + country_code + '"]');
+  options[0].selected = true;
+ }
+
+ const phone_country_code_tag = document.getElementById('phone_country_code');
+ const phone_country_code = phone_country_code_tag.getAttribute("value");
+ if (phone_country_code) {
+  var options = document.querySelectorAll('option[value="' + phone_country_code + '"]');
+  options[0].selected = true;
+ }
+
 {% endblock %}

@@ -84,6 +84,7 @@ class DatabaseAbstractRepository(AbstractRepository):
                 )
             setattr(item, key, value)
         self._db.commit()
+        return item
 
     def delete(self, item: T) -> None:
         if not item:

@@ -8,9 +8,15 @@ import stripe
 from sqlalchemy import select
 
 from ..config import get_config
-from ..models.billing import Invoice, InvoiceStatus, Subscription
+from ..models.billing import (
+    Invoice,
+    InvoiceStatus,
+    PersonalInformation,
+    Subscription,
+)
 from ..utils.dates import last_day_of_month
 from .base import DatabaseAbstractRepository
+from .stripe import StripeCustomerRepo, StripeSubscriptionRepo
 from .team import TeamRepo
 
 log = logging.getLogger(__name__)
@@ -35,7 +41,7 @@ class StripePayments(AbstractPaymentGateway):
         team_ids = list()
         for item in invoice.subscriptions:
             prices = stripe.Price.list(
-                lookup_keys=[item.stripe_key], expand=["data.product"]
+                lookup_keys=[item.stripe.stripe_key], expand=["data.product"]
             )
             line_items.append(
                 {
@@ -56,6 +62,10 @@ class StripePayments(AbstractPaymentGateway):
             metadata=dict(team_ids=" ".join(team_ids)),
             success_url=f"{get_config().STRIPE_RETURN_URL_SUCCESS}",  # ?session_id={CHECKOUT_SESSION_ID}",
             cancel_url=get_config().STRIPE_RETURN_URL_CANCEL,
+            # Promo codes should be enterable on checkout page. This enables
+            # promo-codes from stripe pov and needs no further implementation on
+            # relay.md side!
+            allow_promotion_codes=True,
         )
         return checkout_session
 
@@ -139,11 +149,15 @@ class SubscriptionRepo(DatabaseAbstractRepository):
         self.payment = StripePayments()
 
     def store_subscription_id(self, subscription: Subscription, id):
-        self.update(subscription, stripe_subscription_id=id)
+        stripe_subscription_repo = StripeSubscriptionRepo(self._db)
+        stripe_subscription = stripe_subscription_repo.get_by_kwargs(
+            subscription_id=subscription.id
+        )
+        stripe_subscription_repo.update(stripe_subscription, stripe_subscription_id=id)
 
     def cancel_subscription(self, subscription: Subscription):
         stripe.Subscription.modify(
-            subscription.stripe_subscription_id,
+            subscription.stripe.stripe_subscription_id,
             cancel_at_period_end=True,
         )
 
@@ -152,7 +166,7 @@ class SubscriptionRepo(DatabaseAbstractRepository):
 
         # FIXME: This is limiting us to 1 subscription per invoice!
         subscription_items = stripe.SubscriptionItem.list(
-            subscription=subscription.stripe_subscription_id, limit=1
+            subscription=subscription.stripe.stripe_subscription_id, limit=1
         )
         assert subscription_items["data"]
         subscription_item = subscription_items["data"][0]
@@ -167,3 +181,60 @@ class SubscriptionRepo(DatabaseAbstractRepository):
             .filter_by(team_id=team_id)
             .order_by(Subscription.created_at.desc())
         )
+
+
+class PersonalInformationRepo(DatabaseAbstractRepository):
+    ORM_Model = PersonalInformation
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.payment = StripePayments()
+
+    def create_from_kwargs(self, **kwargs):
+        ip = kwargs.pop("ip", None)
+        personal_info = super().create_from_kwargs(**kwargs)
+        stripe_customer = stripe.Customer.create(
+            name=kwargs["name"],
+            email=kwargs["email"],
+            address=dict(
+                city=kwargs["city"],
+                country=kwargs["country_code"],
+                line1=kwargs["address_line1"],
+                line2=kwargs["address_line2"],
+                postal_code=kwargs["zip"],
+                state=kwargs["state"],
+            ),
+            tax=dict(ip_address=ip),
+        )
+        stripe_customer_repo = StripeCustomerRepo(self._db)
+        stripe_customer_repo.create_from_kwargs(
+            personal_information_id=personal_info.id,
+            stripe_customer_id=stripe_customer["id"],
+        )
+        return personal_info
+
+    def update(self, item, **kwargs):
+        ip = kwargs.pop("ip", None)
+        super().update(item, **kwargs)
+        customer_repo = StripeCustomerRepo(self._db)
+        customer = customer_repo.get_by_kwargs(personal_information_id=item.id)
+        if not customer:
+            log.error(
+                "No stripe customer id known for PersonalInformation {item.id}. Skipping updating Stripe..."
+            )
+            return item
+        stripe.Customer.modify(
+            customer.stripe_customer_id,
+            name=kwargs["name"],
+            email=kwargs["email"],
+            address=dict(
+                city=kwargs["city"],
+                country=kwargs["country_code"],
+                line1=kwargs["address_line1"],
+                line2=kwargs["address_line2"],
+                postal_code=kwargs["zip"],
+                state=kwargs["state"],
+            ),
+            tax=dict(ip_address=ip),
+        )
+        return item

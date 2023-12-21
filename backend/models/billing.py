@@ -40,11 +40,8 @@ class Subscription(Base):
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team.id"), nullable=True)
     team: Mapped["Team"] = relationship()  # noqa
 
-    # Internal id for corresponding stripe product
-    stripe_key: Mapped[str] = mapped_column(String(32))
-    stripe_subscription_id: Mapped[str] = mapped_column(String(32), nullable=True)
-
     invoice: Mapped["Invoice"] = relationship(back_populates="subscriptions")  # noqa
+    stripe: Mapped["StripeSubscription"] = relationship()  # noqa
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, quantity={self.quantity}, price={self.price})"
@@ -56,11 +53,8 @@ class PersonalInformation(Base):
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
 
-    # TODO: at some point, we want to link this to the user so we can present it
-    # when changing subscription
-    #
-    # user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
-    # user: Mapped[User] = relationship()
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
+    user: Mapped[User] = relationship()
 
     name: Mapped[str] = mapped_column(String(128))
     email: Mapped[str] = mapped_column(String(128))
@@ -74,6 +68,8 @@ class PersonalInformation(Base):
     # Phone
     phone_country_code: Mapped[str] = mapped_column(String(6))
     phone_number: Mapped[str] = mapped_column(String(128))
+
+    stripe: Mapped["StripeCustomer"] = relationship()  # noqa
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, email={self.email})"

@@ -5,6 +5,7 @@ from .document import Document
 from .document_access import DocumentAccess
 from .document_team_topic import DocumentTeamTopic
 from .document_user import DocumentUser
+from .stripe import StripeCustomer, StripeSubscription
 from .team import Team
 from .team_topic import TeamTopic
 from .topic import Topic
@@ -27,4 +28,6 @@ __all__ = [
     Subscription.__name__,
     PersonalInformation.__name__,
     Invoice.__name__,
+    StripeCustomer.__name__,
+    StripeSubscription.__name__,
 ]

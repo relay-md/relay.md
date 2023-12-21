@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, Form, Request, status
 from starlette.responses import RedirectResponse
@@ -8,8 +7,9 @@ from starlette.responses import RedirectResponse
 from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import BadRequest, NotAllowed
-from ..models.billing import PersonalInformation, Subscription
-from ..repos.billing import InvoiceRepo
+from ..models.billing import InvoiceStatus, Subscription
+from ..models.stripe import StripeSubscription
+from ..repos.billing import InvoiceRepo, PersonalInformationRepo
 from ..repos.team import Team, TeamRepo
 from ..templates import templates
 from ..utils.pricing import get_price
@@ -18,7 +18,7 @@ from ..utils.user import User, require_user
 router = APIRouter(prefix="/teams/billing")
 
 
-@router.post("/plan")
+@router.post("")
 async def team_billing_post(
     request: Request,
     config: Settings = Depends(get_config),
@@ -63,6 +63,8 @@ async def team_billing_post(
         price_interval = "yearly"
     else:
         price_interval = "monthly"
+    customer_repo = PersonalInformationRepo(db)
+    customer = customer_repo.get_by_kwargs(user_id=user.id)
     return templates.TemplateResponse("billing.pug", context=dict(**locals()))
 
 
@@ -106,10 +108,12 @@ async def team_billing_payment(
             price=int(price_total * 100),
             description=f"Team: {team_name}",
             team_id=team.id,
-            stripe_key=stripe_key,
+            stripe=StripeSubscription(stripe_key=stripe_key),
         )
     ]
-    person = PersonalInformation(
+    customer_repo = PersonalInformationRepo(db)
+    personal_data = dict(
+        user_id=user.id,
         name=user.name,
         email=user.email,
         address_line1=address_line1,
@@ -121,16 +125,23 @@ async def team_billing_payment(
         phone_country_code=phone_country_code,
         phone_number=phone,
     )
-    datetime.utcnow()
-    invoice = invoice_repo.create_from_kwargs(
-        user_id=user.id,
-        customer=person,
-        subscriptions=subscriptions,
+    person = customer_repo.get_by_kwargs(user_id=user.id)
+    if person:
+        person = customer_repo.update(person, **personal_data, ip=request.client.host)
+    else:
+        person = customer_repo.create_from_kwargs(
+            **personal_data, ip=request.client.host
+        )
+    invoice = invoice_repo.get_by_kwargs(
+        user_id=user.id, customer_id=person.id, payment_status=InvoiceStatus.PENDING
     )
-
+    if not invoice:
+        invoice = invoice_repo.create_from_kwargs(
+            user_id=user.id,
+            customer_id=person.id,
+            subscriptions=subscriptions,
+        )
     return RedirectResponse(
-        # Pay externally, but seems to not support subscriptions via Ayden
-        # url=invoice_repo.get_payment_link(invoice),
         url=request.url_for("payment_invoice", invoice_id=invoice.id),
         status_code=status.HTTP_302_FOUND,
     )
