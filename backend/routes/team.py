@@ -20,6 +20,22 @@ from ..utils.user import User, require_user
 router = APIRouter(prefix="/team")
 
 
+@router.get("/{team_name}")
+async def show_team(
+    team_name: str,
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    user_repo = UserRepo(db)
+    membership = user_repo.is_member(user, team)
+    return templates.TemplateResponse(
+        "team.pug", context=dict(**locals(), Permissions=Permissions)
+    )
+
+
 @router.get("/{team_name}/join")
 async def join(
     team_name: str,
@@ -251,6 +267,29 @@ async def team_create_validate_team_name(
         return """<p id="validate-team-name" class="help is-danger">The team name is invalid! Alphanumeric names only (a-z, 0-9 and _)</p>"""
     else:
         return ""
+
+
+@router.post("/{team_name}/headline", response_class=PlainTextResponse)
+async def update_team_headline(
+    request: Request,
+    headline: str = Form(default=""),
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    if not team.user_id == user.id:
+        return """<p id="validate-team-name" class="help is-danger">You cannot update the headline!</p>"""
+    if len(headline) > 63:
+        return (
+            """<p id="validate-team-name" class="help is-danger">Max length 63!</p>"""
+        )
+    team.headline = headline
+    team_repo.update(team)
+    return (
+        """<p id="validate-team-name" class="help is-success">Headline updated!</p>"""
+    )
 
 
 @router.get("/{team_name}/billing")

@@ -62,6 +62,16 @@ td.has-text-light
     {% endif %}
 
    .section
+    .title.is-1 Headline
+    .subtitle Brief description of your team
+    .field
+     .control.has-icons-left
+      input.input#team_name(type="string" placeholder="Description" name="headline" hx-post="{{url_for('update_team_headline', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#updated_team_headline")
+      span.icon.is-left
+       i.fas.fa-expand
+     p(id="updated_team_headline")
+
+   .section
     .block.title.is-3 Permissions
     .subtitle.is-5 Customize Team Permissions
     p.block Click the check marks/crosses to flip the corresponding permission.

@@ -25,10 +25,13 @@ async def subscribe(
     db: Session = Depends(get_session),
 ):
     repo = UserTeamTopicRepo(db)
+    # TODO: this needs updating!!
     if team_topic.team.is_private:
         raise exceptions.NotAllowed(f"Team {team_topic.team.name} is private!")
     repo.create_from_kwargs(user_id=user.id, team_topic_id=team_topic.id)
-    return RedirectResponse(url=request.url_for("get_teams"))
+    return RedirectResponse(
+        url=request.url_for("show_team", team_name=team_topic.team.name)
+    )
 
 
 @router.get("/{team_topic_name}/unsubscribe")
@@ -43,4 +46,6 @@ async def unsubscribe(
     repo = UserTeamTopicRepo(db)
     user_team_topic = repo.get_by_kwargs(user_id=user.id, team_topic_id=team_topic.id)
     repo.delete(user_team_topic)
-    return RedirectResponse(url=request.url_for("get_teams"))
+    return RedirectResponse(
+        url=request.url_for("show_team", team_name=team_topic.team.name)
+    )
