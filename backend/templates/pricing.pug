@@ -42,7 +42,7 @@
     .pricing-table
 
       .pricing-plan
-       form#billing_form(action="{{url_for('team_billing_post')}}" method="POST")
+       form#billing_form(action="{{url_for('team_billing_post')}}" method="POST" onsubmit="return validateForm();")
         input#input_yearly(type="hidden" name="yearly")
         input#input_type(type="hidden" name="type" value="public")
         input#input_team_name(type="hidden" name="team_name")
@@ -70,7 +70,7 @@
          {% endif %}
 
       .pricing-plan.is-warning
-       form#billing_form(action="{{url_for('team_billing_post')}}" method="POST")
+       form#billing_form(action="{{url_for('team_billing_post')}}" method="POST" onsubmit="return validateForm();")
         input#input_yearly(type="hidden" name="yearly")
         input#input_type(type="hidden" name="type" value="private")
         input#input_team_name(type="hidden" name="team_name")
@@ -220,4 +220,25 @@ script
  }
  // Calling the method initially just so we are in sync with what HTML code says
  flipswitch()
+
+script
+.
+ // Form validation
+ function validateForm(e) {
+  const team_name_input = document.getElementById("team_name");
+  const warning_field = document.getElementById("validate-team-name");
+  if (!team_name_input.value) {
+    team_name_input.classList.add("is-danger");
+    warning_field.classList.add("help", "is-danger");
+    warning_field.innerHTML = "A valid team name is required";
+    return false;
+  } else {
+    warning_field.classList.remove("help", "is-danger");
+    if (warning_field.innerHTML) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+ }
 {% endblock %}

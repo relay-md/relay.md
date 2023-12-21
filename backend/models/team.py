@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ DB Storage models
 """
+import re
 import uuid
 from datetime import date, datetime
 from typing import List
@@ -108,3 +109,7 @@ class Team(Base):
             return (action & self.member_permissions) == action
         # public
         return (action & self.public_permissions) == action
+
+    @staticmethod
+    def validate_team_name(name):
+        return re.match("^[\w-]+$", name)  # noqa

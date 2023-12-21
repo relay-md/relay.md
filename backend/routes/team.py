@@ -236,6 +236,23 @@ async def settings_user_search(
     """
 
 
+@router.post("/new/validate-team-name", response_class=PlainTextResponse)
+async def team_create_validate_team_name(
+    request: Request,
+    team_name: str = Form(default=""),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    if team_repo.team_name_search(team_name.lower()):
+        return """<p id="validate-team-name" class="help is-danger">A Team with this name already exists!</p>"""
+    if not Team.validate_team_name(team_name):
+        return """<p id="validate-team-name" class="help is-danger">The team name is invalid! Alphanumeric names only (a-z, 0-9 and _)</p>"""
+    else:
+        return ""
+
+
 @router.get("/{team_name}/billing")
 async def team_billing(
     request: Request,

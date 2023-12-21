@@ -7,10 +7,10 @@ from starlette.responses import RedirectResponse
 
 from ..config import Settings, get_config
 from ..database import Session, get_session
-from ..exceptions import NotAllowed
+from ..exceptions import BadRequest, NotAllowed
 from ..models.billing import OrderItem, PersonalInformation
 from ..repos.billing import InvoiceRepo
-from ..repos.team import TeamRepo
+from ..repos.team import Team, TeamRepo
 from ..templates import templates
 from ..utils.pricing import get_price
 from ..utils.user import User, require_user
@@ -29,6 +29,18 @@ async def team_billing_post(
     db: Session = Depends(get_session),
 ):
     team_repo = TeamRepo(db)
+
+    if not team_name:
+        return RedirectResponse(
+            url=request.url_for("pricing"),
+            status_code=status.HTTP_302_FOUND,
+        )
+
+    team_name = team_name.lower()
+    if not Team.validate_team_name(team_name):
+        raise BadRequest(
+            "The team name is invalid! Alphanumeric names only (a-z, 0-9 and _)"
+        )
 
     # check if team exists owned by user
     team = team_repo.get_by_kwargs(name=team_name)

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from fastapi import APIRouter, Depends, Form, Query, Request
-from fastapi.responses import PlainTextResponse
+from fastapi import APIRouter, Depends, Request
 
 from ..config import Settings, get_config
 from ..database import Session, get_session
@@ -28,30 +27,3 @@ async def get_teams(
     return templates.TemplateResponse(
         "teams.pug", context=dict(**locals(), Permissions=Permissions)
     )
-
-
-@router.get("/new")
-async def team_create(
-    request: Request,
-    type: str = Query(default="public"),
-    yearly: bool = Query(default=False),
-    config: Settings = Depends(get_config),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    return templates.TemplateResponse("pricing.pug", context=dict(**locals()))
-
-
-@router.post("/new/validate-team-name", response_class=PlainTextResponse)
-async def team_create_validate_team_name(
-    request: Request,
-    team_name: str = Form(default=""),
-    config: Settings = Depends(get_config),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    team_repo = TeamRepo(db)
-    if team_repo.team_name_search(team_name.lower()):
-        return """<p class="help is-danger">A Team with this name already exists!</p>"""
-    else:
-        return ""
