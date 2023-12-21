@@ -24,7 +24,9 @@ class Settings(BaseSettings):
 
     # SQL Settings
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///default.db"
-    SQLALCHEMY_ENGINE_OPTIONS: Optional[SQLAlchemyEngineOptions] = None
+    SQLALCHEMY_ENGINE_OPTIONS: Optional[
+        SQLAlchemyEngineOptions
+    ] = SQLAlchemyEngineOptions()
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ECHO: bool = False
 
