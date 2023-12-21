@@ -48,7 +48,7 @@ async def join(
     repo = UserTeamRepo(db)
     if team.is_private:
         raise exceptions.NotAllowed(f"Team {team.name} is private!")
-    repo.create_from_kwargs(user_id=user.id, team_id=team.id)
+    repo.add_member(user_id=user.id, team_id=team.id)
     return RedirectResponse(url=request.url_for("show_team", team_name=team_name))
 
 
@@ -63,7 +63,7 @@ async def leave(
 ):
     repo = UserTeamRepo(db)
     user_team = repo.get_by_kwargs(user_id=user.id, team_id=team.id)
-    repo.delete(user_team)
+    repo.remove_member(user_team)
     return RedirectResponse(url=request.url_for("show_team", team_name=team_name))
 
 
@@ -77,26 +77,19 @@ async def invite_user(
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
-    if team.is_public:
-        raise exceptions.NotAllowed("No need to invite anyone to a public team!")
-
     user_repo = UserRepo(db)
     new_user = user_repo.get_by_kwargs(id=user_id)
     if not new_user:
         raise exceptions.BadRequest("Invalid user id!")
     membership = user_repo.is_member(user, team)
-    user_team_repo = UserTeamRepo(db)
-    if (team.is_private) and not membership:
-        # TODO: check that we are allowed to invite people
-        raise exceptions.NotAllowed(
-            f"Team {team.name} is private and you are not member!"
-        )
-
-    if not membership.can_invite_users:
+    if not team.can(Permissions.can_invite, user, membership):
         raise exceptions.NotAllowed(
             f"You are not allowed to invite to team {team_name}!"
         )
-    user_team_repo.create_from_kwargs(user_id=new_user.id, team_id=team.id)
+    user_team_repo = UserTeamRepo(db)
+    # only add if not already added
+    if not user_team_repo.get_by_kwargs(user_id=new_user.id, team_id=team.id):
+        user_team_repo.add_member(user_id=new_user.id, team_id=team.id)
     return RedirectResponse(url=request.url_for("settings", team_name=team_name))
 
 
@@ -110,25 +103,18 @@ async def remove_user(
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
-    if team.is_public:
-        raise exceptions.NotAllowed("You cannot uninvite anyone from global teams!")
     user_repo = UserRepo(db)
     user_team_repo = UserTeamRepo(db)
     membership_to_remove = user_team_repo.get_by_kwargs(id=membership_id)
     if not membership_to_remove:
         raise exceptions.BadRequest("Invalid membership id!")
     membership = user_repo.is_member(user, team)
-    if (team.is_private) and not membership:
-        # TODO: check that we are allowed to invite people
+    # TODO: can invite means -> can remove from team, too!
+    if not team.can(Permissions.can_invite, user, membership):
         raise exceptions.NotAllowed(
-            f"Team {team.name} is private and you are not member!"
+            f"You are not allowed to invite to team {team_name}!"
         )
-
-    if not membership.can_invite_users:
-        raise exceptions.NotAllowed(
-            f"You are not allowed to manage members of team {team_name}!"
-        )
-    user_team_repo.delete(membership_to_remove)
+    user_team_repo.remove_member(membership_to_remove)
     return RedirectResponse(url=request.url_for("settings", team_name=team_name))
 
 
@@ -226,6 +212,9 @@ async def settings_user_search(
     users = list(user_repo.search_username(name, limit=5))
 
     def user_invite_link(user):
+        price_period = 14.23
+        price = 30
+        price_interval = "year"
         return f"""
             <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">
              <div class="list-item-image">
@@ -239,6 +228,16 @@ async def settings_user_search(
               </div>
               <div class="list-item-description">
                {user.name}
+              </div>
+             </div>
+             <div class="list-item-controls">
+             <div>
+               <div class="title is-5">
+                {price_period}€
+               </div>
+               <div class="subtitle is-7">
+                {price}€/{price_interval}
+               </div>
               </div>
              </div>
             </a>
@@ -285,8 +284,7 @@ async def update_team_headline(
         return (
             """<p id="validate-team-name" class="help is-danger">Max length 63!</p>"""
         )
-    team.headline = headline
-    team_repo.update(team)
+    team_repo.update(team, headline=headline)
     return (
         """<p id="validate-team-name" class="help is-success">Headline updated!</p>"""
     )

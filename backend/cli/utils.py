@@ -51,7 +51,10 @@ def new_item(
             values[key] = json.loads(value)
         except json.decoder.JSONDecodeError:
             if key.endswith("_id"):
-                values[key] = uuid.UUID(value)
+                try:
+                    values[key] = uuid.UUID(value)
+                except Exception:
+                    values[key] = value
             elif key.endswith("_time") or key.endswith("_date") or key.endswith("_at"):
                 values[key] = parse(value)
             else:
@@ -87,7 +90,10 @@ def edit_item(db, model, id: uuid.UUID, ignore_attributes=[], replace_column_nam
             new_values[key] = json.loads(value)
         except json.decoder.JSONDecodeError:
             if key.endswith("_id"):
-                new_values[key] = uuid.UUID(value)
+                try:
+                    new_values[key] = uuid.UUID(value)
+                except Exception:
+                    new_values[key] = value
             elif key.endswith("_time") or key.endswith("_date"):
                 new_values[key] = parse(value)
             else:

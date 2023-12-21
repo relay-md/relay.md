@@ -130,10 +130,10 @@ async def redirect_to_login(
     user: User = Depends(get_optional_user),
     config: Settings = Depends(get_config),
 ):
-    url = request.url_for("login")
+    url = str(request.url_for("login"))
     if exc.next_url:
         parsed = list(urllib.parse.urlparse(url))
-        parsed[4] = urllib.parse.urlencode(dict(next=exc.next_url))
+        parsed[4] = urllib.parse.urlencode(dict(next=str(exc.next_url)))
         url = urllib.parse.urlunparse(parsed)
     return RedirectResponse(url=url)
 

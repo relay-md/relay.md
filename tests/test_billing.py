@@ -109,8 +109,8 @@ def test_create_invoice(
 ):
     team = create_team("private_team")
     billing_repo = repos.InvoiceRepo(dbsession)
-    products = [
-        models.OrderItem(
+    subscriptions = [
+        models.Subscription(
             name="Foobar",
             quantity=10,
             price=3000,
@@ -134,7 +134,7 @@ def test_create_invoice(
         models.Invoice(
             user_id=account.id,
             customer=person,
-            products=products,
+            subscriptions=subscriptions,
         )
     )
 

@@ -8,7 +8,7 @@ from starlette.responses import RedirectResponse
 from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import BadRequest, NotAllowed
-from ..models.billing import OrderItem, PersonalInformation
+from ..models.billing import PersonalInformation, Subscription
 from ..repos.billing import InvoiceRepo
 from ..repos.team import Team, TeamRepo
 from ..templates import templates
@@ -94,17 +94,15 @@ async def team_billing_payment(
 
     price_total = get_price(yearly=yearly, private=True)
     if yearly:
-        quantity = 12
         stripe_key = "team-yearly"
     else:
-        quantity = 1
         stripe_key = "team-monthly"
 
     invoice_repo = InvoiceRepo(db)
-    products = [
-        OrderItem(
+    subscriptions = [
+        Subscription(
             name="Team Subscription",
-            quantity=quantity,
+            quantity=1,  # 1 member
             price=int(price_total * 100),
             description=f"Team: {team_name}",
             team_id=team.id,
@@ -127,7 +125,7 @@ async def team_billing_payment(
     invoice = invoice_repo.create_from_kwargs(
         user_id=user.id,
         customer=person,
-        products=products,
+        subscriptions=subscriptions,
     )
 
     return RedirectResponse(

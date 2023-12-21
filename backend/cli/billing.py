@@ -24,8 +24,8 @@ def demo(email):
     user = repos.UserRepo(db).get_by_kwargs(email=email)
     if not user:
         raise ValueError("User not found")
-    products = [
-        models.OrderItem(
+    subscriptions = [
+        models.Subscription(
             name="Foobar", quantity=10, price=3000, description="Team subscription"
         )
     ]
@@ -43,7 +43,7 @@ def demo(email):
     invoice = models.Invoice(
         user_id=user.id,
         customer=person,
-        products=products,
+        subscriptions=subscriptions,
     )
 
     invoice_db = billing_repo.create(invoice)

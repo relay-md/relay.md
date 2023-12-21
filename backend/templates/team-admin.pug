@@ -115,51 +115,57 @@ td.has-text-light
      {% if documents | length == size %}
      a.pagination-next(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page+1) |safe}}") Next Page
      {% endif %}
-     table.table
-      thead
-       tr
-        th
-         span.icon
-          i.fas.fa-user
-        td
-        td(data-tooltip="Read")
-         i.fas.fa-glasses
-        td(data-tooltip="Post")
-         i.fas.fa-pencil
-        td(data-tooltip="Modify")
-         i.fas.fa-edit
-        td(data-tooltip="Create Topics")
-         i.fas.fa-plus
-        td(data-tooltip="Invite")
-         i.fas.fa-user-plus
-        td(data-tooltip="Reset to Team permissions")
-         i.fas.fa-redo
-        td
-        td(data-tooltip="Remove")
-          i.fas.fa-trash
-      {% for member in members %}
+    table.table
+     thead
       tr
-       td {{member.user.username}}
+       th
+        span.icon
+         i.fas.fa-user
        td
-       {{ member_permissions(member) }}
+       td(data-tooltip="Read")
+        i.fas.fa-glasses
+       td(data-tooltip="Post")
+        i.fas.fa-pencil
+       td(data-tooltip="Modify")
+        i.fas.fa-edit
+       td(data-tooltip="Create Topics")
+        i.fas.fa-plus
+       td(data-tooltip="Invite")
+        i.fas.fa-user-plus
+       td(data-tooltip="Reset to Team permissions")
+        i.fas.fa-redo
        td
-       td
-        a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
-         span.icon.is-small
-          i.fas.fa-trash
-      {% endfor %}
-     {% else %}
-     p No members have joined yet.
-     {% endif %}
+       td(data-tooltip="Remove")
+         i.fas.fa-trash
+     {% for member in members %}
+     tr
+      td {{member.user.username}}
+      td
+      {{ member_permissions(member) }}
+      td
+      td
+       a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
+        span.icon.is-small
+         i.fas.fa-trash
+     {% endfor %}
+    {% else %}
+    p No members have joined yet.
+    {% endif %}
 
    .section
     .block.title.is-3 Invite Users
-    .subtitle.is-5 Add others to your team
+    .subtitle.is-5.mb-0 Add others to your team
+    .subtitle.is-7.mt-0 *Adding members to your team will result in additional costs!
     .control.has-icons-left
-     input.input(type="tags" id="invite-users" name="name" hx-post="settings/user/search" hx-trigger="input changed delay:500ms, search" hx-target="#users")
+     input.input(type="tags" id="invite-users" name="name" hx-post="{{url_for('settings_user_search', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#users")
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
+
+   .section
+    .block.title.is-3 Billing Details
+    .subtitle.is-5
+
 
    {% if not team.is_active %}
    .section.box.is-danger

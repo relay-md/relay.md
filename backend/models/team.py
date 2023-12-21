@@ -48,7 +48,7 @@ class Team(Base):
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
     name: Mapped[str] = mapped_column(String(32))
-    headline: Mapped[str] = mapped_column(String(64))
+    headline: Mapped[str] = mapped_column(String(64), default="", nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     owner_permissions: Mapped[int] = mapped_column(
@@ -111,4 +111,4 @@ class Team(Base):
 
     @staticmethod
     def validate_team_name(name):
-        return re.match("^[\w-]+$", name)  # noqa
+        return re.match("^[\w.-]+$", name)  # noqa

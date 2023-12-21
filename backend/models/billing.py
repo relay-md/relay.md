@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import Enum, ForeignKey, String, Text
+from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -19,18 +19,20 @@ class InvoiceStatus(enum.Enum):
     EXPIRED = "expired"
 
 
-class OrderItem(Base):
-    __tablename__ = "billing_product"
+class Subscription(Base):
+    __tablename__ = "billing_subscription"
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
     # Reference to the invoice
     invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("billing_invoice.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow())
 
     # E.g. Team Subscription
     name: Mapped[str] = mapped_column(String(64))
     # E.g. Name
     description: Mapped[str] = mapped_column(String(64))
+    # e.g. number of team members!
     quantity: Mapped[int] = mapped_column()
     price: Mapped[int] = mapped_column()
 
@@ -40,6 +42,9 @@ class OrderItem(Base):
 
     # Internal id for corresponding stripe product
     stripe_key: Mapped[str] = mapped_column(String(32))
+    stripe_subscription_id: Mapped[str] = mapped_column(String(32), nullable=True)
+
+    invoice: Mapped["Invoice"] = relationship(back_populates="subscriptions")  # noqa
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, quantity={self.quantity}, price={self.price})"
@@ -95,11 +100,11 @@ class Invoice(Base):
 
     user: Mapped[User] = relationship()
     customer: Mapped[PersonalInformation] = relationship()
-    products: Mapped[List[OrderItem]] = relationship()
+    subscriptions: Mapped[List[Subscription]] = relationship()
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(customer={self.customer},products={self.products})"
+        return f"{self.__class__.__name__}(customer={self.customer},subscriptions={self.subscriptions})"
 
     @property
     def total_amount(self):
-        return sum([x.quantity * x.price for x in self.products])
+        return sum([x.quantity * x.price for x in self.subscriptions])
