@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import secrets
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from starlette.responses import HTMLResponse
 
 from ..config import Settings, get_config
@@ -14,29 +12,10 @@ from ..exceptions import BadRequest
 from ..repos.billing import InvoiceRepo
 from ..repos.user import User
 from ..templates import templates
+from ..utils.http import required_basic_auth
 from ..utils.user import get_optional_user
 
 router = APIRouter(prefix="/payment")
-security = HTTPBasic()
-
-
-def required_webhook_basic_auth(credentials: HTTPBasicCredentials = Depends(security)):
-    forbidden = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect credentials",
-        headers={"WWW-Authenticate": "Basic"},
-    )
-    allowed = get_config().PAYMENT_BASIC_AUTH_WHITELIST
-    allowed_set = list(filter(lambda x: x[0] == credentials.username, allowed))
-    if not allowed_set:
-        raise forbidden
-    allowed_set = allowed_set[0]
-    credentials.password.encode("utf8")
-    if not secrets.compare_digest(
-        credentials.password.encode("utf8"), allowed_set[1].encode("utf8")
-    ):
-        raise forbidden
-    return credentials.username
 
 
 @router.get(
@@ -128,7 +107,7 @@ async def stripe_webhook(
     request: Request,
     config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
-    username: str = Depends(required_webhook_basic_auth),
+    username: str = Depends(required_basic_auth),
 ):
     invoice_repo = InvoiceRepo(db)
     try:

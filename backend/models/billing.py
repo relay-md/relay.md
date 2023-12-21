@@ -50,6 +50,13 @@ class PersonalInformation(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
     )
+
+    # TODO: at some point, we want to link this to the user so we can present it
+    # when changing subscription
+    #
+    # user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
+    # user: Mapped[User] = relationship()
+
     name: Mapped[str] = mapped_column(String(128))
     email: Mapped[str] = mapped_column(String(128))
     # Address
