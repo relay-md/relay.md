@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
+from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Query, Request
@@ -17,8 +17,8 @@ from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
 from ..templates import templates
 from ..utils.dates import (
-    percentage_of_current_month,
-    percentage_of_current_year,
+    percentage_of_period_month,
+    percentage_of_period_year,
 )
 from ..utils.team import get_team
 from ..utils.user import User, require_user
@@ -229,20 +229,22 @@ async def settings_user_search(
     users = list(user_repo.search_username(name, limit=5))
 
     def user_invite_link(user, team):
-        if not team.subscriptions:
+        if not team.paid_until:
             raise exceptions.BadRequest("There is no subscription for this team!")
         subscription = team.subscriptions[0]
         if subscription.is_yearly:
             price = get_config().PRICING_TEAM_YEARLY
             price_interval = "year"
             price_period = round(
-                (1 - percentage_of_current_year(datetime.utcnow())) * price, 2
+                (1 - percentage_of_period_year(date.today(), team.paid_until)) * price,
+                2,
             )
         else:
             price = get_config().PRICING_TEAM_MONTHLY
             price_interval = "month"
             price_period = round(
-                (1 - percentage_of_current_month(datetime.utcnow())) * price, 2
+                (1 - percentage_of_period_month(date.today(), team.paid_until)) * price,
+                2,
             )
         return f"""
             <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">

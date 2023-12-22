@@ -81,7 +81,11 @@ td.has-text-light
      .field-label.is-normal Hide Team
      .field-body
       .control
-       input.switch(id="hide_team" checked="{{'checked' if team.hide else ''}}" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+       {% if team.hide %}
+       input.switch(id="hide_team" checked="checked" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+       {% else %}
+       input.switch(id="hide_team" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+       {% endif %}
        label(for="hide_team")
        span(id="updated_team_hide")
 
