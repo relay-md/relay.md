@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.16.0 (2023-12-22)
+### Feature
+* **seats:** Implement seats for subscription ([`7a3e53a`](https://github.com/knowledgemd/backend/commit/7a3e53aa08da311c6cb623cb2f67e14a500f5f5d))
+
+### Fix
+* Unittests ([`9c1bbf8`](https://github.com/knowledgemd/backend/commit/9c1bbf8442ca94aeceecc2233dd04090b09be518))
+* **billing:** Properly deal with subscription periods ([`9b50715`](https://github.com/knowledgemd/backend/commit/9b507156aff61556beb80387f5b8f05d72818235))
+
 ## v0.15.0 (2023-12-22)
 ### Feature
 * **contact form:** Add a contact form ([`5af5d80`](https://github.com/knowledgemd/backend/commit/5af5d80b29f352e82ed370f7c85cbd568d6e3ce5))
