@@ -11,6 +11,7 @@ from .config import get_config
 from .database import Base, engine
 from .routes import (
     billing,
+    contact,
     document,
     home,
     login,
@@ -47,6 +48,7 @@ app.include_router(teams.router)
 app.include_router(topic.router)
 app.include_router(billing.router)
 app.include_router(stripe.router)
+app.include_router(contact.router)
 
 # TODO:
 # exception handling:

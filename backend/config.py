@@ -37,11 +37,12 @@ class Settings(BaseSettings):
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
     MAIL_PORT: int = 587
-    MAIL_SERVER: str = "smtp.mailgun.org"
+    MAIL_SERVER: str = "mail.chainsquad.com"
     MAIL_STARTTLS: bool = True
     MAIL_SSL_TLS: bool = False
     # MAIL_DEBUG: bool = False
-    MAIL_FROM: str = "noreply@example.com"
+    MAIL_FROM: str = "noreply@relay.md"
+    MAIL_ADMIN: str = "fabian@relay.md"
 
     # Oauth Client data
     GITHUB_CLIENT_ID: Optional[str]

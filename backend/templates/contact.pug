@@ -1,0 +1,24 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5.mb-5
+.section
+  .container.has-text-centered
+  .columns.is-8.is-variable
+    .column.is-two-thirds.has-text-left
+      h1.title.is-1 Contact Us
+      p.is-size-4.block We would love to hear from you! If you have any questions, feedback, or inquiries, please don&apos;t hesitate to reach out to us.
+      p.is-size-4.block Our team is here to assist you and provide any assistance you may need. Feel free to use the contact information below or fill out the contact form, and we&apos;ll get back to you as soon as possible.
+    .column.is-one-third.has-text-left
+      form.box.p-5(method='POST' hx-post="{{url_for('contact_post')}}")
+        label.is-block.mb-4
+          span.is-block.mb-2 Your name
+          input.input(name='name' type='text' placeholder='Joe Krueger' value="{{user.name if user else ''}}")
+        label.is-block.mb-4
+          span.is-block.mb-2 Email address
+          input.input(required='' name='email' type='email' placeholder='joe.krueger@example.com' value="{{user.email if user else ''}}")
+        label.is-block.mb-4
+          span.is-block.mb-2 Message
+          textarea.textarea(name='message' rows='3' placeholder="Tell us what you're thinking about...")
+        .mb-4
+          button.button.is-link.px-4(type='submit') Contact Us
+{% endblock %}
