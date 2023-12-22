@@ -46,8 +46,8 @@ async def join(
     db: Session = Depends(get_session),
 ):
     repo = UserTeamRepo(db)
-    if team.is_private:
-        raise exceptions.NotAllowed(f"Team {team.name} is private!")
+    if not team.can(Permissions.can_join, user):
+        raise exceptions.NotAllowed(f"You are not allowed to join team {team_name}!")
     repo.add_member(user_id=user.id, team_id=team.id)
     return RedirectResponse(url=request.url_for("show_team", team_name=team_name))
 

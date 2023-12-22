@@ -47,24 +47,25 @@ def check_document_read_permissions(
             )
 
 
-def check_document_write_permissions(
-    db: Session, user: User, shareables: Shareables, action: str
-):
+def check_document_post_permissions(db: Session, user: User, shareables: Shareables):
     user_repo = UserRepo(db)
     for team_topic in shareables.team_topics:
         team = team_topic.team
         membership = user_repo.is_member(user, team_topic.team)
 
-        if action == "post-document" and not team.can(
-            Permissions.can_post, user, membership
-        ):
+        if not team.can(Permissions.can_post, user, membership):
             raise exceptions.NotAllowed(
                 f"You are not allowed to post to {team_topic.team}!"
             )
 
-        if action == "modify-document" and not team.can(
-            Permissions.can_modify, user, membership
-        ):
+
+def check_document_modify_permissions(db: Session, user: User, shareables: Shareables):
+    user_repo = UserRepo(db)
+    for team_topic in shareables.team_topics:
+        team = team_topic.team
+        membership = user_repo.is_member(user, team_topic.team)
+
+        if not team.can(Permissions.can_modify, user, membership):
             raise exceptions.NotAllowed(
                 f"You are not allowed to post to {team_topic.team}!"
             )

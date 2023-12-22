@@ -27,8 +27,9 @@ from ..schema import (
     VersionResponse,
 )
 from ..utils.document import (
+    check_document_modify_permissions,
+    check_document_post_permissions,
     check_document_read_permissions,
-    check_document_write_permissions,
     get_shareables,
     get_title_from_body,
 )
@@ -170,7 +171,7 @@ async def post_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
-    check_document_write_permissions(db, user, shareables, "post-document")
+    check_document_post_permissions(db, user, shareables)
 
     # if the document already has an id, let's raise
     if front.relay_document:
@@ -267,7 +268,7 @@ async def put_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
-    check_document_write_permissions(db, user, shareables, "modify-document")
+    check_document_modify_permissions(db, user, shareables)
 
     document_repo.update(
         document,
