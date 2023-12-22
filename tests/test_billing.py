@@ -116,10 +116,11 @@ def test_create_invoice(
             price=3000,
             description="Foobar",
             team_id=team.id,
-            stripe_key="team-yearly",
+            stripe=models.StripeSubscription(stripe_key="team-yearly"),
         )
     ]
     person = models.PersonalInformation(
+        user_id=account.id,
         name="Fabian Schuh",
         email="fabian@chainsquad.com",
         address_line1="Address 13, 24 Foobar",
