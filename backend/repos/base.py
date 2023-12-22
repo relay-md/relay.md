@@ -3,7 +3,7 @@ import abc
 from typing import List, TypeVar, Union
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
 from ..database import Session
@@ -91,3 +91,8 @@ class DatabaseAbstractRepository(AbstractRepository):
             return
         self._db.delete(item)
         self._db.commit()
+
+    def count(self, **kwargs):
+        return self._db.scalar(
+            select(func.count(self.ORM_Model.id)).filter_by(**kwargs)
+        )

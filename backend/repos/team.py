@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import func, select
 
+from ..models.billing import Subscription
 from ..models.team import Team
 from ..models.user_team import UserTeam
 from .base import DatabaseAbstractRepository
@@ -31,3 +32,10 @@ class TeamRepo(DatabaseAbstractRepository):
             .group_by(Team.id)
             .order_by(member_count.desc())
         )
+
+    def update_seats(self, team: Team, subscription: Subscription, new_seats: int):
+        from .billing import SubscriptionRepo
+
+        subscription_repo = SubscriptionRepo(self._db)
+        subscription_repo.update_quantity(subscription, new_seats)
+        self.update(team, seats=new_seats)

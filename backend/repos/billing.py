@@ -169,7 +169,7 @@ class SubscriptionRepo(DatabaseAbstractRepository):
     def update_quantity(self, subscription: Subscription, new_quantity):
         self.update(subscription, quantity=new_quantity)
 
-        if not subscription.stripe:
+        if not subscription.stripe or not subscription.stripe.stripe_subscription_id:
             log.error(f"Subscription {subscription.id} has no relation to stripe!")
             return subscription
 

@@ -93,6 +93,8 @@ async def invite_user(
             f"You are not allowed to invite to team {team_name}!"
         )
     user_team_repo = UserTeamRepo(db)
+    if user_team_repo.count(team_id=team.id) >= team.seats:
+        raise exceptions.NotAllowed("No seats left.")
     # only add if not already added
     if not user_team_repo.get_by_kwargs(user_id=new_user.id, team_id=team.id):
         user_team_repo.add_member(user_id=new_user.id, team_id=team.id)
@@ -335,6 +337,24 @@ async def update_team_hide(
         return """<p id="validate-team-name" class="help is-danger">You cannot update the headline!</p>"""
     team_repo.update(team, hide=hide)
     return """<p id="validate-team-name" class="help is-success">Team updated!</p>"""
+
+
+@router.post("/{team_name}/seats", response_class=PlainTextResponse)
+async def update_team_seats(
+    request: Request,
+    seats: int = Form(default=0),
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    subscription_repo = SubscriptionRepo(db)
+    subscription = subscription_repo.get_latest_subscription_for_team_id(team.id)
+    if not subscription:
+        return """<p id="validate-team-name" class="help is-danger">No Subscription available, cannot set seats!</p>"""
+    team_repo.update_seats(team, subscription, seats)
+    return """<p id="validate-team-name" class="help is-success">Seats updated!</p>"""
 
 
 @router.get("/{team_name}/billing")
