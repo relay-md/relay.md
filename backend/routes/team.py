@@ -308,6 +308,22 @@ async def update_team_headline(
     )
 
 
+@router.post("/{team_name}/toggle/hide", response_class=PlainTextResponse)
+async def update_team_hide(
+    request: Request,
+    hide: bool = Form(default=False),
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    if not team.user_id == user.id:
+        return """<p id="validate-team-name" class="help is-danger">You cannot update the headline!</p>"""
+    team_repo.update(team, hide=hide)
+    return """<p id="validate-team-name" class="help is-success">Team updated!</p>"""
+
+
 @router.get("/{team_name}/billing")
 async def team_billing(
     request: Request,

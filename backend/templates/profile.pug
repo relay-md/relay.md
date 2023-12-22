@@ -38,14 +38,19 @@ section.hero.is-link
  section.section
   .title API
   .subtitle Access Token
-  table.table
-   {% for access_token in user.access_tokens %}
-   tr
-    td
-     span.icon-text
-      span.icon
-       i.fas.fa-key
-      span
-       tt {{access_token.token}}
-   {% endfor %}
+  {% for access_token in user.access_tokens %}
+  .media.box
+   .media-left
+    span.icon-text
+     span.icon
+      i.fas.fa-key
+   .media-content
+    .content
+     p.mb-0
+      tt
+       strong {{access_token.token}}
+     p.mt-0
+      small Last Used: &nbsp; {{access_token.latest_document_at }}
+  {% endfor %}
+
 {% endblock %}

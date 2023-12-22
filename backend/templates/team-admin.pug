@@ -62,17 +62,27 @@ td.has-text-light
     {% endif %}
 
    .section
-    .title.is-1 Headline
-    .subtitle Brief description of your team
-    .field
-     .control.has-icons-left
-      input.input#team_name(type="string" placeholder="Description" name="headline" hx-post="{{url_for('update_team_headline', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#updated_team_headline")
-      span.icon.is-left
-       i.fas.fa-expand
-     p(id="updated_team_headline")
+    .title.is-3 Team Settings
+
+    .field.is-horizontal
+      .field-label.is-normal Description/Headline
+      .field-body
+        .control.has-icons-left
+          input.input#team_name(type="string" placeholder="Description" name="headline" hx-post="{{url_for('update_team_headline', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#updated_team_headline")
+          span.icon.is-left
+           i.fas.fa-expand
+        span(id="updated_team_headline")
+
+    .field.is-horizontal
+     .field-label.is-normal Hide Team
+     .field-body
+      .control
+       input.switch(id="hide_team" checked="{{'checked' if team.hide else ''}}" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+       label(for="hide_team")
+       span(id="updated_team_hide")
 
    .section
-    .block.title.is-3 Permissions
+    .title.is-3 Permissions
     .subtitle.is-5 Customize Team Permissions
     p.block Click the check marks/crosses to flip the corresponding permission.
     table.table.block
@@ -101,7 +111,7 @@ td.has-text-light
        {{permissions("public", team.public_permissions)}}
 
    .section
-    .block.title.is-3 Members
+    .title.is-3 Members
     .subtitle.is-5 List of users subscribed to your team
     p.block
      |Customize your members permissions. By default,&nbsp;
@@ -152,7 +162,7 @@ td.has-text-light
     {% endif %}
 
    .section
-    .block.title.is-3 Invite Users
+    .title.is-3 Invite Users
     .subtitle.is-5.mb-0 Add others to your team
     .subtitle.is-7.mt-0 *Adding members to your team will result in additional costs!
     .control.has-icons-left
@@ -162,7 +172,7 @@ td.has-text-light
     div(id="users")
 
    .section.box
-    .block.title.is-3 Subscription
+    .title.is-3 Subscription
     .subtitle.is-5
     table.table.mb-0
      thead

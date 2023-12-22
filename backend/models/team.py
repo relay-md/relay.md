@@ -77,6 +77,9 @@ class Team(Base):
 
     paid_until: Mapped[date] = mapped_column(Date(), nullable=True)
 
+    # Should this be shown in directory listing teams?
+    hide: Mapped[bool] = mapped_column(default=False)
+
     @property
     def is_public(self):
         return self.public_permissions == 0
