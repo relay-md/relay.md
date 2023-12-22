@@ -8,6 +8,7 @@ from typing import List
 from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from ..config import get_config
 from ..database import Base
 from .user import User
 
@@ -38,10 +39,20 @@ class Subscription(Base):
 
     # In case this pays for a team, we link the team here
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team.id"), nullable=True)
-    team: Mapped["Team"] = relationship()  # noqa
+    team: Mapped["Team"] = relationship(back_populates="subscriptions")  # noqa
 
     invoice: Mapped["Invoice"] = relationship(back_populates="subscriptions")  # noqa
     stripe: Mapped["StripeSubscription"] = relationship()  # noqa
+
+    @property
+    def is_yearly(self):
+        if self.price == int(get_config().PRICING_TEAM_YEARLY * 100):
+            return True
+        return False
+
+    @property
+    def is_monthly(self):
+        return not self.is_yearly
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, quantity={self.quantity}, price={self.price})"

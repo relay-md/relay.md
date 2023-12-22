@@ -164,6 +164,10 @@ class SubscriptionRepo(DatabaseAbstractRepository):
     def update_quantity(self, subscription: Subscription, new_quantity):
         self.update(subscription, quantity=new_quantity)
 
+        if not subscription.stripe:
+            log.error(f"Subscription {subscription.id} has no relation to stripe!")
+            return subscription
+
         # FIXME: This is limiting us to 1 subscription per invoice!
         subscription_items = stripe.SubscriptionItem.list(
             subscription=subscription.stripe.stripe_subscription_id, limit=1
@@ -174,6 +178,7 @@ class SubscriptionRepo(DatabaseAbstractRepository):
             subscription_item["id"],
             quantity=new_quantity,
         )
+        return subscription
 
     def get_latest_subscription_for_team_id(self, team_id: UUID):
         return self._db.scalar(

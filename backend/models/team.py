@@ -71,6 +71,9 @@ class Team(Base):
     topics: Mapped[List["Topic"]] = relationship(  # noqa
         secondary="team_topics", back_populates="teams"
     )
+    subscriptions: Mapped[List["Subscription"]] = relationship(  # noqa
+        back_populates="team"
+    )
 
     paid_until: Mapped[date] = mapped_column(Date(), nullable=True)
 

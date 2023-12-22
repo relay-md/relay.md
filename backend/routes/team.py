@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Query, Request
@@ -14,6 +15,10 @@ from ..repos.team import Team, TeamRepo
 from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
 from ..templates import templates
+from ..utils.dates import (
+    percentage_of_current_month,
+    percentage_of_current_year,
+)
 from ..utils.team import get_team
 from ..utils.user import User, require_user
 
@@ -211,10 +216,22 @@ async def settings_user_search(
     user_repo = UserRepo(db)
     users = list(user_repo.search_username(name, limit=5))
 
-    def user_invite_link(user):
-        price_period = 14.23
-        price = 30
-        price_interval = "year"
+    def user_invite_link(user, team):
+        if not team.subscriptions:
+            raise exceptions.BadRequest("There is no subscription for this team!")
+        subscription = team.subscriptions[0]
+        if subscription.is_yearly:
+            price = get_config().PRICING_TEAM_YEARLY
+            price_interval = "year"
+            price_period = round(
+                (1 - percentage_of_current_year(datetime.utcnow())) * price, 2
+            )
+        else:
+            price = get_config().PRICING_TEAM_MONTHLY
+            price_interval = "month"
+            price_period = round(
+                (1 - percentage_of_current_month(datetime.utcnow())) * price, 2
+            )
         return f"""
             <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">
              <div class="list-item-image">
@@ -243,7 +260,7 @@ async def settings_user_search(
             </a>
         """
 
-    ret = "\n".join([user_invite_link(x) for x in users])
+    ret = "\n".join([user_invite_link(x, team) for x in users])
     return f"""
         <div class="list">
         {ret}

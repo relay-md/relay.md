@@ -161,19 +161,36 @@ td.has-text-light
       i.fas.fa-search
     div(id="users")
 
-   .section
+   .section.box
     .block.title.is-3 Subscription
     .subtitle.is-5
+    table.table.mb-0
+     thead
+      tr
+       th Date
+       th Invoice Name
+       th Description
+       th Quantity
+       th Price
+     tbody
+      {% for sub in team.subscriptions %}
+      tr
+        td {{sub.created_at.strftime("%Y-%m-%d") }}
+        td {{sub.name}}
+        td {{sub.description}}
+        td {{sub.quantity }}
+        td {{sub.price / 100}} €
+      {% endfor %}
+    p.help Find out more by logging into the&nbsp;
+     a(href=config.STRIPE_CUSTOMER_PORTAL_URL) Customer Portal.
 
-   {% if not team.can_upgrade %}
-   .section.box.is-danger
-    .block.title.is-3 Membership
+    {% if team.can_upgrade %}
     .subtitle.is-5 Upgrade to Private Member
     a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
      span.icon.is-medium
       🎉
      span Upgrade to Private Team
     div(id="users")
-   {% endif %}
+    {% endif %}
 
 {% endblock %}
