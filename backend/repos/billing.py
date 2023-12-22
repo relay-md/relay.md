@@ -14,7 +14,6 @@ from ..models.billing import (
     PersonalInformation,
     Subscription,
 )
-from ..utils.dates import last_day_of_month
 from .base import DatabaseAbstractRepository
 from .stripe import StripeCustomerRepo, StripeSubscriptionRepo
 from .team import TeamRepo
@@ -132,10 +131,11 @@ class InvoiceRepo(DatabaseAbstractRepository):
             # Store the subscruption id
             if subscription.team_id:
                 log.info(f" Team {subscription.team.name} was just paid successfully")
-                months = subscription.quantity
-                # always fill next month
                 now = datetime.utcnow()
-                paid_until = last_day_of_month(now + timedelta(days=months * 30))
+                if subscription.is_yearly:
+                    paid_until = now + timedelta(days=365)
+                else:
+                    paid_until = now + timedelta(days=30)
                 team_repo.update(subscription.team, paid_until=paid_until)
         return self.update(
             invoice, payment_status=InvoiceStatus.COMPLETED, paid_at=datetime.utcnow()
@@ -169,7 +169,7 @@ class SubscriptionRepo(DatabaseAbstractRepository):
     def update_quantity(self, subscription: Subscription, new_quantity):
         self.update(subscription, quantity=new_quantity)
 
-        if not subscription.stripe:
+        if not subscription.stripe or not subscription.stripe.stripe_subscription_id:
             log.error(f"Subscription {subscription.id} has no relation to stripe!")
             return subscription
 

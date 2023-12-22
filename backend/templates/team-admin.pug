@@ -81,7 +81,11 @@ td.has-text-light
      .field-label.is-normal Hide Team
      .field-body
       .control
-       input.switch(id="hide_team" checked="{{'checked' if team.hide else ''}}" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+       {% if team.hide %}
+       input.switch(id="hide_team" checked="checked" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+       {% else %}
+       input.switch(id="hide_team" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+       {% endif %}
        label(for="hide_team")
        span(id="updated_team_hide")
 
@@ -169,7 +173,9 @@ td.has-text-light
    .section
     .title.is-3 Invite Users
     .subtitle.is-5.mb-0 Add others to your team
-    .subtitle.is-7.mt-0 *Adding members to your team will result in additional costs!
+    .subtitle.is-7 You have&nbsp;
+     strong {{team.seats}}
+     |&nbsp;in your subscription
     .control.has-icons-left
      input.input(type="tags" id="invite-users" name="name" hx-post="{{url_for('settings_user_search', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#users")
      span.icon.is-left
@@ -179,7 +185,19 @@ td.has-text-light
 
    .section.box
     .title.is-3 Subscription
+    .subtitle.is-7 *Adding seats to your team will result in additional costs!
     {% if team.is_paid %}
+    form(hx-post="{{url_for('update_team_seats', team_name=team.name)}}" hx-target="#updated_team_seats")
+     .field.has-addons
+      .field-label.is-normal No. Seats
+      .field-body
+       .control
+        input.input(id="seats_team" value="{{team.seats | default(0)}}" type="number" name="seats")
+        label(for="seats_team")
+       .control
+        button.button.is-primary Ok
+       span(id="updated_team_seats")
+
     .subtitle.is-5
     table.table.mb-0
      thead

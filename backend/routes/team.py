@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
+from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Query, Request
@@ -17,8 +17,8 @@ from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
 from ..templates import templates
 from ..utils.dates import (
-    percentage_of_current_month,
-    percentage_of_current_year,
+    percentage_of_period_month,
+    percentage_of_period_year,
 )
 from ..utils.team import get_team
 from ..utils.user import User, require_user
@@ -93,6 +93,8 @@ async def invite_user(
             f"You are not allowed to invite to team {team_name}!"
         )
     user_team_repo = UserTeamRepo(db)
+    if user_team_repo.count(team_id=team.id) >= team.seats:
+        raise exceptions.NotAllowed("No seats left.")
     # only add if not already added
     if not user_team_repo.get_by_kwargs(user_id=new_user.id, team_id=team.id):
         user_team_repo.add_member(user_id=new_user.id, team_id=team.id)
@@ -229,20 +231,22 @@ async def settings_user_search(
     users = list(user_repo.search_username(name, limit=5))
 
     def user_invite_link(user, team):
-        if not team.subscriptions:
+        if not team.paid_until:
             raise exceptions.BadRequest("There is no subscription for this team!")
         subscription = team.subscriptions[0]
         if subscription.is_yearly:
             price = get_config().PRICING_TEAM_YEARLY
             price_interval = "year"
             price_period = round(
-                (1 - percentage_of_current_year(datetime.utcnow())) * price, 2
+                (1 - percentage_of_period_year(date.today(), team.paid_until)) * price,
+                2,
             )
         else:
             price = get_config().PRICING_TEAM_MONTHLY
             price_interval = "month"
             price_period = round(
-                (1 - percentage_of_current_month(datetime.utcnow())) * price, 2
+                (1 - percentage_of_period_month(date.today(), team.paid_until)) * price,
+                2,
             )
         return f"""
             <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">
@@ -333,6 +337,24 @@ async def update_team_hide(
         return """<p id="validate-team-name" class="help is-danger">You cannot update the headline!</p>"""
     team_repo.update(team, hide=hide)
     return """<p id="validate-team-name" class="help is-success">Team updated!</p>"""
+
+
+@router.post("/{team_name}/seats", response_class=PlainTextResponse)
+async def update_team_seats(
+    request: Request,
+    seats: int = Form(default=0),
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    subscription_repo = SubscriptionRepo(db)
+    subscription = subscription_repo.get_latest_subscription_for_team_id(team.id)
+    if not subscription:
+        return """<p id="validate-team-name" class="help is-danger">No Subscription available, cannot set seats!</p>"""
+    team_repo.update_seats(team, subscription, seats)
+    return """<p id="validate-team-name" class="help is-success">Seats updated!</p>"""
 
 
 @router.get("/{team_name}/billing")

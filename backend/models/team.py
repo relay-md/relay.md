@@ -6,7 +6,7 @@ import uuid
 from datetime import date, datetime
 from typing import List
 
-from sqlalchemy import Date, ForeignKey, String
+from sqlalchemy import Date, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -76,6 +76,7 @@ class Team(Base):
     )
 
     paid_until: Mapped[date] = mapped_column(Date(), nullable=True)
+    seats: Mapped[int] = mapped_column(Integer(), default=0)
 
     # Should this be shown in directory listing teams?
     hide: Mapped[bool] = mapped_column(default=False)
