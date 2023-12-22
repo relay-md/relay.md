@@ -25,6 +25,10 @@ table.table
     {% else %}
     i.fa.fa-times
     {% endif %}
+   {% if not team.is_paid and type == "public" and perm.name in ["can_read", "can_post"] %}
+   span.icon(data-tooltip="Disabling this permission requires a paid permission").has-text-info.is-small
+    i.fas.fa-exclamation
+   {% endif %}
  {% endfor %}
 {% endmacro %}
 
@@ -57,7 +61,7 @@ td.has-text-light
   .column.is-8.is-offset-2
    .section
     .title.is-1 {{team.name}}
-    {% if team.paid %}
+    {% if team.is_paid %}
     .subtitle paid until {{team.paid_until}}
     {% endif %}
 
@@ -161,6 +165,7 @@ td.has-text-light
     p No members have joined yet.
     {% endif %}
 
+   {% if team.is_paid %}
    .section
     .title.is-3 Invite Users
     .subtitle.is-5.mb-0 Add others to your team
@@ -170,9 +175,11 @@ td.has-text-light
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
+   {% endif %}
 
    .section.box
     .title.is-3 Subscription
+    {% if team.is_paid %}
     .subtitle.is-5
     table.table.mb-0
      thead
@@ -209,6 +216,7 @@ td.has-text-light
      span.icon.is-medium
       i.fas.fa-skull
      span Cancel Subscription
+    {% endif %}
 
     {% if team.can_upgrade %}
     .subtitle.is-5 Upgrade to Private Member

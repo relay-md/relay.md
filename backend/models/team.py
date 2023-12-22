@@ -25,6 +25,7 @@ DEFAULT_OWNER_PERMISSIONS = (
     | OwnerPermissions.can_modify
     | OwnerPermissions.can_create_topics
     | OwnerPermissions.can_invite
+    | OwnerPermissions.can_join
 )
 
 DEFAULT_MEMBER_PERMISSIONS = (
@@ -32,7 +33,6 @@ DEFAULT_MEMBER_PERMISSIONS = (
     | MemberPermissions.can_post
     | MemberPermissions.can_modify
     | MemberPermissions.can_create_topics
-    | MemberPermissions.can_invite
 )
 
 DEFAULT_PUBLIC_PERMISSIONS = PublicPermissions.can_read | PublicPermissions.can_join
@@ -82,7 +82,7 @@ class Team(Base):
 
     @property
     def is_public(self):
-        return self.public_permissions == 0
+        return self.public_permissions & (Permissions.can_read | Permissions.can_post)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.name}>"
