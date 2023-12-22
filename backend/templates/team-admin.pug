@@ -57,7 +57,7 @@ td.has-text-light
   .column.is-8.is-offset-2
    .section
     .title.is-1 {{team.name}}
-    {% if team.is_active %}
+    {% if team.paid %}
     .subtitle paid until {{team.paid_until}}
     {% endif %}
 
@@ -99,7 +99,6 @@ td.has-text-light
        {{permissions("member", team.member_permissions)}}
       td
        {{permissions("public", team.public_permissions)}}
-
 
    .section
     .block.title.is-3 Members
@@ -163,11 +162,10 @@ td.has-text-light
     div(id="users")
 
    .section
-    .block.title.is-3 Billing Details
+    .block.title.is-3 Subscription
     .subtitle.is-5
 
-
-   {% if not team.is_active %}
+   {% if not team.can_upgrade %}
    .section.box.is-danger
     .block.title.is-3 Membership
     .subtitle.is-5 Upgrade to Private Member

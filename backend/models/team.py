@@ -75,18 +75,20 @@ class Team(Base):
     paid_until: Mapped[date] = mapped_column(Date(), nullable=True)
 
     @property
-    def is_private(self):
-        return self.public_permissions == 0
-
-    @property
     def is_public(self):
-        return self.public_permissions != 0
+        return self.public_permissions == 0
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.name}>"
 
     @property
-    def is_active(self):
+    def can_upgrade(self):
+        """Is the team paid? Else, if becomes inactive, no posting, reading
+        etc.."""
+        return not self.is_paid
+
+    @property
+    def is_paid(self):
         """Is the team paid? Else, if becomes inactive, no posting, reading
         etc.."""
         if not self.paid_until:

@@ -92,7 +92,7 @@ def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Share
             # becomes public!
             topic, team = to.split("@")
             team_topic = team_topic_repo.from_string(to, user)
-            if team_topic.team.is_public:
+            if team_topic.team.public_permissions & Permissions.can_read:
                 is_public = True
             team_topics.append(team_topic)
     return Shareables(team_topics=team_topics, users=users, is_public=is_public)
