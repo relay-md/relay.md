@@ -1,3 +1,8 @@
+@font-face {
+    font-family: lato-regular;
+    src: url('/static/fonts/Lato-Regular.ttf');
+}
+
 :root {
     --brandColor: hsl(166, 67%, 51%);
     --background: rgb(247, 247, 247);
@@ -9,6 +14,6 @@ body {
     background: var(--background);
     height: 100vh;
     color: var(--textDark);
-    font-family: 'Lato', sans-serif;
+    font-family: lato-regular, sans-serif;
     font-weight: 400;
 }

@@ -1,7 +1,7 @@
-{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 {% if user %}
-{% include "get-document.html" %}
+{% include "get-document.pug" %}
 {% endif %}
 {% include "features.pug" %}
 {% include "howitworks.pug" %}

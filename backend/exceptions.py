@@ -109,7 +109,7 @@ async def web_handle_exception(
 ):
     # required for top
     user = None
-    return templates.TemplateResponse("exception.html", context=dict(**locals()))
+    return templates.TemplateResponse("exception.pug", context=dict(**locals()))
 
 
 async def web_unhandled_exception(
@@ -119,9 +119,7 @@ async def web_unhandled_exception(
     config: Settings = Depends(get_config),
 ):
     # required for top
-    return templates.TemplateResponse(
-        "exception-unhandled.html", context=dict(**locals())
-    )
+    return templates.TemplateResponse("exception.pug", context=dict(**locals()))
 
 
 async def redirect_to_login(

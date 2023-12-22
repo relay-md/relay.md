@@ -1,0 +1,39 @@
+footer.footer
+  .container
+    .columns
+      .column.is-4
+        .block
+          a(href='/')
+           img(src="{{ url_for('static', path='img/logo-navbar.svg') }}" width='64')
+          .title.is-5 Relay.md
+          .sub-title.is-3 Markdown workflows for teams
+        .block
+          span.icon
+            a(target='_blank' href='https://github.com/relay-md/relay.md')
+              i.fab.fa-github
+          span.icon
+            a(target='_blank' href='mailto:fabian@relay.md')
+              i.fas.fa-envelope
+          span.icon
+            a(target='_blank' href='https://forum.obsidian.md/t/relay-md-sharing-documents-with-people-and-teams/72208')
+              i.fab.fa-discourse
+          span.icon
+            a(target='_blank' href='https://www.reddit.com/r/ObsidianMD/comments/187rq1k/relaymd_sharing_markdown_documents_with_people/')
+              i.fab.fa-reddit
+        .block
+          small(style='color: var(--textLight)') &copy; ChainSquad GmbH
+      .column.is-4
+        .title.is-5 Product
+        a.navbar-item.p-0(href='/#features') Features
+        a.navbar-item.p-0(href="{{url_for('relay_basics')}}") Basics
+        a.navbar-item.p-0(href="{{url_for('obsidian_plugin')}}") Plugin
+        {% if not config.ENABLE_EARLY_ACCESS or user%}
+        a.navbar-item.p-0(href="{{url_for('get_teams')}}") Teams
+        {%endif%}
+      .column.is-4
+        .title.is-5 Commercial
+        a.navbar-item.p-0(href="{{url_for('pricing')}}") Pricing
+        a.navbar-item.p-0(href="{{url_for('tos')}}/#tos") Terms of Service
+        a.navbar-item.p-0(href="{{url_for('tos')}}/#privacy") Privacy Policy
+        a.navbar-item.p-0(href="{{url_for('tos')}}/#imprint") Imprint
+      .column.is-4

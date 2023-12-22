@@ -68,7 +68,7 @@ class Settings(BaseSettings):
     STRIPE_WEBHOOK_SECRET: Optional[str] = ""
     STRIPE_RETURN_URL_SUCCESS: str = "https://relay.md/payment/success"
     STRIPE_RETURN_URL_CANCEL: str = "https://relay.md/payment/failed"
-    STRIPE_CUSTOMER_PORTAL_URL: Optional[str]
+    STRIPE_CUSTOMER_PORTAL_URL: Optional[str] = ""
 
     PRICING_TEAM_YEARLY: float = 30.0
     PRICING_TEAM_MONTHLY: float = 3.0

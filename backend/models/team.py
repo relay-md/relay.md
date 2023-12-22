@@ -88,7 +88,7 @@ class Team(Base):
     def can_upgrade(self):
         """Is the team paid? Else, if becomes inactive, no posting, reading
         etc.."""
-        return not self.is_paid
+        return not (self.is_paid and any([x.active for x in self.subscriptions]))
 
     @property
     def is_paid(self):

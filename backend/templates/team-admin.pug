@@ -50,7 +50,7 @@ td.has-text-light
   i.fa.fa-redo
 {% endmacro %}
 
-{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 .mt-5.mb-5
  .columns
@@ -167,22 +167,38 @@ td.has-text-light
     table.table.mb-0
      thead
       tr
+       th Active
        th Date
-       th Invoice Name
+       th Invoice
+       th Schedule
        th Description
        th Quantity
        th Price
      tbody
       {% for sub in team.subscriptions %}
-      tr
+      tr.is-success
+        {% if sub.active %}
+        td.has-text-success.icon-text
+         span.icon
+          i.fas.fa-check
+        {% else %}
+        td.has-text-dancer.icon-text
+         span.icon
+          i.fas.fa-times
+        {% endif %}
         td {{sub.created_at.strftime("%Y-%m-%d") }}
         td {{sub.name}}
+        td {{ "yearly" if sub.is_yearly else "monthly" }}
         td {{sub.description}}
         td {{sub.quantity }}
-        td {{sub.price / 100}} €
+        td {{sub.quantity * sub.price / 100}} €
       {% endfor %}
-    p.help Find out more by logging into the&nbsp;
+    p.help.block Find out more by logging into the&nbsp;
      a(href=config.STRIPE_CUSTOMER_PORTAL_URL) Customer Portal.
+    a.block.button.is-medium.is-danger.is-outlined(href="{{ url_for('cancel_subscription', team_name=team.name) }}")
+     span.icon.is-medium
+      i.fas.fa-skull
+     span Cancel Subscription
 
     {% if team.can_upgrade %}
     .subtitle.is-5 Upgrade to Private Member

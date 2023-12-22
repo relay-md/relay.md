@@ -9,7 +9,11 @@ from ..database import Session, get_session
 from ..exceptions import BadRequest, NotAllowed
 from ..models.billing import InvoiceStatus, Subscription
 from ..models.stripe import StripeSubscription
-from ..repos.billing import InvoiceRepo, PersonalInformationRepo
+from ..repos.billing import (
+    InvoiceRepo,
+    PersonalInformationRepo,
+    SubscriptionRepo,
+)
 from ..repos.team import Team, TeamRepo
 from ..templates import templates
 from ..utils.pricing import get_price
@@ -58,6 +62,9 @@ async def team_billing_post(
             url=request.url_for("settings", team_name=team_name),
             status_code=status.HTTP_302_FOUND,
         )
+
+    if SubscriptionRepo(db).get_by_kwargs(team_id=team.id, active=True):
+        raise BadRequest(f"Team {team.name} already has an active subscription!")
     price_total = get_price(yearly=yearly, private=True)
     if yearly:
         price_interval = "yearly"

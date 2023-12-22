@@ -66,6 +66,7 @@ class StripePayments(AbstractPaymentGateway):
             # promo-codes from stripe pov and needs no further implementation on
             # relay.md side!
             allow_promotion_codes=True,
+            proration_behavior="always_invoice",
         )
         return checkout_session
 
@@ -156,6 +157,10 @@ class SubscriptionRepo(DatabaseAbstractRepository):
         stripe_subscription_repo.update(stripe_subscription, stripe_subscription_id=id)
 
     def cancel_subscription(self, subscription: Subscription):
+        self.update(subscription, active=False)
+        if not subscription.stripe:
+            log.error(f"Subscription {subscription.id} has no relation to stripe!")
+            return subscription
         stripe.Subscription.modify(
             subscription.stripe.stripe_subscription_id,
             cancel_at_period_end=True,

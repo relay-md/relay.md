@@ -11,6 +11,7 @@ from .. import exceptions
 from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..models.permissions import Permissions
+from ..repos.billing import SubscriptionRepo
 from ..repos.team import Team, TeamRepo
 from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
@@ -316,3 +317,17 @@ async def team_billing(
     db: Session = Depends(get_session),
 ):
     return templates.TemplateResponse("pricing.pug", context=dict(**locals()))
+
+
+@router.get("/{team_name}/billing/subscription/cancel")
+async def cancel_subscription(
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    subscription_repo = SubscriptionRepo(db)
+    for subscription in team.subscriptions:
+        subscription_repo.cancel_subscription(subscription)
+    return RedirectResponse(url=request.url_for("settings", team_name=team.name))
