@@ -26,7 +26,7 @@ table.table
     i.fa.fa-times
     {% endif %}
    {% if not team.is_paid and type == "public" and perm.name in ["can_read", "can_post"] %}
-   span.icon(data-tooltip="Disabling this permission requires a paid permission").has-text-info.is-small
+   span.icon(data-tooltip="Disabling this permission requires a paid subscription").has-text-info.is-small
     i.fas.fa-exclamation
    {% endif %}
  {% endfor %}
