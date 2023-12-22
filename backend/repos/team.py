@@ -27,6 +27,6 @@ class TeamRepo(DatabaseAbstractRepository):
         return self._db.execute(
             select(Team, member_count)
             .outerjoin(UserTeam)
-            .group_by(UserTeam.team_id)
+            .group_by(Team.id)
             .order_by(member_count.desc())
         )

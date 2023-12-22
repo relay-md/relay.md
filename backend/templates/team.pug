@@ -54,7 +54,8 @@
     p.block
      span.tag.is-primary Subscribed
      span.tag Unsubscribed
-    {% if team.is_private %}
+    // TODO: might want to make this a different permission to be able to list topics!
+    {% if not team.can(Permissions.can_read, user, membership) %}
     span.is-italic confidential
     {% else %}
     {% for topic in team.topics %}
