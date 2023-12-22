@@ -7,7 +7,6 @@ import pytest
 
 from backend import models, repos
 from backend.models.billing import InvoiceStatus
-from backend.utils.dates import last_day_of_month
 
 
 @pytest.fixture
@@ -157,6 +156,4 @@ def test_create_invoice(
     assert invoice.payment_status == InvoiceStatus.COMPLETED
     dbsession.refresh(team)
 
-    assert team.paid_until == last_day_of_month(
-        datetime.utcnow() + timedelta(days=30 * 10)
-    )
+    assert team.paid_until == (datetime.utcnow() + timedelta(days=365)).date()
