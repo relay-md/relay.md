@@ -39,4 +39,4 @@ async def get_document_from_id(
     access_token = (
         request.session.get("access_token") or "empty"
     )  # in case no user exists
-    return templates.TemplateResponse("viewer.html", context=dict(**locals()))
+    return templates.TemplateResponse("viewer.pug", context=dict(**locals()))

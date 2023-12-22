@@ -1,0 +1,19 @@
+section.hero.is-info
+  .hero-body
+    .container
+      .card
+        header.card-header
+          p.card-header-title
+            | DocumentID Search
+        .card-content
+          .content
+            form(action="{{url_for('get_document')}}" method='POST')
+              .field.has-addons
+                .control.has-icons-left.has-icons-right.is-expanded
+                  input.input.is-large(type='search' placeholder='c62089b7-328d-4325-bcb0-91772ca435dd' name='id')
+                  span.icon.is-medium.is-left
+                    i.fas.fa-file-search
+                .control
+                  button.button.is-link.is-large(type='submit')
+                    span.icon.is-small
+                      i.fas.fa-search

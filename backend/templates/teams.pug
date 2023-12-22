@@ -1,4 +1,4 @@
-{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 .mt-5.mb-5
  .columns
@@ -6,103 +6,36 @@
    h1.title.is-1 Team Overview
    p.block You can subscribe to individual topics of each team by clicking the topic. You will get new documents in those topics into your Vault automatically.
    p.block
-    span.tag.is-primary Subscribed
-    span.tag Unsubscribed
     span.text-icon
      span.icon
       i.fas.fa-globe
      span Public
     span.text-icon
      span.icon
-      i.fas.fa-shield
-     span Restricted
-    span.text-icon
-     span.icon
       i.fas.fa-lock
      span Private
-   table.table.is-fullwidth.block
-    thead
-     th Team
-     th Topics
-     th Owner
-     th Creation Date
-     th Type
-     th Create Topics
-     th Control
-    tbody
-     {% for team in teams %}
-     tr
-      td
-       {%if team.name == "_"%}
-       .icon-text
-        span.tag.is-primary.icon
+
+   .columns.is-multiline
+    {% for team, member_count in teams %}
+    {% if team.name != "_" %}
+    .column.is-6
+     a(href="{{url_for('show_team', team_name=team.name)}}").card-content.box
+      .media
+       .media-left
+        figure.image.is48x48
+         {% if team.is_public %}
+         span.icon
           i.fas.fa-globe
-        span Global
-       {%else%}
-       tt {{team.name}}
-       {%endif%}
-      td
-       {% if team.is_private %}
-       span.is-italic confidential
-       {% else %}
-       {% for topic in team.topics %}
-       // FIXME: this is super inefficient
-       {% if user and user_repo.is_subscribed(user, team, topic) %}
-       a(href="{{url_for('unsubscribe', team_topic_name=topic.name+'@'+team.name)}}" alt="Subscribe to topic")
-        p.tag.is-primary {{topic.name}}
-       {% else %}
-       a(href="{{url_for('subscribe', team_topic_name=topic.name+'@'+team.name)}}")
-        p.tag {{topic.name}}
-       {% endif %}
-       {% endfor %}
-       {% endif %}
-      td {{team.user.username}}
-      td {{team.created_at}}
-      td
-       span
-       {% if team.is_public %}
-       span.icon
-        i.fas.fa-globe
-       {% elif team.is_restricted %}
-       span.icon
-        i.fas.fa-shield
-       {% else %}
-       span.icon
-        i.fas.fa-lock
-       {% endif %}
-      td
-       {% if team.allow_create_topics %}
-       span.icon
-        i.fas.fa-check
-       {% else %}
-       span.icon
-        i.fas.fa-times
-       {% endif %}
-      {% if user %}
-      td
-       .field.has-addons
-        {% if not team.is_private %}
-        p.control
-          {% if user_repo.is_member(user, team) %}
-          a(href="{{url_for('leave', team_name=team.name)}}").button
-            span.icon.is-small
-              i.fas.fa-signature
-            span Leave
-          {% else %}
-          {% if team.is_public %}
-          a(href="{{url_for('join', team_name=team.name)}}").button
-            span.icon.is-small
-              i.fas.fa-signature
-            span Join Team
-          {% endif %}
-          {% endif %}
-        {% endif %}
-        {% if user and team.user_id == user.id %}
-        p.control
-          a(href="{{url_for('settings', team_name=team.name)}}").button
-            span.icon.is-small
-              i.fas.fa-edit
-        {% endif %}
-      {% endif %}
-     {% endfor %}
+         {% else %}
+         span.icon
+          i.fas.fa-lock
+         {% endif %}
+       .media-content
+        .title.is-4 {{team.name}}
+        .subtitle.is-6.mb-1 {{team.headline | default("")}}
+        nav.level
+         .level-left
+          .level-item {{member_count}} members
+    {% endif %}
+    {% endfor %}
 {% endblock %}

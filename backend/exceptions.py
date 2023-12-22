@@ -51,6 +51,12 @@ class Unauthorized(BaseAPIException):
     code = status.HTTP_401_UNAUTHORIZED
 
 
+class BillingException(BaseAPIException):
+    """400"""
+
+    code = status.HTTP_400_BAD_REQUEST
+
+
 class LoginRequiredException(BaseAPIException):
     """401"""
 
@@ -103,7 +109,7 @@ async def web_handle_exception(
 ):
     # required for top
     user = None
-    return templates.TemplateResponse("exception.html", context=dict(**locals()))
+    return templates.TemplateResponse("exception.pug", context=dict(**locals()))
 
 
 async def web_unhandled_exception(
@@ -113,10 +119,7 @@ async def web_unhandled_exception(
     config: Settings = Depends(get_config),
 ):
     # required for top
-    user = None
-    return templates.TemplateResponse(
-        "exception-unhandled.html", context=dict(**locals())
-    )
+    return templates.TemplateResponse("exception.pug", context=dict(**locals()))
 
 
 async def redirect_to_login(
@@ -125,10 +128,10 @@ async def redirect_to_login(
     user: User = Depends(get_optional_user),
     config: Settings = Depends(get_config),
 ):
-    url = request.url_for("login")
+    url = str(request.url_for("login"))
     if exc.next_url:
         parsed = list(urllib.parse.urlparse(url))
-        parsed[4] = urllib.parse.urlencode(dict(next=exc.next_url))
+        parsed[4] = urllib.parse.urlencode(dict(next=str(exc.next_url)))
         url = urllib.parse.urlunparse(parsed)
     return RedirectResponse(url=url)
 
@@ -140,9 +143,9 @@ def include_app(app):
 
 
 def include_app_web(app):
-    # FIXME: need to deal with making nicer
     app.add_exception_handler(LoginRequiredException, redirect_to_login)
     app.add_exception_handler(NotAllowed, web_handle_exception)
     app.add_exception_handler(NotFound, web_handle_exception)
     app.add_exception_handler(Unauthorized, web_handle_exception)
+    app.add_exception_handler(BillingException, web_handle_exception)
     app.add_exception_handler(Exception, web_unhandled_exception)

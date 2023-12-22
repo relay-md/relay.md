@@ -3,7 +3,7 @@ from typing import List
 
 import pytest
 
-from backend.models.team import TeamType
+from backend.models.permissions import Permissions
 
 
 @pytest.fixture
@@ -87,7 +87,7 @@ def test_get_docs_in_team_topics_i_subscribed(
     create_team_topic,
     subscribe_to_team_topic,
 ):
-    create_team("test", allow_create_topics=True)
+    create_team("test", public_permissions=Permissions.can_create_topics)
     team_topic = create_team_topic("unit@test")
     document = create_document("foo.bar.text", [team_topic.name], [], False)
     req = api_client.get("/v1/docs", headers=auth_header)
@@ -115,7 +115,10 @@ def test_cannot_subscribe_private_team(
     create_team_topic,
     subscribe_to_team_topic,
 ):
-    create_team("test", allow_create_topics=True, type=TeamType.PRIVATE)
+    create_team(
+        "test",
+        public_permissions=0,
+    )
     create_team_topic("unit@test")
 
     # No we subscribe and try again

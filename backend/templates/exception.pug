@@ -1,0 +1,8 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+section.hero.is-danger.is-halfheight
+  .hero-body
+    div
+      p.title Cannot proceed
+      p.subtitle {{exc}}
+{% endblock %}

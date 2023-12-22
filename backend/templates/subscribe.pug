@@ -1,0 +1,30 @@
+#getearlyaccess.block.mt-5
+  .columns
+    .column.has-text-centered.is-half.is-offset-one-quarter
+      .notification.is-warning.has-text-weight-bold
+        | Coming in Q1 of 2024!
+      h1.title.colored.is-4
+        | Sign up for early access
+      p.subtitle
+        | Be one of the first to access relay.md and its
+        | Obsidian plugin when we launch in Q1 of 2024 by signing up for our early
+        | access program.
+      form(hx-post="{{url_for('submitmail')}}")
+        .field.is-horizontal
+          .field-body
+            .field
+              .control.has-icons-left
+                input.input.is-medium(type='text' name='first_name' placeholder='Bob')
+                span.icon.is-small.is-left
+                  i.fas.fa-user
+            .field
+              .control.has-icons-left
+                input.input.is-medium(type='text' name='last_name' placeholder='Smith')
+                span.icon.is-small.is-left
+                  i.fas.fa-user
+        .field(hx-target='this' hx-swap='outerHTML')
+          .control.has-icons-left.has-icons-right
+            input.input.is-medium(type='email' name='email' placeholder='bob@smith.com' hx-post="{{url_for('validatemail')}}")
+            span.icon.is-small.is-left
+              i.fas.fa-envelope
+        button.button.is-block.is-warning.is-fullwidth.is-medium Get Early Access

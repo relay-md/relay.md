@@ -1,0 +1,43 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.column.is-10.is-offset-1
+  .card
+    header.card-header
+      p.card-header-title
+        | Document {{id}}
+    .card-content
+      .content
+        #document
+          progress.progress.is-small.is-dark(max="100") 15%
+    .card-footer
+      .card-footer-item
+        #frontmatter.content
+{% endblock %}
+
+{% block javascript %}
+script
+.
+  get_document("{{id}}")
+    .then((doc) => {
+      const [html, metadata] = post_process_markdown(doc);
+      document.getElementById('document').innerHTML = html;
+
+      var supported_metadatatag = ["title"];
+      var metadata_html = "";
+
+      // iterate over relay_to
+      for (var to of metadata["relay-to"]) {
+    metadata_html += `<div class="control">
+          <div class="tags has-addons">
+        <span class="tag is-dark">to</span>
+        <span class="tag is-info">${to}</span>
+          </div>
+        </div>
+      `;
+      }
+      document.getElementById('frontmatter').innerHTML = metadata_html;
+    })
+    .catch((msg) => {
+      document.getElementById('document').innerHTML = msg;
+    });
+{% endblock %}

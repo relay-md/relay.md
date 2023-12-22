@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Query, Request
@@ -9,76 +10,39 @@ from starlette.responses import RedirectResponse
 from .. import exceptions
 from ..config import Settings, get_config
 from ..database import Session, get_session
-from ..models.team import TeamType
+from ..models.permissions import Permissions
+from ..repos.billing import SubscriptionRepo
 from ..repos.team import Team, TeamRepo
-from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
-from ..repos.user_team_topic import UserTeamTopicRepo
 from ..templates import templates
+from ..utils.dates import (
+    percentage_of_current_month,
+    percentage_of_current_year,
+)
+from ..utils.team import get_team
 from ..utils.user import User, require_user
 
-router = APIRouter(prefix="")
+router = APIRouter(prefix="/team")
 
 
-async def get_team(team_name: str, db: Session = Depends(get_session)) -> Team:
-    team_repo = TeamRepo(db)
-    team = team_repo.get_by_kwargs(name=team_name)
-    if not team:
-        raise exceptions.NotFound("team id unknown")
-    return team
-
-
-async def get_team_topic(team_topic_name: str, db: Session = Depends(get_session)):
-    team_topic_repo = TeamTopicRepo(db)
-    return team_topic_repo.from_string(team_topic_name)
-
-
-@router.get("/teams")
-async def get_teams(
+@router.get("/{team_name}")
+async def show_team(
+    team_name: str,
     request: Request,
     config: Settings = Depends(get_config),
-    db: Session = Depends(get_session),
+    team: Team = Depends(get_team),
     user: User = Depends(require_user),
+    db: Session = Depends(get_session),
 ):
     user_repo = UserRepo(db)
-    team_repo = TeamRepo(db)
-    teams = team_repo.list()
-    return templates.TemplateResponse("teams.pug", context=dict(**locals()))
+    membership = user_repo.is_member(user, team)
+    return templates.TemplateResponse(
+        "team.pug", context=dict(**locals(), Permissions=Permissions)
+    )
 
 
-@router.get("/topic/{team_topic_name}/subscribe")
-async def subscribe(
-    team_topic_name: str,
-    request: Request,
-    config: Settings = Depends(get_config),
-    team_topic: Team = Depends(get_team_topic),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    repo = UserTeamTopicRepo(db)
-    if team_topic.team.is_private:
-        raise exceptions.NotAllowed(f"Team {team_topic.team.name} is private!")
-    repo.create_from_kwargs(user_id=user.id, team_topic_id=team_topic.id)
-    return RedirectResponse(url=request.url_for("get_teams"))
-
-
-@router.get("/topic/{team_topic_name}/unsubscribe")
-async def unsubscribe(
-    team_topic_name: str,
-    request: Request,
-    config: Settings = Depends(get_config),
-    team_topic: Team = Depends(get_team_topic),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    repo = UserTeamTopicRepo(db)
-    user_team_topic = repo.get_by_kwargs(user_id=user.id, team_topic_id=team_topic.id)
-    repo.delete(user_team_topic)
-    return RedirectResponse(url=request.url_for("get_teams"))
-
-
-@router.get("/team/{team_name}/join")
+@router.get("/{team_name}/join")
 async def join(
     team_name: str,
     request: Request,
@@ -88,78 +52,13 @@ async def join(
     db: Session = Depends(get_session),
 ):
     repo = UserTeamRepo(db)
-    if team.is_private or team.is_restricted:
-        raise exceptions.NotAllowed(f"Team {team.name} is private or restricted!")
-    repo.create_from_kwargs(user_id=user.id, team_id=team.id)
-    return RedirectResponse(url=request.url_for("get_teams"))
+    if not team.can(Permissions.can_join, user):
+        raise exceptions.NotAllowed(f"You are not allowed to join team {team_name}!")
+    repo.add_member(user_id=user.id, team_id=team.id)
+    return RedirectResponse(url=request.url_for("show_team", team_name=team_name))
 
 
-@router.get("/team/{team_name}/invite/{user_id}")
-async def invite_user(
-    team_name: str,
-    user_id: UUID,
-    request: Request,
-    config: Settings = Depends(get_config),
-    team: Team = Depends(get_team),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    if team.is_public:
-        raise exceptions.NotAllowed("No need to invite anyone to a public team!")
-
-    user_repo = UserRepo(db)
-    new_user = user_repo.get_by_kwargs(id=user_id)
-    if not new_user:
-        raise exceptions.BadRequest("Invalid user id!")
-    membership = user_repo.is_member(user, team)
-    user_team_repo = UserTeamRepo(db)
-    if (team.is_private or team.is_restricted) and not membership:
-        # TODO: check that we are allowed to invite people
-        raise exceptions.NotAllowed(
-            f"Team {team.name} is private or restricted and you are not member!"
-        )
-
-    if not membership.can_invite_users:
-        raise exceptions.NotAllowed(
-            f"You are not allowed to invite to team {team_name}!"
-        )
-    user_team_repo.create_from_kwargs(user_id=new_user.id, team_id=team.id)
-    return RedirectResponse(url=request.url_for("settings", team_name=team_name))
-
-
-@router.get("/team/{team_name}/remove/{membership_id}")
-async def remove_user(
-    team_name: str,
-    membership_id: UUID,
-    request: Request,
-    config: Settings = Depends(get_config),
-    team: Team = Depends(get_team),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    if team.is_public:
-        raise exceptions.NotAllowed("You cannot uninvite anyone from global teams!")
-    user_repo = UserRepo(db)
-    user_team_repo = UserTeamRepo(db)
-    membership_to_remove = user_team_repo.get_by_kwargs(id=membership_id)
-    if not membership_to_remove:
-        raise exceptions.BadRequest("Invalid membership id!")
-    membership = user_repo.is_member(user, team)
-    if (team.is_private or team.is_restricted) and not membership:
-        # TODO: check that we are allowed to invite people
-        raise exceptions.NotAllowed(
-            f"Team {team.name} is private or restricted and you are not member!"
-        )
-
-    if not membership.can_invite_users:
-        raise exceptions.NotAllowed(
-            f"You are not allowed to manage members of team {team_name}!"
-        )
-    user_team_repo.delete(membership_to_remove)
-    return RedirectResponse(url=request.url_for("settings", team_name=team_name))
-
-
-@router.get("/team/{team_name}/leave")
+@router.get("/{team_name}/leave")
 async def leave(
     team_name: str,
     request: Request,
@@ -170,11 +69,134 @@ async def leave(
 ):
     repo = UserTeamRepo(db)
     user_team = repo.get_by_kwargs(user_id=user.id, team_id=team.id)
-    repo.delete(user_team)
-    return RedirectResponse(url=request.url_for("get_teams"))
+    repo.remove_member(user_team)
+    return RedirectResponse(url=request.url_for("show_team", team_name=team_name))
 
 
-@router.get("/team/{team_name}/settings")
+@router.get("/{team_name}/invite/{user_id}")
+async def invite_user(
+    team_name: str,
+    user_id: UUID,
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    user_repo = UserRepo(db)
+    new_user = user_repo.get_by_kwargs(id=user_id)
+    if not new_user:
+        raise exceptions.BadRequest("Invalid user id!")
+    membership = user_repo.is_member(user, team)
+    if not team.can(Permissions.can_invite, user, membership):
+        raise exceptions.NotAllowed(
+            f"You are not allowed to invite to team {team_name}!"
+        )
+    user_team_repo = UserTeamRepo(db)
+    # only add if not already added
+    if not user_team_repo.get_by_kwargs(user_id=new_user.id, team_id=team.id):
+        user_team_repo.add_member(user_id=new_user.id, team_id=team.id)
+    return RedirectResponse(url=request.url_for("settings", team_name=team_name))
+
+
+@router.get("/{team_name}/remove/{membership_id}")
+async def remove_user(
+    team_name: str,
+    membership_id: UUID,
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    user_repo = UserRepo(db)
+    user_team_repo = UserTeamRepo(db)
+    membership_to_remove = user_team_repo.get_by_kwargs(id=membership_id)
+    if not membership_to_remove:
+        raise exceptions.BadRequest("Invalid membership id!")
+    membership = user_repo.is_member(user, team)
+    # TODO: can invite means -> can remove from team, too!
+    if not team.can(Permissions.can_invite, user, membership):
+        raise exceptions.NotAllowed(
+            f"You are not allowed to invite to team {team_name}!"
+        )
+    user_team_repo.remove_member(membership_to_remove)
+    return RedirectResponse(url=request.url_for("settings", team_name=team_name))
+
+
+@router.get("/{team_name}/toggle/perm")
+async def toggle_team_perms(
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+    type: str = Query(default=""),
+    perm: int = Query(default=0),
+):
+    if team.user_id != user.id:
+        raise exceptions.NotAllowed(f"Team {team.name} is not your team!")
+    if not type:
+        raise exceptions.BadRequest("Need a 'type'!")
+    team_repo = TeamRepo(db)
+    if type == "owner":
+        team_repo.update(
+            team, owner_permissions=(team.owner_permissions ^ Permissions(perm)).value
+        )
+    elif type == "member":
+        team_repo.update(
+            team, member_permissions=(team.member_permissions ^ Permissions(perm)).value
+        )
+    elif type == "public":
+        # Changing this flag requries upgrade
+        new_perm = team.public_permissions ^ Permissions(perm)
+        if not team.is_paid:
+            if any(
+                [
+                    x not in Permissions(new_perm)
+                    for x in [Permissions.can_read, Permissions.can_post]
+                ]
+            ):
+                return RedirectResponse(
+                    url=request.url_for("team_billing", team_name=team.name)
+                )
+
+        team_repo.update(team, public_permissions=(new_perm).value)
+    else:
+        raise exceptions.BadRequest(f"Invalid value for {type=}")
+    return RedirectResponse(url=request.url_for("settings", team_name=team.name))
+
+
+@router.get("/{team_name}/toggle/perm/member")
+async def toggle_member_perms(
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+    member_id: UUID = Query(default=None),
+    perm: int = Query(default=None),
+):
+    if team.user_id != user.id:
+        raise exceptions.NotAllowed(f"Team {team.name} is not your team!")
+    user_team_repo = UserTeamRepo(db)
+    membership = user_team_repo.get_by_id(member_id)
+    if not membership:
+        raise exceptions.BadRequest("Member not found")
+    if perm:
+        new_perms = (membership.permissions or team.member_permissions) ^ Permissions(
+            perm
+        )
+        user_team_repo.update(
+            membership,
+            permissions=new_perms.value,
+        )
+    else:
+        user_team_repo.update(membership, permissions=0)
+    return RedirectResponse(url=request.url_for("settings", team_name=team.name))
+
+
+@router.get("/{team_name}/settings")
 async def settings(
     request: Request,
     config: Settings = Depends(get_config),
@@ -186,28 +208,12 @@ async def settings(
 ):
     team_repo = TeamRepo(db)
     members = team_repo.list_team_members(team, page, size)
-    return templates.TemplateResponse("team-admin.pug", context=dict(**locals()))
+    return templates.TemplateResponse(
+        "team-admin.pug", context=dict(**locals(), Permissions=Permissions)
+    )
 
 
-@router.post("/team/{team_name}/settings/type", response_class=PlainTextResponse)
-async def settings_type_post(
-    request: Request,
-    type: str = Form(default=""),
-    config: Settings = Depends(get_config),
-    team: Team = Depends(get_team),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    team_repo = TeamRepo(db)
-    team_repo.update(team, type=TeamType(type))
-    return """
-        <div class="notification is-success is-light">
-        Change saved successfully
-        </div>
-    """
-
-
-@router.post("/team/{team_name}/settings/user/search", response_class=PlainTextResponse)
+@router.post("/{team_name}/settings/user/search", response_class=PlainTextResponse)
 async def settings_user_search(
     request: Request,
     team_name: str,
@@ -222,15 +228,133 @@ async def settings_user_search(
     user_repo = UserRepo(db)
     users = list(user_repo.search_username(name, limit=5))
 
-    def user_invite_link(user):
+    def user_invite_link(user, team):
+        if not team.subscriptions:
+            raise exceptions.BadRequest("There is no subscription for this team!")
+        subscription = team.subscriptions[0]
+        if subscription.is_yearly:
+            price = get_config().PRICING_TEAM_YEARLY
+            price_interval = "year"
+            price_period = round(
+                (1 - percentage_of_current_year(datetime.utcnow())) * price, 2
+            )
+        else:
+            price = get_config().PRICING_TEAM_MONTHLY
+            price_interval = "month"
+            price_period = round(
+                (1 - percentage_of_current_month(datetime.utcnow())) * price, 2
+            )
         return f"""
             <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">
-            <span class="icon-text"><span class="icon"><i class="fab fa-{user.oauth_provider.value}"></i></span><span>{user.username}</span></a>
+             <div class="list-item-image">
+              <figure class="image is-32x32">
+               <img class="is-rounded" src="{user.profile_picture_url}" />
+              </figure>
+             </div>
+             <div class="list-item-content">
+              <div class="list-item-title">
+               @{user.username}
+              </div>
+              <div class="list-item-description">
+               {user.name}
+              </div>
+             </div>
+             <div class="list-item-controls">
+             <div>
+               <div class="title is-5">
+                {price_period}€
+               </div>
+               <div class="subtitle is-7">
+                {price}€/{price_interval}
+               </div>
+              </div>
+             </div>
+            </a>
         """
 
-    ret = "\n".join([user_invite_link(x) for x in users])
+    ret = "\n".join([user_invite_link(x, team) for x in users])
     return f"""
         <div class="list">
         {ret}
         </div>
     """
+
+
+@router.post("/new/validate-team-name", response_class=PlainTextResponse)
+async def team_create_validate_team_name(
+    request: Request,
+    team_name: str = Form(default=""),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    if team_repo.team_name_search(team_name.lower()):
+        return """<p id="validate-team-name" class="help is-danger">A Team with this name already exists!</p>"""
+    if not Team.validate_team_name(team_name):
+        return """<p id="validate-team-name" class="help is-danger">The team name is invalid! Alphanumeric names only (a-z, 0-9 and _)</p>"""
+    else:
+        return ""
+
+
+@router.post("/{team_name}/headline", response_class=PlainTextResponse)
+async def update_team_headline(
+    request: Request,
+    headline: str = Form(default=""),
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    if not team.user_id == user.id:
+        return """<p id="validate-team-name" class="help is-danger">You cannot update the headline!</p>"""
+    if len(headline) > 63:
+        return (
+            """<p id="validate-team-name" class="help is-danger">Max length 63!</p>"""
+        )
+    team_repo.update(team, headline=headline)
+    return (
+        """<p id="validate-team-name" class="help is-success">Headline updated!</p>"""
+    )
+
+
+@router.post("/{team_name}/toggle/hide", response_class=PlainTextResponse)
+async def update_team_hide(
+    request: Request,
+    hide: bool = Form(default=False),
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    if not team.user_id == user.id:
+        return """<p id="validate-team-name" class="help is-danger">You cannot update the headline!</p>"""
+    team_repo.update(team, hide=hide)
+    return """<p id="validate-team-name" class="help is-success">Team updated!</p>"""
+
+
+@router.get("/{team_name}/billing")
+async def team_billing(
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    return templates.TemplateResponse("pricing.pug", context=dict(**locals()))
+
+
+@router.get("/{team_name}/billing/subscription/cancel")
+async def cancel_subscription(
+    request: Request,
+    config: Settings = Depends(get_config),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    subscription_repo = SubscriptionRepo(db)
+    for subscription in team.subscriptions:
+        subscription_repo.cancel_subscription(subscription)
+    return RedirectResponse(url=request.url_for("settings", team_name=team.name))

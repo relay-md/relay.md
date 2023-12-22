@@ -1,0 +1,54 @@
+nav.navbar(role='navigation' aria-label='main navigation')
+  .navbar-brand
+    a.navbar-item(href='/')
+      img.brand-logo(src="{{ url_for('static', path='img/logo-navbar.svg') }}" width='32')
+    a.navbar-burger(role='button' aria-label='menu' aria-expanded='false' data-target='navBarBurger')
+      span(aria-hidden='true')
+      span(aria-hidden='true')
+      span(aria-hidden='true')
+  #navBarBurger.navbar-menu
+    .navbar-start
+      a.navbar-item(href='/#features') Features
+      a.navbar-item(href="{{url_for('pricing')}}") Pricing
+      a.navbar-item(href="{{url_for('relay_basics')}}") Basics
+      a.navbar-item(href="{{url_for('obsidian_plugin')}}") Plugin
+      {% if not config.ENABLE_EARLY_ACCESS or user%}
+      a.navbar-item(href="{{url_for('get_teams')}}") Teams
+      a.navbar-item(href="{{url_for('my_documents')}}") My Docs
+      {% endif %}
+    .navbar-end
+      .navbar-item
+        #switcher-default
+      {% if user %}
+      .navbar-item
+        a.button.is-warning(href='/profile')
+          span.icon
+            figure.image.is-24x24
+              img.is-rounded(src='{{user.profile_picture_url}}')
+          span
+            strong {{ user.username }}
+      .navbar-item
+        a.button.is-primary(href='/logout')
+          i.fas.fa-sign-out
+      {% else %}
+      {% if config.ENABLE_EARLY_ACCESS %}
+      .navbar-item
+        a.button.is-danger(href='/#getearlyaccess')
+          span.icon
+            i.fas.fa-envelope
+          span
+            strong Get Early Access
+      {% else %}
+      .navbar-item
+        .buttons
+          a.button.is-primary(href='/register')
+            span.icon
+              i.fab.fa-github
+            span
+              strong Sign up
+          a.button.is-light(href='/login/github')
+            span.icon
+              i.fab.fa-github
+            span Log in
+      {% endif %}
+      {% endif %}

@@ -1,0 +1,13 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.column.is-6.is-offset-3.has-text-centered
+ .block.mt-5
+  p
+   img.status-image(src="{{ url_for('static', path='img/success.svg') }}")
+  p
+   img.status-image-thank-you(src="{{ url_for('static', path='img/thank-you.svg') }}")
+ .block
+  p.status-message Your order has been successfully placed.
+ .block
+   a.button(href='/') Return Home
+{% endblock %}

@@ -24,7 +24,7 @@ async def welcome(
     user: User = Depends(get_optional_user),
     config: Settings = Depends(get_config),
 ):
-    return templates.TemplateResponse("welcome.html", context=dict(**locals()))
+    return templates.TemplateResponse("welcome.pug", context=dict(**locals()))
 
 
 @router.get(
@@ -120,3 +120,16 @@ async def tos(
     config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("tos.pug", context=dict(**locals()))
+
+
+@router.get(
+    "/pricing",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def pricing(
+    request: Request,
+    user: User = Depends(get_optional_user),
+    config: Settings = Depends(get_config),
+):
+    return templates.TemplateResponse("pricing.pug", context=dict(**locals()))

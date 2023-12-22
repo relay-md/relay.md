@@ -1,10 +1,104 @@
-{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 .mt-5.mb-5
  .columns
   .column.is-8.is-offset-2
-   h1.title.is-1 Team {{team.name}}
+   .title.is-1 {{team.name}}
+   .subtitle.is-5.text-icon
+     {% if team.is_public %}
+     span.icon
+      i.fas.fa-globe
+     span Public Team
+     {% else %}
+     span.icon
+      i.fas.fa-lock
+     span Private Team
+     {% endif %}
 
-   p Site is under contruction
+   .block
+    {% if user_repo.is_member(user, team) %}
+    a(href="{{url_for('leave', team_name=team.name)}}").button
+      span.icon.is-small
+        i.fas.fa-signature
+      span Leave
+    {% else %}
+    {% if team.can(Permissions.can_join, user, membership) %}
+    a(href="{{url_for('join', team_name=team.name)}}").button
+      span.icon.is-small
+        i.fas.fa-signature
+      span Join Team
+    {% else %}
+    p.notification.is-warning.is-light You cannot join this team. You must be invited.
+    {% endif %}
+    {% endif %}
+
+    {% if user and team.user_id == user.id %}
+    a(href="{{url_for('settings', team_name=team.name)}}").button.is-warning
+     span.icon-text
+      span.icon.is-small
+       i.fas.fa-edit
+      span Admin Setting
+    {% endif %}
+
+   .block
+    .title.is-3 Description
+    .box
+     {% if team.headline %}
+     p {{team.headline}}
+     {% else %}
+     p.is-italic no description provided
+     {% endif %}
+
+   .block
+    .title.is-3 Topics
+    p.block
+     span.tag.is-primary Subscribed
+     span.tag Unsubscribed
+    // TODO: might want to make this a different permission to be able to list topics!
+    {% if not team.can(Permissions.can_read, user, membership) %}
+    span.is-italic confidential
+    {% else %}
+    {% for topic in team.topics %}
+    {% if user and user_repo.is_subscribed(user, team, topic) %}
+    a(href="{{url_for('unsubscribe', team_topic_name=topic.name+'@'+team.name)}}" data-tooltip="Subscribe to topic")
+     .button.is-primary
+       span.icon
+        i.fas.fa-sign-out
+       span {{topic.name | capitalize}}
+    {% else %}
+    a(href="{{url_for('subscribe', team_topic_name=topic.name+'@'+team.name)}}" data-tooltip="Unsubscribe from topic")
+     .button
+       span.icon
+        i.fas.fa-sign-in
+       span {{topic.name | capitalize}}
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+   .block
+    .title.is-3 Public Permissions
+    .column.is-5
+     table.table.is-fullwidth
+      thead
+       td(data-tooltip="Join")
+        i.fas.fa-sign-in
+       td(data-tooltip="Read")
+        i.fas.fa-glasses
+       td(data-tooltip="Post")
+        i.fas.fa-pencil
+       td(data-tooltip="Modify")
+        i.fas.fa-edit
+       td(data-tooltip="Create Topics")
+        i.fas.fa-plus
+      tbody
+       tr
+        {% for perm in [Permissions.can_join, Permissions.can_read, Permissions.can_post, Permissions.can_modify, Permissions.can_create_topics] %}
+        td
+         {% if perm in Permissions(team.public_permissions) %}
+         i.fa.fa-check
+          {% else %}
+         i.fa.fa-times
+         {% endif %}
+        {% endfor %}
 
 {% endblock %}

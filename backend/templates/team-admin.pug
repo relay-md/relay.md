@@ -2,6 +2,7 @@
 span.icon
  i{{name}}
 {% endmacro %}
+
 {% macro bool_icon(flag) %}
 {% if flag %}
 span.icon
@@ -11,77 +12,219 @@ span.icon
  i.fas.fa-times
 {% endif %}
 {% endmacro %}
-{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+
+{% macro permissions(type, team_perms) %}
+table.table
+ {% for perm in Permissions %}
+ tr
+  td {{perm.name | replace("_", "-")}}
+  td
+   a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm.value, type=type) | safe}}")
+    {% if perm in Permissions(team_perms) %}
+    i.fa.fa-check
+    {% else %}
+    i.fa.fa-times
+    {% endif %}
+   {% if not team.is_paid and type == "public" and perm.name in ["can_read", "can_post"] %}
+   span.icon(data-tooltip="Disabling this permission requires a paid permission").has-text-info.is-small
+    i.fas.fa-exclamation
+   {% endif %}
+ {% endfor %}
+{% endmacro %}
+
+{% macro member_permissions(member) %}
+{% if not member.permissions %}
+{% set perms = team.member_permissions %}
+{% else %}
+{% set perms = member.permissions %}
+{% endif %}
+{% for perm in Permissions %}
+{% if perm.name != "can_join" %}
+td.has-text-light
+ a(class="{% if not member.permissions %}has-text-light{% endif %}" href="{{url_for('toggle_member_perms', team_name=team.name).include_query_params(perm=perm.value, member_id=member.id) | safe}}")
+  {% if perm in Permissions(perms) %}
+  i.fa.fa-check
+  {% else %}
+  i.fa.fa-times
+  {% endif %}
+{% endif %}
+{% endfor %}
+td.has-text-light
+ a(class="{% if not member.permissions %}has-text-light{% endif %}" href="{{url_for('toggle_member_perms', team_name=team.name).include_query_params(member_id=member.id) | safe}}")
+  i.fa.fa-redo
+{% endmacro %}
+
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 .mt-5.mb-5
  .columns
   .column.is-8.is-offset-2
    .section
-    h1.title.is-1 {{team.name}}
+    .title.is-1 {{team.name}}
+    {% if team.is_paid %}
+    .subtitle paid until {{team.paid_until}}
+    {% endif %}
 
    .section
-    h1.title.is-3 Team Privacy
-    h2.subtitle.is-5 Define what kind of Team this is
+    .title.is-3 Team Settings
+
+    .field.is-horizontal
+      .field-label.is-normal Description/Headline
+      .field-body
+        .control.has-icons-left
+          input.input#team_name(type="string" placeholder="Description" name="headline" hx-post="{{url_for('update_team_headline', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#updated_team_headline")
+          span.icon.is-left
+           i.fas.fa-expand
+        span(id="updated_team_headline")
+
+    .field.is-horizontal
+     .field-label.is-normal Hide Team
+     .field-body
+      .control
+       input.switch(id="hide_team" checked="{{'checked' if team.hide else ''}}" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+       label(for="hide_team")
+       span(id="updated_team_hide")
+
+   .section
+    .title.is-3 Permissions
+    .subtitle.is-5 Customize Team Permissions
+    p.block Click the check marks/crosses to flip the corresponding permission.
+    table.table.block
+     tr
+      th
+       .icon-text
+        .span.icon
+         i.fa.fa-user
+        span Owner
+      th
+       .icon-text
+        .span.icon
+         i.fa.fa-shield
+        span Member
+      th
+       .icon-text
+        .span.icon
+         i.fa.fa-globe
+        span Public
+     tr
+      td
+       {{permissions("owner", team.owner_permissions)}}
+      td
+       {{permissions("member", team.member_permissions)}}
+      td
+       {{permissions("public", team.public_permissions)}}
+
+   .section
+    .title.is-3 Members
+    .subtitle.is-5 List of users subscribed to your team
+    p.block
+     |Customize your members permissions. By default,&nbsp;
+     span.is-underlined Team permissions apply!
+    {% if members %}
+    nav.block.pagination(role="navication" aria-label="pagination")
+     {% if page %}
+     a.pagination-previous(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page-1) | safe}}") Previous
+     {% endif %}
+     {% if documents | length == size %}
+     a.pagination-next(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page+1) |safe}}") Next Page
+     {% endif %}
+    table.table
+     thead
+      tr
+       th
+        span.icon
+         i.fas.fa-user
+       td
+       td(data-tooltip="Read")
+        i.fas.fa-glasses
+       td(data-tooltip="Post")
+        i.fas.fa-pencil
+       td(data-tooltip="Modify")
+        i.fas.fa-edit
+       td(data-tooltip="Create Topics")
+        i.fas.fa-plus
+       td(data-tooltip="Invite")
+        i.fas.fa-user-plus
+       td(data-tooltip="Reset to Team permissions")
+        i.fas.fa-redo
+       td
+       td(data-tooltip="Remove")
+         i.fas.fa-trash
+     {% for member in members %}
+     tr
+      td {{member.user.username}}
+      td
+      {{ member_permissions(member) }}
+      td
+      td
+       a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
+        span.icon.is-small
+         i.fas.fa-trash
+     {% endfor %}
+    {% else %}
+    p No members have joined yet.
+    {% endif %}
+
+   {% if team.is_paid %}
+   .section
+    .title.is-3 Invite Users
+    .subtitle.is-5.mb-0 Add others to your team
+    .subtitle.is-7.mt-0 *Adding members to your team will result in additional costs!
     .control.has-icons-left
-     .select
-      select(name="type" hx-post="settings/type" hx-target="#team-type-updated")
-       option(value="public" selected="{{'1' if team.is_public else '0'}}") Public
-       option(value="restricted" selected="{{'1' if team.is_restricted else '0'}}") Restricted
-       option(value="private" selected="{{'1' if team.is_private else '0'}}") Private
-     span.icon.is-left
-      i.fas.fa-globe
-     div(id="team-type-updated")
-
-   .section
-    h1
-    h1.block.title.is-3 Members
-    h2.subtitle.is-5 List of users subscribed to your team
-     nav.pagination(role="navication" aria-label="pagination")
-      {% if page %}
-      a.pagination-previous(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page-1)}}") Previous
-      {% endif %}
-      {% if documents | length == size %}
-      a.pagination-next(href="{{url_for('settings', team_name=team.name).include_query_params(type=type, size=size, page=page+1)}}") Next Page
-      {% endif %}
-      table.table
-       thead
-        tr
-         th
-          span.icon
-           i.fas.fa-user
-         th
-          span.icon
-           i.fas.fa-user-plus
-         th
-          span.icon
-           i.fas.fa-file-plus
-         th
-          span.icon
-           i.fas.fa-user-times
-         th
-          span.icon
-           i.fas.fa-edit
-         th control
-       {% for member in members %}
-       tr
-        td {{member.user.username}}
-        td {{bool_icon(member.can_invite_users)}}
-        td {{bool_icon(member.can_post_documents)}}
-        td {{bool_icon(member.can_delete_documents)}}
-        td {{bool_icon(member.can_modify_documents)}}
-        td
-         a.button.is-small(href="{{url_for('remove_user', team_name=team.name, membership_id=member.id)}}")
-          span.icon.is-small
-           i.fas.fa-trash
-       {% endfor %}
-
-   .section
-    h1.block.title.is-3 Invite Users
-    h2.subtitle.is-5 Add others to your team
-    .control.has-icons-left
-     input.input(type="tags" id="invite-users" name="name" hx-post="settings/user/search" hx-trigger="input changed delay:500ms, search" hx-target="#users")
+     input.input(type="tags" id="invite-users" name="name" hx-post="{{url_for('settings_user_search', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#users")
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
+   {% endif %}
+
+   .section.box
+    .title.is-3 Subscription
+    {% if team.is_paid %}
+    .subtitle.is-5
+    table.table.mb-0
+     thead
+      tr
+       th Active
+       th Date
+       th Invoice
+       th Schedule
+       th Description
+       th Quantity
+       th Price
+     tbody
+      {% for sub in team.subscriptions %}
+      tr.is-success
+        {% if sub.active %}
+        td.has-text-success.icon-text
+         span.icon
+          i.fas.fa-check
+        {% else %}
+        td.has-text-dancer.icon-text
+         span.icon
+          i.fas.fa-times
+        {% endif %}
+        td {{sub.created_at.strftime("%Y-%m-%d") }}
+        td {{sub.name}}
+        td {{ "yearly" if sub.is_yearly else "monthly" }}
+        td {{sub.description}}
+        td {{sub.quantity }}
+        td {{sub.quantity * sub.price / 100}} €
+      {% endfor %}
+    p.help.block Find out more by logging into the&nbsp;
+     a(href=config.STRIPE_CUSTOMER_PORTAL_URL) Customer Portal.
+    a.block.button.is-medium.is-danger.is-outlined(href="{{ url_for('cancel_subscription', team_name=team.name) }}")
+     span.icon.is-medium
+      i.fas.fa-skull
+     span Cancel Subscription
+    {% endif %}
+
+    {% if team.can_upgrade %}
+    .subtitle.is-5 Upgrade to Private Member
+    a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
+     span.icon.is-medium
+      🎉
+     span Upgrade to Private Team
+    div(id="users")
+    {% endif %}
 
 {% endblock %}

@@ -1,16 +1,16 @@
-{% extends 'layout.html' %} {% block title %}{{ name }} {% endblock %}
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
 section.hero.is-link
  .hero-body
-  p.title
-   span.icon
-    i.fas.fa-user
-  p.subtitle User Profile
+  .title
+   figure.image.is-128x128
+     img.is-rounded(src="{{user.profile_picture_url}}")
+  .subtitle User Profile
 
 .column
  section.section
-  h1.title Account
-  h2.subclass Personal Information of your account
+  .title Account
+  .subtitle Personal Information of your account
   table.table
    tr
     td
@@ -36,16 +36,21 @@ section.hero.is-link
 
 
  section.section
-  h1.title API
-  h2.subclass Access Token
-  table.table
-   {% for access_token in user.access_tokens %}
-   tr
-    td
-     span.icon-text
-      span.icon
-       i.fas.fa-key
-      span
-       tt {{access_token.token}}
-   {% endfor %}
+  .title API
+  .subtitle Access Token
+  {% for access_token in user.access_tokens %}
+  .media.box
+   .media-left
+    span.icon-text
+     span.icon
+      i.fas.fa-key
+   .media-content
+    .content
+     p.mb-0
+      tt
+       strong {{access_token.token}}
+     p.mt-0
+      small Last Used: &nbsp; {{access_token.latest_document_at }}
+  {% endfor %}
+
 {% endblock %}

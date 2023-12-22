@@ -3,7 +3,7 @@
 
 Allow to load values from environment variables.
 """
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -24,7 +24,9 @@ class Settings(BaseSettings):
 
     # SQL Settings
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///default.db"
-    SQLALCHEMY_ENGINE_OPTIONS: Optional[SQLAlchemyEngineOptions] = None
+    SQLALCHEMY_ENGINE_OPTIONS: Optional[
+        SQLAlchemyEngineOptions
+    ] = SQLAlchemyEngineOptions()
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ECHO: bool = False
 
@@ -35,11 +37,12 @@ class Settings(BaseSettings):
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
     MAIL_PORT: int = 587
-    MAIL_SERVER: str = "smtp.mailgun.org"
+    MAIL_SERVER: str = "mail.chainsquad.com"
     MAIL_STARTTLS: bool = True
     MAIL_SSL_TLS: bool = False
     # MAIL_DEBUG: bool = False
-    MAIL_FROM: str = "noreply@example.com"
+    MAIL_FROM: str = "noreply@relay.md"
+    MAIL_ADMIN: str = "fabian@relay.md"
 
     # Oauth Client data
     GITHUB_CLIENT_ID: Optional[str]
@@ -57,12 +60,25 @@ class Settings(BaseSettings):
     MINIO_ACCESS_KEY: Optional[str]
     MINIO_SECRET_KEY: Optional[str]
     MINIO_SECURE: bool = True
+    MINIO_BUCKET: str = "documents"
+
+    PAYMENT_BASIC_AUTH_WHITELIST: List[Tuple[str, str]] = [("foo", "bar")]
+
+    STRIPE_API_KEY: Optional[str] = ""
+    STRIPE_API_PRIVATE_KEY: Optional[str] = ""
+    STRIPE_WEBHOOK_SECRET: Optional[str] = ""
+    STRIPE_RETURN_URL_SUCCESS: str = "https://relay.md/payment/success"
+    STRIPE_RETURN_URL_CANCEL: str = "https://relay.md/payment/failed"
+    STRIPE_CUSTOMER_PORTAL_URL: Optional[str] = ""
+
+    PRICING_TEAM_YEARLY: float = 30.0
+    PRICING_TEAM_MONTHLY: float = 3.0
 
     # Early access configs
     ENABLE_EARLY_ACCESS: bool = True
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
 
-    RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID]
+    RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID] = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

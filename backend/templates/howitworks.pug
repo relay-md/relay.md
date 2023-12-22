@@ -1,0 +1,50 @@
+#howitworks.block.content
+  .container
+    .columns
+      .column.is-6.is-offset-3.p-5
+        h1.title How it works
+        h3.subtitle The power of Markdown, Frontmatter and Obsidian
+        .mb-5
+        .title.is-5.icon-text.mb-0
+          span.icon.has-text-success
+            i.fas.fa-check-square
+          span.has-text-weight-bold Log-in
+        p.block
+          | With your
+          span.icon-text
+            span.icon
+              i.fab.fa-github
+            span Account
+          | , you can register
+          | on relay.md with just one click. Other identity providers may be
+          | supported in the future.
+        .title.is-5.icon-text.mb-0
+          span.icon.has-text-success
+            i.fas.fa-check-square
+          span.has-text-weight-bold Obsidian Plugin
+        p.block
+          | Use the power of Relay.md fully integrating into Obsidian via a
+          | plugin. Get newly shared content and post new documents with a single click.
+        .title.is-5.icon-text.mb-0
+          span.icon.has-text-success
+            i.fas.fa-check-square
+          span.has-text-weight-bold Sharing
+        p.block
+          | Use the frontmatter key
+          span.tag.is-dark
+            tt relay-to
+          | to list recipients individually or
+          | entire teams including a topic. &nbsp;
+          a(href="{{url_for('relay_basics')}}") Find out more.
+        .title.is-5.icon-text.mb-0
+          span.icon.has-text-success
+            i.fas.fa-check-square
+          span.has-text-weight-bold Developer Access
+        p.block
+          | You can build your own apps using our API at
+          a(href='https://api.relay.md/docs') api.relay.md
+          | .
+          | Obtain your custom access key from your
+          a(href='https://relay.md/profile') relay.md profile
+          | . Use the Access
+          | key for authentication against our API.

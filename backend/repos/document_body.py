@@ -66,4 +66,4 @@ class MinioAbstractRepo(AbstractRepository):
 
 
 class DocumentBodyRepo(MinioAbstractRepo):
-    BUCKET = "documents"
+    BUCKET = get_config().MINIO_BUCKET

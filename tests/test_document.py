@@ -45,7 +45,7 @@ def s3(patch_document_body_create, patch_document_body_get):
     yield
 
 
-def test_document_upload(account, auth_header, api_client, s3, dbsession):
+def test_document_upload(account, auth_header, api_client, s3, dbsession, create_team):
     req = api_client.post("/v1/doc", headers=auth_header, content=mocked_up_text)
     req.raise_for_status(), req.text
 
