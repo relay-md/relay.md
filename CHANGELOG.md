@@ -2,6 +2,28 @@
 
 <!--next-version-placeholder-->
 
+## v0.15.0 (2023-12-22)
+### Feature
+* **contact form:** Add a contact form ([`5af5d80`](https://github.com/knowledgemd/backend/commit/5af5d80b29f352e82ed370f7c85cbd568d6e3ce5))
+* **perms:** Require read/post for unpaid teams ([`9df1e53`](https://github.com/knowledgemd/backend/commit/9df1e53773935cd2589dd85771f8be46ecd47c50))
+* **team:** Allow to hide a team ([`8838468`](https://github.com/knowledgemd/backend/commit/8838468c7edba92dd4caf3024562d8a693b52ed3))
+* **pug:** Consistently use pug over html templates ([`d63086a`](https://github.com/knowledgemd/backend/commit/d63086a68c9be2150735aef530e6067c728e8c41))
+* **stripe:** Offload stripe specifics into separate tables ([`ef14b58`](https://github.com/knowledgemd/backend/commit/ef14b5854bbd55405955df465d02a696f99153d3))
+* Sort teams by members ([`48eb0d8`](https://github.com/knowledgemd/backend/commit/48eb0d8e26255fe034035887f5d5b96be095d5d6))
+* **susbcriptions:** Run the numbers by users per team ([`3f80d3d`](https://github.com/knowledgemd/backend/commit/3f80d3dee647ca0823d636f78d0d9fec0902a2cd))
+
+### Fix
+* Proper subscription handling with price ([`3d4520d`](https://github.com/knowledgemd/backend/commit/3d4520d2cc53fd4839bfc8f3fd4e774364a6815f))
+* Permissions and list of teams with no members ([`bd72164`](https://github.com/knowledgemd/backend/commit/bd72164c1d83a6cee7acd67708e1341f090e9613))
+* Unittests ([`a14eed1`](https://github.com/knowledgemd/backend/commit/a14eed1c52627e92165ab660ccf7ec2fe2445d38))
+* Proper redirect ([`95de82d`](https://github.com/knowledgemd/backend/commit/95de82dfe4f67875000c4f6bd7868f07606bb40b))
+* Database must do pre_ping by default ([`902a11a`](https://github.com/knowledgemd/backend/commit/902a11a1f0b1e9718749e30ad7bdcac52c985a50))
+* Proper payment return URLs ([`19952b9`](https://github.com/knowledgemd/backend/commit/19952b9f36e731d1cf74ce93a448dc8681a544db))
+* Cyclic import error resovled ([`9ef3017`](https://github.com/knowledgemd/backend/commit/9ef3017b77e381e0a45b022a8ceece91ecfaf8e9))
+* Unittests ([`712d1d1`](https://github.com/knowledgemd/backend/commit/712d1d14abaf747fc4802decd788c3a82e45130c))
+* Add HMAC and favicon ([`78ddf78`](https://github.com/knowledgemd/backend/commit/78ddf7819ea4b70bd5f75f3c78491f9acd349df0))
+* **tos:** More text ([`74b9fd7`](https://github.com/knowledgemd/backend/commit/74b9fd7743bfe29e97ded938f30e6a3b0f55e19f))
+
 ## v0.14.1 (2023-12-15)
 ### Fix
 * Email validation ([`773082e`](https://github.com/knowledgemd/backend/commit/773082e8feb0f7458c56d6fd269f235ccfe206bd))
