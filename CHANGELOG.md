@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.16.4 (2023-12-23)
+### Fix
+* Only activate a subscription if it gets paid ([`eb7a55e`](https://github.com/knowledgemd/backend/commit/eb7a55e4500ed82e58d9a2e7cfcea09bcdb49141))
+* Default seats=1 ([`d9a3285`](https://github.com/knowledgemd/backend/commit/d9a3285d95c128c9ba4677ec889856977566afcc))
+
 ## v0.16.3 (2023-12-23)
 ### Fix
 * **stripe:** Submit the customer id in the session ([`c4f0cfd`](https://github.com/knowledgemd/backend/commit/c4f0cfd9185cdfc9e7cce530f300bae58d15b68c))
