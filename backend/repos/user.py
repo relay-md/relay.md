@@ -27,6 +27,8 @@ class UserRepo(DatabaseAbstractRepository):
         )
 
     def is_member(self, user: User, team: Team):
+        if not user:
+            return False
         user_team_topic_repo = UserTeamRepo(self._db)
         return user_team_topic_repo.get_by_kwargs(
             user_id=user.id,
