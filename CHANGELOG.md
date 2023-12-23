@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.16.2 (2023-12-23)
+### Fix
+* **stripe:** Proration_behavior invalid here ([`a02c73f`](https://github.com/knowledgemd/backend/commit/a02c73f6acd175923803ce012774a3eede184f41))
+
 ## v0.16.1 (2023-12-23)
 ### Fix
 * Obtain access_token from doc, linting ([`078ec6c`](https://github.com/knowledgemd/backend/commit/078ec6c5c365644798ad237f7b18e145767ea4a0))
