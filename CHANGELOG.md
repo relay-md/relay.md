@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.16.1 (2023-12-23)
+### Fix
+* Obtain access_token from doc, linting ([`078ec6c`](https://github.com/knowledgemd/backend/commit/078ec6c5c365644798ad237f7b18e145767ea4a0))
+* Typo ([`de7840f`](https://github.com/knowledgemd/backend/commit/de7840fdedbc8d0bfb3b857d7748f9c09fa0bfad))
+* Typo ([`16c7df6`](https://github.com/knowledgemd/backend/commit/16c7df68206ea9b232ca72e4e4d9fb27da2b064f))
+
 ## v0.16.0 (2023-12-22)
 ### Feature
 * **seats:** Implement seats for subscription ([`7a3e53a`](https://github.com/knowledgemd/backend/commit/7a3e53aa08da311c6cb623cb2f67e14a500f5f5d))
