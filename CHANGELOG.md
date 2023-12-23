@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.16.3 (2023-12-23)
+### Fix
+* **stripe:** Submit the customer id in the session ([`c4f0cfd`](https://github.com/knowledgemd/backend/commit/c4f0cfd9185cdfc9e7cce530f300bae58d15b68c))
+
 ## v0.16.2 (2023-12-23)
 ### Fix
 * **stripe:** Proration_behavior invalid here ([`a02c73f`](https://github.com/knowledgemd/backend/commit/a02c73f6acd175923803ce012774a3eede184f41))
