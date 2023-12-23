@@ -103,6 +103,10 @@ class StripePayments(AbstractPaymentGateway):
                 subscription_repo.store_subscription_id(
                     subscription, session.get("subscription")
                 )
+                # Activate subscription
+                # TODO: might want to move this to a different webhook as
+                # managed by stripe
+                subscription_repo.update(subscription, active=True)
         elif event["type"] == "checkout.session.expired":
             session = event["data"]["object"]
         else:
