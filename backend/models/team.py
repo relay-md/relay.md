@@ -10,32 +10,33 @@ from sqlalchemy import Date, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
-from .permissions import (
-    MemberPermissions,
-    OwnerPermissions,
-    Permissions,
-    PublicPermissions,
-)
+from .permissions import Permissions
 from .user import User
 from .user_team import UserTeam
 
 DEFAULT_OWNER_PERMISSIONS = (
-    OwnerPermissions.can_read
-    | OwnerPermissions.can_post
-    | OwnerPermissions.can_modify
-    | OwnerPermissions.can_create_topics
-    | OwnerPermissions.can_invite
-    | OwnerPermissions.can_join
+    Permissions.can_read
+    | Permissions.can_post
+    | Permissions.can_modify
+    | Permissions.can_create_topics
+    | Permissions.can_invite
+    | Permissions.can_join
 )
 
 DEFAULT_MEMBER_PERMISSIONS = (
-    MemberPermissions.can_read
-    | MemberPermissions.can_post
-    | MemberPermissions.can_modify
-    | MemberPermissions.can_create_topics
+    Permissions.can_read
+    | Permissions.can_post
+    | Permissions.can_modify
+    | Permissions.can_create_topics
+    | Permissions.can_invite
 )
 
-DEFAULT_PUBLIC_PERMISSIONS = PublicPermissions.can_read | PublicPermissions.can_join
+DEFAULT_PUBLIC_PERMISSIONS = (
+    Permissions.can_read
+    | Permissions.can_post
+    | Permissions.can_create_topics
+    | Permissions.can_join
+)
 
 
 class Team(Base):
