@@ -79,6 +79,18 @@ class Settings(BaseSettings):
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
 
     RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID] = None
+    FASTAPI_CONFIG: dict = {
+        "title": "Relay.md Developer Access",
+        "description": "Access relay.md features through API",
+        "contact": {
+            "name": "Fabian Schuh",
+            "email": "fabian@relay.md",
+        },
+        "openapi_tags": [
+            {"name": "v1", "description": "Version 1 Implementation of the API"},
+            {"name": "default", "description": "Internal use"},
+        ],
+    }
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

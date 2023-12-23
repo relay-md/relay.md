@@ -38,7 +38,7 @@ class Subscription(Base):
     price: Mapped[int] = mapped_column()
 
     # The subscription is active?
-    active: Mapped[bool] = mapped_column(default=True)
+    active: Mapped[bool] = mapped_column(default=False)
 
     # In case this pays for a team, we link the team here
     team_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("team.id"), nullable=True)

@@ -12,6 +12,7 @@ nav.navbar(role='navigation' aria-label='main navigation')
       a.navbar-item(href="{{url_for('pricing')}}") Pricing
       a.navbar-item(href="{{url_for('relay_basics')}}") Basics
       a.navbar-item(href="{{url_for('obsidian_plugin')}}") Plugin
+      a.navbar-item(href="{{url_for('news')}}") News
       {% if not config.ENABLE_EARLY_ACCESS or user%}
       a.navbar-item(href="{{url_for('get_teams')}}") Teams
       a.navbar-item(href="{{url_for('my_documents')}}") My Docs
