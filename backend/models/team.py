@@ -77,7 +77,7 @@ class Team(Base):
     )
 
     paid_until: Mapped[date] = mapped_column(Date(), nullable=True)
-    seats: Mapped[int] = mapped_column(Integer(), default=0)
+    seats: Mapped[int] = mapped_column(Integer(), default=1)
 
     # Should this be shown in directory listing teams?
     hide: Mapped[bool] = mapped_column(default=False)
