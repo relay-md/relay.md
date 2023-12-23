@@ -65,7 +65,7 @@ class StripePayments(AbstractPaymentGateway):
             # promo-codes from stripe pov and needs no further implementation on
             # relay.md side!
             allow_promotion_codes=True,
-            proration_behavior="always_invoice",
+            # proration_behavior="always_invoice",
         )
         return checkout_session
 
