@@ -55,7 +55,7 @@ class StripePayments(AbstractPaymentGateway):
             # FIXME: might want to create a stripe customer and reference to it
             # https://stripe.com/docs/api/checkout/sessions/create
             currency="EUR",
-            customer_email=invoice.user.email,
+            customer=invoice.customer.stripe.stripe_customer_id,
             line_items=line_items,
             mode="subscription",
             metadata=dict(team_ids=" ".join(team_ids)),
