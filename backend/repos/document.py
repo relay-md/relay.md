@@ -188,6 +188,7 @@ class DocumentRepo(DatabaseAbstractRepository):
                         TeamTopic.id == config.RELAY_NEWS_TEAM_TOPIC_ID
                     )
                 )
+                .order_by(Document.last_updated_at.desc())
                 .limit(size)
             )
         )
