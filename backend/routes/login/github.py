@@ -17,7 +17,7 @@ oauth.register(
     name="github",
     client_id=get_config().GITHUB_CLIENT_ID,
     client_secret=get_config().GITHUB_CLIENT_SECRET,
-    client_kwargs={"scope": "read:user"},
+    client_kwargs={"scope": "read:user user:email"},
     access_token_url="https://github.com/login/oauth/access_token",
     authorize_url="https://github.com/login/oauth/authorize",
     api_base_url="https://api.github.com/",
@@ -35,6 +35,12 @@ async def auth_github(request: Request, db: Session = Depends(get_session)):
     token = await oauth.github.authorize_access_token(request)
     resp = await oauth.github.get("user", token=token)
     github_user = resp.json()
+    email = github_user.get("email")
+    if not email:
+        resp = await oauth.github.get("user/emails", token=token)
+        emails = resp.json()
+        email = next(filter(lambda x: x["primary"] is True, emails))
+        email = email["email"]
     user_repo = UserRepo(db)
     access_token_repo = AccessTokenRepo(db)
     user = user_repo.get_by_kwargs(
@@ -43,7 +49,7 @@ async def auth_github(request: Request, db: Session = Depends(get_session)):
     if not user:
         user = user_repo.create_from_kwargs(
             username=github_user["login"].lower(),
-            email=github_user["email"].lower(),
+            email=email.lower(),
             name=github_user["name"].lower(),
             oauth_provider=OauthProvider.GITHUB,
             profile_picture_url=github_user["avatar_url"],
