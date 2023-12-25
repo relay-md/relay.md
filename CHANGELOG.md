@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.16.5 (2023-12-25)
+### Fix
+* Obtain emails thru api in case profile has no default email ([`4078ed7`](https://github.com/knowledgemd/backend/commit/4078ed76960a63bddeb71be4c26daa9285e04b08))
+
 ## v0.16.4 (2023-12-23)
 ### Fix
 * Only activate a subscription if it gets paid ([`eb7a55e`](https://github.com/knowledgemd/backend/commit/eb7a55e4500ed82e58d9a2e7cfcea09bcdb49141))
