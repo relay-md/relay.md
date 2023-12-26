@@ -68,6 +68,10 @@ class LoginRequiredException(BaseAPIException):
         self.next_url = next_url
 
 
+class WebhookException(BaseAPIException):
+    code = status.HTTP_400_BAD_REQUEST
+
+
 async def handle_exception(request: Request, exc: BaseAPIException):
     """Our internal exceptions are handled here"""
     from .schema import Response
@@ -122,6 +126,19 @@ async def web_unhandled_exception(
     return templates.TemplateResponse("exception.pug", context=dict(**locals()))
 
 
+async def web_handle_webhookexception(
+    request: Request,
+    exc: Exception,
+    user: User = Depends(get_optional_user),
+    config: Settings = Depends(get_config),
+):
+    from .schema import Response
+
+    error = dict(message=str(exc), detail={})
+    content: Response = Response(error=error)
+    return JSONResponse(content=content.model_dump(exclude_none=True), status_code=400)
+
+
 async def redirect_to_login(
     request: Request,
     exc: Exception,
@@ -148,4 +165,5 @@ def include_app_web(app):
     app.add_exception_handler(NotFound, web_handle_exception)
     app.add_exception_handler(Unauthorized, web_handle_exception)
     app.add_exception_handler(BillingException, web_handle_exception)
+    app.add_exception_handler(WebhookException, web_handle_webhookexception)
     app.add_exception_handler(Exception, web_unhandled_exception)

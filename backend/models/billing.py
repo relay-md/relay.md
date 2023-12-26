@@ -45,7 +45,9 @@ class Subscription(Base):
     team: Mapped["Team"] = relationship(back_populates="subscriptions")  # noqa
 
     invoice: Mapped["Invoice"] = relationship(back_populates="subscriptions")  # noqa
-    stripe: Mapped["StripeSubscription"] = relationship()  # noqa
+    stripe: Mapped["StripeSubscription"] = relationship(  # noqa
+        back_populates="subscription"
+    )
 
     @property
     def is_yearly(self):

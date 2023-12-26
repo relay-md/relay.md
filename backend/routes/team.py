@@ -349,6 +349,12 @@ async def update_team_seats(
     db: Session = Depends(get_session),
 ):
     team_repo = TeamRepo(db)
+
+    # Get number of members in the team
+    user_team_repo = UserTeamRepo(db)
+    count_members = user_team_repo.count(team_id=team.id)
+    if count_members > seats:
+        return f"""<p id="validate-team-name" class="help is-danger">Your team has {count_members} seats in use right now!</p>"""
     subscription_repo = SubscriptionRepo(db)
     subscription = subscription_repo.get_latest_subscription_for_team_id(team.id)
     if not subscription:
