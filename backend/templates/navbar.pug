@@ -8,26 +8,33 @@ nav.navbar(role='navigation' aria-label='main navigation')
       span(aria-hidden='true')
   #navBarBurger.navbar-menu
     .navbar-start
-      a.navbar-item(href='/#features') Features
+      .navbar-item.has-dropdown.is-hoverable
+        .navbar-link Relay.md
+        .navbar-dropdown
+          a.navbar-item(href='/#features') Features
+          a.navbar-item(href='/#howitworks') How it Works
+          a.navbar-item(href="{{url_for('relay_basics')}}") Basics
+          a.navbar-item(href="{{url_for('obsidian_plugin')}}") Plugin
       a.navbar-item(href="{{url_for('pricing')}}") Pricing
-      a.navbar-item(href="{{url_for('relay_basics')}}") Basics
-      a.navbar-item(href="{{url_for('obsidian_plugin')}}") Plugin
       a.navbar-item(href="{{url_for('news')}}") News
-      {% if not config.ENABLE_EARLY_ACCESS or user%}
-      a.navbar-item(href="{{url_for('get_teams')}}") Teams
-      a.navbar-item(href="{{url_for('my_documents')}}") My Docs
-      {% endif %}
     .navbar-end
       .navbar-item
         #switcher-default
       {% if user %}
-      .navbar-item
-        a.button.is-warning(href='/profile')
+      .navbar-item.has-dropdown.is-hoverable
+        .navbar-link
+         .button.is-warning
           span.icon
             figure.image.is-24x24
               img.is-rounded(src='{{user.profile_picture_url}}')
           span
             strong {{ user.username }}
+        .navbar-dropdown
+          a.navbar-item(href="{{url_for('profile')}}") Profile
+          a.navbar-item(href="{{url_for('get_teams')}}") Teams
+          a.navbar-item(href="{{url_for('my_documents')}}") Documents
+          .navbar-item Assets&nbsp;&nbsp;
+           .tag.is-danger.is-small soon
       .navbar-item
         a.button.is-primary(href='/logout')
           i.fas.fa-sign-out
