@@ -2,11 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* Burger Menu
     ***************************************************************/
-    // Get all "navbar-burger" elements
-    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-
-    // Add a click event on each of them
-    $navbarBurgers.forEach(el => {
+    function dropdown(el) {
         el.addEventListener('click', () => {
 
             // Get the target from the "data-target" attribute
@@ -18,6 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
             $target.classList.toggle('is-active');
 
         });
+    }
+    // Get all "navbar-burger" elements
+    const $navbarBurgers = document.querySelectorAll('.navbar-burger');
+    $navbarBurgers.forEach(el => {
+        dropdown(el);
+    });
+    // Get all "navbar-burger" elements
+    const $dropdownMenu = document.querySelectorAll('.has-dropdown');
+    $dropdownMenu.forEach(el => {
+        dropdown(el);
     });
 
     /* Light/dark switcher

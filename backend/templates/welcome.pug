@@ -3,6 +3,10 @@
 {% if user %}
 {% include "get-document.pug" %}
 {% endif %}
-{% include "features.pug" %}
+{% include "title-hero.pug" %}
 {% include "howitworks.pug" %}
+{% if not user %}
+{% include "subscribe.pug" %}
+{% endif %}
+{% include "features.pug" %}
 {% endblock %}

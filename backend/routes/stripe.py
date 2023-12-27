@@ -2,13 +2,13 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import RedirectResponse
 from starlette.responses import HTMLResponse
 
 from ..config import Settings, get_config
 from ..database import Session, get_session
-from ..exceptions import BadRequest
+from ..exceptions import BadRequest, WebhookException
 from ..repos.billing import InvoiceRepo
 from ..repos.user import User
 from ..templates import templates
@@ -105,6 +105,7 @@ async def stripe_session_for_invoice(
 )
 async def stripe_webhook(
     request: Request,
+    response: Response,
     config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
     username: str = Depends(required_basic_auth),
@@ -113,5 +114,5 @@ async def stripe_webhook(
     try:
         await invoice_repo.process_webhook(request)
     except Exception as e:
-        return dict(error=dict(message=str(e)))
+        raise WebhookException(str(e))
     return dict(success=True, message="accepted")

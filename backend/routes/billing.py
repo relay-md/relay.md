@@ -7,7 +7,7 @@ from starlette.responses import RedirectResponse
 from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import BadRequest, NotAllowed
-from ..models.billing import InvoiceStatus, Subscription
+from ..models.billing import Subscription
 from ..models.stripe import StripeSubscription
 from ..repos.billing import (
     InvoiceRepo,
@@ -107,17 +107,6 @@ async def team_billing_payment(
     else:
         stripe_key = "team-monthly"
 
-    invoice_repo = InvoiceRepo(db)
-    subscriptions = [
-        Subscription(
-            name="Team Subscription",
-            quantity=1,  # 1 member
-            price=int(price_total * 100),
-            description=f"Team: {team_name}",
-            team_id=team.id,
-            stripe=StripeSubscription(stripe_key=stripe_key),
-        )
-    ]
     customer_repo = PersonalInformationRepo(db)
     personal_data = dict(
         user_id=user.id,
@@ -133,21 +122,37 @@ async def team_billing_payment(
         phone_number=phone,
     )
     person = customer_repo.get_by_kwargs(user_id=user.id)
+    subscription_repo = SubscriptionRepo(db)
+    invoice_repo = InvoiceRepo(db)
+
     if person:
         person = customer_repo.update(person, **personal_data, ip=request.client.host)
     else:
         person = customer_repo.create_from_kwargs(
             **personal_data, ip=request.client.host
         )
-    invoice = invoice_repo.get_by_kwargs(
-        user_id=user.id, customer_id=person.id, payment_status=InvoiceStatus.PENDING
-    )
-    if not invoice:
+
+    subscription = subscription_repo.get_by_kwargs(team_id=team.id, active=False)
+    if not subscription:
+        subscriptions = [
+            Subscription(
+                name="Team Subscription",
+                quantity=1,  # 1 member
+                price=int(price_total * 100),
+                description=f"Team: {team_name}",
+                team_id=team.id,
+                stripe=StripeSubscription(stripe_key=stripe_key),
+            )
+        ]
         invoice = invoice_repo.create_from_kwargs(
             user_id=user.id,
             customer_id=person.id,
             subscriptions=subscriptions,
         )
+    else:
+        subscriptions = [subscription]
+        invoice = invoice_repo.get_by_id(subscriptions[0].invoice_id)
+
     return RedirectResponse(
         url=request.url_for("payment_invoice", invoice_id=invoice.id),
         status_code=status.HTTP_302_FOUND,

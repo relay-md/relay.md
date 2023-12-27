@@ -3,8 +3,13 @@
 .mt-5.mb-5
  .columns
   .column.is-8.is-offset-2
-   h1.title.is-1 Team Overview
-   p.block You can subscribe to individual topics of each team by clicking the topic. You will get new documents in those topics into your Vault automatically.
+   .title.is-2 Team Directory
+   .subtitle.is-5 Click on the team to join and subscribe to topics
+   p.block
+     a.button.is-primary(href="{{url_for('pricing')}}")
+       span.icon
+         i.fas.fa-plus
+       span Create a new team
    p.block
     span.text-icon
      span.icon

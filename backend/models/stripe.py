@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
 
@@ -37,6 +37,7 @@ class StripeSubscription(Base):
     subscription_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("billing_subscription.id"), unique=True
     )
+    subscription: Mapped["Subscription"] = relationship()  # noqa
 
     # Internal id for corresponding stripe product
     stripe_key: Mapped[str] = mapped_column(String(32))

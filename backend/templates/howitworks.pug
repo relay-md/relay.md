@@ -1,50 +1,63 @@
 #howitworks.block.content
-  .container
-    .columns
-      .column.is-6.is-offset-3.p-5
-        h1.title How it works
-        h3.subtitle The power of Markdown, Frontmatter and Obsidian
-        .mb-5
-        .title.is-5.icon-text.mb-0
-          span.icon.has-text-success
-            i.fas.fa-check-square
-          span.has-text-weight-bold Log-in
-        p.block
-          | With your
-          span.icon-text
-            span.icon
-              i.fab.fa-github
-            span Account
-          | , you can register
-          | on relay.md with just one click. Other identity providers may be
-          | supported in the future.
-        .title.is-5.icon-text.mb-0
-          span.icon.has-text-success
-            i.fas.fa-check-square
-          span.has-text-weight-bold Obsidian Plugin
-        p.block
-          | Use the power of Relay.md fully integrating into Obsidian via a
-          | plugin. Get newly shared content and post new documents with a single click.
-        .title.is-5.icon-text.mb-0
-          span.icon.has-text-success
-            i.fas.fa-check-square
-          span.has-text-weight-bold Sharing
-        p.block
-          | Use the frontmatter key
+ .column.is-6.is-offset-3.p-5
+  .title.is-4 How it works
+  .subtitle.is-6 The power of Markdown, Frontmatter and Obsidian
+
+  .media
+    figure.media-left
+      p.image.is-128x128
+        img(src='{{url_for("static", path="img/howto/plugin-configuration.png")}}').is-rounded
+    .media-content
+      .content
+        .title.is-5.mb-1
+          strong Configure the Plugin
+        p After installing the plugin, a single click in the plugin's settings is enough to link your Relay.md account in Obsidian. No more configuration is required. It couldn't be more easy to set up.
+
+  .media
+    figure.media-left
+      p.image.is-128x128
+        img(src='{{url_for("static", path="img/howto/frontmatter.png")}}').is-rounded
+    .media-content
+      .content
+        .title.is-5.mb-1
+          strong Add properties to your document
+        p Use the frontmatter key&nbsp;
           span.tag.is-dark
             tt relay-to
-          | to list recipients individually or
+          | &nbsp;to list recipients individually or
           | entire teams including a topic. &nbsp;
           a(href="{{url_for('relay_basics')}}") Find out more.
-        .title.is-5.icon-text.mb-0
-          span.icon.has-text-success
-            i.fas.fa-check-square
-          span.has-text-weight-bold Developer Access
-        p.block
-          | You can build your own apps using our API at
+
+  .media
+    figure.media-left
+      p.image.is-128x128
+        img(src='{{url_for("static", path="img/howto/downloaded-articles-in-base-folder.png")}}').is-rounded
+    .media-content
+      .content
+        .title.is-5.mb-1
+          strong Receive your documents
+        p You will receive documents shared with you automatically into your vault, sorted into corresponding teams and topics. Each document will contain a unique identifier that allows the plugin to locate the document anywhere in your vault for updates. We recommend you move received documents into your usual hierarchy.
+
+  .media
+    figure.media-left
+      p.image.is-128x128
+        img(src='{{url_for("static", path="img/howto/document-search.png")}}').is-rounded
+    .media-content
+      .content
+        .title.is-5.mb-1
+          strong Access documents online
+        p Public documents can be access through the website by means of the unique document id. Simply share the document-id and people can read the document through the search online.
+
+  .media
+    figure.media-left
+      p.image.is-128x128
+        img(src='{{url_for("static", path="img/howto/api.png")}}').is-rounded
+    .media-content
+      .content
+        .title.is-5.mb-1
+          strong Developer Access
+        p You can build your own apps using our API at&nbsp;
           a(href='https://api.relay.md/docs') api.relay.md
-          | .
-          | Obtain your custom access key from your
-          a(href='https://relay.md/profile') relay.md profile
-          | . Use the Access
-          | key for authentication against our API.
+          | . Feel free to build your own note-taking app integration, or&nbsp;
+          a(href="{{url_for('contact')}}") contact using
+          | &nbsp;for assistance.
