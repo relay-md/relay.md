@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.0 (2023-12-27)
+### Feature
+* **subscription:** Deal with subscriptions using stripe webhooks ([`c0f0ae5`](https://github.com/knowledgemd/backend/commit/c0f0ae55e00d52e9e214fa75cb4416cc650cb128))
+
+### Fix
+* Unittests ([`c7e6334`](https://github.com/knowledgemd/backend/commit/c7e633430d32e7f3b63a7d2b9314dee4b850ab62))
+
 ## v0.16.5 (2023-12-25)
 ### Fix
 * Obtain emails thru api in case profile has no default email ([`4078ed7`](https://github.com/knowledgemd/backend/commit/4078ed76960a63bddeb71be4c26daa9285e04b08))
