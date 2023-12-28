@@ -8,7 +8,15 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from backend import database, models, repos
+from backend.api import app as api_app
 from backend.config import Settings, SettingsConfigDict
+from backend.repos.document import DocumentRepo
+from backend.repos.team import TeamRepo
+from backend.repos.team_topic import TeamTopicRepo
+from backend.repos.user import UserRepo
+from backend.repos.user_team_topic import UserTeamTopicRepo
+from backend.web import app as web_app
 
 # monekey patching so we load config properly
 Settings.model_config = SettingsConfigDict(
@@ -16,14 +24,6 @@ Settings.model_config = SettingsConfigDict(
 )
 
 # noqa
-from backend import database, models, repos
-from backend.api import app as api_app
-from backend.repos.document import DocumentRepo
-from backend.repos.team import TeamRepo
-from backend.repos.team_topic import TeamTopicRepo
-from backend.repos.user import UserRepo
-from backend.repos.user_team_topic import UserTeamTopicRepo
-from backend.web import app as web_app
 
 
 @pytest.fixture(scope="session")
@@ -252,7 +252,47 @@ def create_team(team_repo, account):
 
 @pytest.fixture
 def create_team_topic(team_topic_repo, account):
-    def func(name: str):
-        return team_topic_repo.from_string(name, account)
+    def func(name: str, from_account=account):
+        return team_topic_repo.from_string(name, from_account)
+
+    return func
+
+
+@pytest.fixture
+def upload_document(api_client):
+    def func(content: str, headers: dict, relay_to: str):
+        payload = f"""---
+relay-filename: example.md
+relay-to:
+- {relay_to}
+---
+
+{content}"""
+        req = api_client.post("/v1/doc", headers=headers, content=payload)
+        req.raise_for_status()
+        res = req.json()
+        if "error" in res:
+            raise ValueError(res["error"]["code"], res["error"]["message"])
+        return res["result"]
+
+    return func
+
+
+@pytest.fixture
+def update_document(api_client):
+    def func(id: str, content: str, headers: dict, relay_to: str):
+        payload = f"""---
+relay-filename: example.md
+relay-to:
+- {relay_to}
+---
+
+{content}"""
+        req = api_client.put(f"/v1/doc/{id}", headers=headers, content=payload)
+        req.raise_for_status()
+        res = req.json()
+        if "error" in res:
+            raise ValueError(res["error"]["code"], res["error"]["message"])
+        return res["result"]
 
     return func

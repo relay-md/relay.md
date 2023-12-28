@@ -44,13 +44,13 @@ def s3(patch_document_body_create, patch_document_body_get):
 
 def test_document_upload(auth_header, api_client, s3):
     req = api_client.post("/v1/doc", headers=auth_header, content=mocked_up_text)
-    req.raise_for_status(), req.text
+    req.raise_for_status()
 
     ret = req.json()
     doc_id = ret["result"]["relay-document"]
 
     req = api_client.get(f"/v1/doc/{doc_id}", headers=auth_header)
-    req.raise_for_status(), req.text
+    req.raise_for_status()
 
     # lets add the id to the doc
     original_doc = mocked_up_text.split("\n")
@@ -67,7 +67,7 @@ def test_document_upload(auth_header, api_client, s3):
     req = api_client.get(
         f"/v1/doc/{doc_id}", headers={**auth_header, "content-type": "text/markdown"}
     )
-    req.raise_for_status(), req.text
+    req.raise_for_status()
 
     expected = f"""---
 relay-document: {doc_id}

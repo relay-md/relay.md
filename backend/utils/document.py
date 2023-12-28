@@ -41,9 +41,10 @@ def check_document_read_permissions(
         team = team_topic.team
         membership = user_repo.is_member(user, team_topic.team)
 
+        print(user, team.public_permissions)
         if not team.can(Permissions.can_post, user, membership):
             raise exceptions.NotAllowed(
-                f"You are not allowed to post to {team_topic.team}!"
+                f"You are not allowed to read from {team_topic.team}!"
             )
 
 
@@ -67,7 +68,7 @@ def check_document_modify_permissions(db: Session, user: User, shareables: Share
 
         if not team.can(Permissions.can_modify, user, membership):
             raise exceptions.NotAllowed(
-                f"You are not allowed to post to {team_topic.team}!"
+                f"You are not allowed to modify posts in {team_topic.team}!"
             )
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 import frontmatter
@@ -13,7 +13,7 @@ from .. import __version__, exceptions
 from ..database import Session, get_session
 from ..models.document import Document
 from ..models.user import User
-from ..repos.access_token import AccessTokenRepo
+from ..repos.access_token import AccessToken, AccessTokenRepo
 from ..repos.document import DocumentRepo
 from ..repos.document_access import DocumentAccessRepo
 from ..repos.document_body import DocumentBodyRepo
@@ -54,7 +54,7 @@ async def get_access_token(
 
 async def get_optional_access_token(
     api_key_header: str = Security(api_key_header), db: Session = Depends(get_session)
-) -> str:
+) -> Optional[str]:
     """This still requires that the X-API-key is defined in the header"""
     try:
         api_key_uuid = UUID(api_key_header)
@@ -69,12 +69,14 @@ async def get_optional_access_token(
     return
 
 
-async def require_authenticated_user(access_token: str = Security(get_access_token)):
+async def require_authenticated_user(
+    access_token: AccessToken = Security(get_access_token),
+):
     return access_token.user
 
 
 async def optional_authenticated_user(
-    access_token: str = Security(get_optional_access_token),
+    access_token: AccessToken = Security(get_optional_access_token),
 ):
     """We need this optional autentication to be able to share documents
     without requiring a login
@@ -248,7 +250,6 @@ async def get_doc(
 @router.put("/doc/{id}", tags=["v1"])
 async def put_doc(
     request: Request,
-    id: UUID,
     document: Document = Depends(get_user_owned_document),
     user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
