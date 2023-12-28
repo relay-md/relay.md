@@ -40,7 +40,6 @@ async def contact_post(
     email: str = Form(default=""),
     message: str = Form(default=""),
 ):
-
     send_email(
         get_config().MAIL_ADMIN,
         f"[relay.md - contact form] {name}",
