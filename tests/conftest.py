@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Configuration for pytest"""
 import tempfile
-from typing import List
+from typing import List, Optional
 
 import pytest
 from fastapi.testclient import TestClient
@@ -260,8 +260,16 @@ def create_team_topic(team_topic_repo, account):
 
 @pytest.fixture
 def upload_document(api_client):
-    def func(content: str, headers: dict, relay_to: str):
-        payload = f"""---
+    def func(content: str, headers: dict, relay_to: Optional[str] = None):
+        if not relay_to:
+            payload = f"""---
+relay-filename: example.md
+relay-to: []
+---
+
+{content}"""
+        else:
+            payload = f"""---
 relay-filename: example.md
 relay-to:
 - {relay_to}
