@@ -8,22 +8,22 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend import database, models, repos
-from backend.api import app as api_app
 from backend.config import Settings, SettingsConfigDict
+
+# monekey patching so we load config properly
+Settings.model_config = SettingsConfigDict(  # noqa
+    env_file="tests/config.env", env_file_encoding="utf-8"
+)
+
+# noqa
+from backend import database, models, repos  # noqa
+from backend.api import app as api_app
 from backend.repos.document import DocumentRepo
 from backend.repos.team import TeamRepo
 from backend.repos.team_topic import TeamTopicRepo
 from backend.repos.user import UserRepo
 from backend.repos.user_team_topic import UserTeamTopicRepo
 from backend.web import app as web_app
-
-# monekey patching so we load config properly
-Settings.model_config = SettingsConfigDict(
-    env_file="tests/config.env", env_file_encoding="utf-8"
-)
-
-# noqa
 
 
 @pytest.fixture(scope="session")
