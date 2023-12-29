@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v0.17.1 (2023-12-29)
+### Fix
+* Tests ([`babba50`](https://github.com/knowledgemd/backend/commit/babba5059c4830dfc9c141ee87e4679a65b435e9))
+* Require a github username for oauth ([`4986a17`](https://github.com/knowledgemd/backend/commit/4986a178bd131ec585a88880bdf9a23216a82197))
+* Additional test for empty upload ([`4d4b289`](https://github.com/knowledgemd/backend/commit/4d4b289e7b5363ca824de3ea81e9523c051f4101))
+* Linting ([`52b3513`](https://github.com/knowledgemd/backend/commit/52b35135c16548e9f7c28642f477b844632e98e7))
+
 ## v0.17.0 (2023-12-27)
 ### Feature
 * **subscription:** Deal with subscriptions using stripe webhooks ([`c0f0ae5`](https://github.com/knowledgemd/backend/commit/c0f0ae55e00d52e9e214fa75cb4416cc650cb128))
