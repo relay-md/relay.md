@@ -11,16 +11,17 @@ from .database import Base, engine
 from .routes import v1
 
 # Setup sentry for alerting in case of exceptions
-sentry_sdk.init(
-    dsn=get_config().SENTRY_DSN,
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    traces_sample_rate=1.0,
-    # Set profiles_sample_rate to 1.0 to profile 100%
-    # of sampled transactions.
-    # We recommend adjusting this value in production.
-    profiles_sample_rate=1.0,
-)
+if get_config().SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=get_config().SENTRY_DSN,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
 
 # Create all tables
 Base.metadata.create_all(engine)
