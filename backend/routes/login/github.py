@@ -6,6 +6,7 @@ from starlette.responses import RedirectResponse
 
 from ...config import get_config
 from ...database import Session, get_session
+from ...exceptions import BadRequest
 from ...models.user import OauthProvider
 from ...repos.access_token import AccessTokenRepo
 from ...repos.user import UserRepo
@@ -46,6 +47,10 @@ async def auth_github(request: Request, db: Session = Depends(get_session)):
     user = user_repo.get_by_kwargs(
         username=github_user["login"].lower(), oauth_provider=OauthProvider.GITHUB
     )
+    if not github_user.get("name"):
+        raise BadRequest(
+            "A username in github is required. Please add a username to your github profile!"
+        )
     if not user:
         user = user_repo.create_from_kwargs(
             username=github_user["login"].lower(),
