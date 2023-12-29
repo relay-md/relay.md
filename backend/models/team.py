@@ -117,7 +117,7 @@ class Team(Base):
                 return membership_action
             return (action & self.member_permissions) == action
         # public
-        return (action & self.public_permissions) == action
+        return bool((action & self.public_permissions) == action)
 
     @staticmethod
     def validate_team_name(name):

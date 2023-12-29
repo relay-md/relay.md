@@ -26,7 +26,6 @@ class StripeCustomer(Base):
 
 
 class StripeSubscription(Base):
-
     __tablename__ = "stripe_subscription"
 
     id: Mapped[uuid.UUID] = mapped_column(
