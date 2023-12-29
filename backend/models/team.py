@@ -81,6 +81,7 @@ class Team(Base):
 
     # Should this be shown in directory listing teams?
     hide: Mapped[bool] = mapped_column(default=False)
+    favorit: Mapped[bool] = mapped_column(default=False)
 
     @property
     def is_public(self):

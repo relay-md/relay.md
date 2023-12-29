@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ECHO: bool = False
 
+    # Admins
+    ADMIN_USER_IDS: List[str] = []
+
     # Limit API access by means of CORS
     API_ALLOWED_ORIGINS: List[str] = ["*"]
 
