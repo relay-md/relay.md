@@ -15,28 +15,30 @@
       {% endif %}
     .media-content
      a(href="{{url_for('show_team', team_name=team.name)}}").title.is-4 {{team.name}}
-     .subtitle.is-6.mb-3 {{team.headline | default("")}}
+     .subtitle.is-6.mb-0.mt-0 {{team.headline | default("")}}
      nav.level.is-mobile.m-0
       .level-left
        .level-item {{member_count}} members
-     {% if user.is_admin %}
-     nav.level.is-mobile.m-0
-      .level-left
-       a.level-item
-         {% if team.favorit %}
-         a(href="{{url_for('toggle_team_favorit', team_name=team.name)}}")
-          span.icon.has-text-warning
-           i.fas.fa-star
-         {% else %}
-         a(href="{{url_for('toggle_team_favorit', team_name=team.name)}}")
-          span.icon.has-text-link
-           i.fas.fa-star
-         {% endif %}
-     {% endif %}
     .media-left.mr-0
      {% if team.favorit %}
      span.icon.has-text-warning
       i.fas.fa-star
+     {% endif %}
+     {% if user.is_admin %}
+     .level-right.box.p-1
+      .level-item
+       span.icon
+        i.fas.fa-tools
+      .level-item
+        {% if team.favorit %}
+        a(href="{{url_for('toggle_team_favorit', team_name=team.name)}}")
+         span.icon.has-text-warning
+          i.fas.fa-star
+        {% else %}
+        a(href="{{url_for('toggle_team_favorit', team_name=team.name)}}")
+         span.icon.has-text-link
+          i.fas.fa-star
+        {% endif %}
      {% endif %}
 
  {% endif %}
