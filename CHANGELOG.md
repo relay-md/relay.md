@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.18.0 (2023-12-30)
+### Feature
+* **teams:** Selected teams, search for teams ([`c458f7f`](https://github.com/knowledgemd/backend/commit/c458f7f423702e5ab4bf2243dc1c1d57cba77303))
+
+### Fix
+* Team list with headline looks better now ([`fbaff14`](https://github.com/knowledgemd/backend/commit/fbaff14b3facccec4eaabf1fbc6c011119bd7772))
+* Make sentry optional ([`c36799b`](https://github.com/knowledgemd/backend/commit/c36799be4d3f4942c2c236716e6cb8673a6687f1))
+
 ## v0.17.1 (2023-12-29)
 ### Fix
 * Tests ([`babba50`](https://github.com/knowledgemd/backend/commit/babba5059c4830dfc9c141ee87e4679a65b435e9))
