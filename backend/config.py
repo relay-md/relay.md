@@ -12,7 +12,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class SQLAlchemyEngineOptions(BaseSettings):
     # list of all options: https://docs.sqlalchemy.org/en/13/core/engines.html#engine-creation-api
     pool_pre_ping: bool = True  # helps reconnect in case a SQL server goes down
-    pool_recycle: int = 300  # this setting causes the pool to recycle connections after the given number of seconds
+    # this setting causes the pool to recycle connections after the given number of seconds
+    pool_recycle: int = 300
     pool_size: Optional[int] = 32
     max_overflow: Optional[int] = 64
 
@@ -29,6 +30,9 @@ class Settings(BaseSettings):
     ] = SQLAlchemyEngineOptions()
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ECHO: bool = False
+
+    # Admins
+    ADMIN_USER_IDS: List[str] = []
 
     # Limit API access by means of CORS
     API_ALLOWED_ORIGINS: List[str] = ["*"]
@@ -91,6 +95,8 @@ class Settings(BaseSettings):
             {"name": "default", "description": "Internal use"},
         ],
     }
+
+    SENTRY_DSN: Optional[str] = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

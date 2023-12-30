@@ -31,3 +31,11 @@ def require_user(
     if not user:
         raise LoginRequiredException(next_url=request.url)
     return user
+
+
+def require_admin(user: User = Depends(require_user)) -> Optional[User]:
+    if not user.is_admin:
+        from ..exceptions import NotAllowed
+
+        raise NotAllowed("Only admins can access this area!")
+    return user

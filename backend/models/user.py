@@ -10,6 +10,7 @@ from typing import List
 from sqlalchemy import Column, Enum, Index, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from ..config import get_config
 from ..database import Base
 
 log = logging.getLogger(__name__)
@@ -51,6 +52,10 @@ class User(Base):
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: @{str(self.username)}>"
+
+    @property
+    def is_admin(self):
+        return str(self.id) in get_config().ADMIN_USER_IDS
 
 
 Index("user_oauth_index_unique", User.username, User.oauth_provider, unique=True)

@@ -10,37 +10,25 @@
        span.icon
          i.fas.fa-plus
        span Create a new team
-   p.block
-    span.text-icon
-     span.icon
-      i.fas.fa-globe
-     span Public
-    span.text-icon
-     span.icon
-      i.fas.fa-lock
-     span Private
 
-   .columns.is-multiline
-    {% for team, member_count in teams %}
-    {% if team.name != "_" %}
-    .column.is-6
-     a(href="{{url_for('show_team', team_name=team.name)}}").card-content.box
-      .media
-       .media-left
-        figure.image.is48x48
-         {% if team.is_public %}
-         span.icon
-          i.fas.fa-globe
-         {% else %}
-         span.icon
-          i.fas.fa-lock
-         {% endif %}
-       .media-content
-        .title.is-4 {{team.name}}
-        .subtitle.is-6.mb-1 {{team.headline | default("")}}
-        nav.level
-         .level-left
-          .level-item {{member_count}} members
-    {% endif %}
-    {% endfor %}
+   .title.is-4.mb-0 Selected Teams
+   p.block
+    .level
+     .level-left
+      span.text-icon
+       span.icon
+        i.fas.fa-globe
+       span Public&nbsp;
+      span.text-icon
+       span.icon
+        i.fas.fa-lock
+       span Private
+     .level-right
+      .field
+       p.control.has-icons-left
+         input.input(type="text" name="name" placeholder="Search" hx-post="{{url_for('search_team')}}" hx-trigger="input changed delay:500ms, search" hx-target="#team-search-results")
+         span.icon.is-small.is-left
+           i.fas.fa-search
+   #team-search-results
+    {% include "teams-iterator.pug" %}
 {% endblock %}

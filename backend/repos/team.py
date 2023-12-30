@@ -23,12 +23,12 @@ class TeamRepo(DatabaseAbstractRepository):
     def team_name_search(self, team_name):
         return self._db.scalar(select(Team).filter_by(name=team_name))
 
-    def list_with_count_members(self):
+    def list_selected_teams(self):
         member_count = func.count(UserTeam.team_id)
         return self._db.execute(
             select(Team, member_count)
             .outerjoin(UserTeam)
-            .filter(Team.hide.is_(False))
+            .filter(Team.hide.is_(False), Team.favorit.is_(True))
             .group_by(Team.id)
             .order_by(member_count.desc())
         )
@@ -39,3 +39,14 @@ class TeamRepo(DatabaseAbstractRepository):
         subscription_repo = SubscriptionRepo(self._db)
         subscription_repo.update_quantity(subscription, new_seats)
         self.update(team, seats=new_seats)
+
+    def search_with_count(self, name, limit=10):
+        member_count = func.count(UserTeam.team_id)
+        return self._db.execute(
+            select(Team, member_count)
+            .outerjoin(UserTeam)
+            .filter(Team.name.like(f"%{name}%"), Team.hide.is_(False))
+            .group_by(Team.id)
+            .order_by(member_count.desc())
+            .limit(limit)
+        )
