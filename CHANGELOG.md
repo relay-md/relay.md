@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.0.1 (2023-12-31)
+### Fix
+* Public documents do not require checks to read ([`d8173f9`](https://github.com/knowledgemd/backend/commit/d8173f947d9af9d64c8da6b9c853a5b26e632822))
+
 ## v1.0.0 (2023-12-31)
 ### Feature
 * **early-access:** End of closed beta, go public ([`e9e8fa2`](https://github.com/knowledgemd/backend/commit/e9e8fa22d25422313cfe9406b879d6ed52a8bf9b))
