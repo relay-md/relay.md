@@ -39,14 +39,6 @@ nav.navbar(role='navigation' aria-label='main navigation')
         a.button.is-primary(href='/logout')
           i.fas.fa-sign-out
       {% else %}
-      {% if config.ENABLE_EARLY_ACCESS %}
-      .navbar-item
-        a.button.is-danger(href='/#getearlyaccess')
-          span.icon
-            i.fas.fa-envelope
-          span
-            strong Get Early Access
-      {% else %}
       .navbar-item
         .buttons
           a.button.is-primary(href='/register')
@@ -58,5 +50,4 @@ nav.navbar(role='navigation' aria-label='main navigation')
             span.icon
               i.fab.fa-github
             span Log in
-      {% endif %}
       {% endif %}
