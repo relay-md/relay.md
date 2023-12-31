@@ -4,7 +4,7 @@
 import re
 import uuid
 from datetime import date, datetime
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import Date, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -107,7 +107,11 @@ class Team(Base):
             return True
         return False
 
-    def can(self, action: Permissions, user: User, membership: UserTeam = None):
+    def can(
+        self, action: Permissions, user: User, membership: Optional[UserTeam] = None
+    ):
+        if not user:
+            return False
         if self.user_id == user.id:
             # owner
             return (action & self.owner_permissions) == action
