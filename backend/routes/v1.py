@@ -212,7 +212,8 @@ async def get_doc(
     db: Session = Depends(get_session),
     user: User = Depends(optional_authenticated_user),
 ):
-    check_document_read_permissions(db, user, document.team_topics)
+    if not document.is_public:
+        check_document_read_permissions(db, user, document.team_topics)
     document_body_repo = DocumentBodyRepo()
     document_access_repo = DocumentAccessRepo(db)
     body = document_body_repo.get_by_id(document.id)

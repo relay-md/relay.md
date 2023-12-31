@@ -41,7 +41,6 @@ def check_document_read_permissions(
         team = team_topic.team
         membership = user_repo.is_member(user, team_topic.team)
 
-        print(user, team.public_permissions)
         if not team.can(Permissions.can_post, user, membership):
             raise exceptions.NotAllowed(
                 f"You are not allowed to read from {team_topic.team}!"
