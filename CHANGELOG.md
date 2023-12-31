@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.0.0 (2023-12-31)
+### Feature
+* **early-access:** End of closed beta, go public ([`e9e8fa2`](https://github.com/knowledgemd/backend/commit/e9e8fa22d25422313cfe9406b879d6ed52a8bf9b))
+
+### Breaking
+* end of closed beta  ([`e9e8fa2`](https://github.com/knowledgemd/backend/commit/e9e8fa22d25422313cfe9406b879d6ed52a8bf9b))
+
 ## v0.18.0 (2023-12-30)
 ### Feature
 * **teams:** Selected teams, search for teams ([`c458f7f`](https://github.com/knowledgemd/backend/commit/c458f7f423702e5ab4bf2243dc1c1d57cba77303))
