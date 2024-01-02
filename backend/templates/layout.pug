@@ -34,5 +34,17 @@ head
  script(src='https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js' integrity='sha512-LhccdVNGe2QMEfI3x4DVV3ckMRe36TfydKss6mJpdHjNFiV07dFpS2xzeZedptKZrwxfICJpez09iNioiSZ3hA==' crossorigin='anonymous' referrerpolicy='no-referrer')
  script(src='https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js' integrity='sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q==' crossorigin='anonymous' referrerpolicy='no-referrer')
  link(href=' https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css ' rel='stylesheet')
+ script.
+  var _paq = window._paq = window._paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://matomo.infra.chainsquad.com/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+
  {% block javascript %}
  {% endblock %}
