@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.0 (2024-01-02)
+### Feature
+* **matomo:** Add tracking code ([`fa11c00`](https://github.com/knowledgemd/backend/commit/fa11c001c6bbde6f17beb059ca812391cc65b555))
+
+### Fix
+* Remove early access terms ([`593ae5b`](https://github.com/knowledgemd/backend/commit/593ae5b9e1ba919b6d2f58c3082fc96b3733cdde))
+
 ## v1.0.1 (2023-12-31)
 ### Fix
 * Public documents do not require checks to read ([`d8173f9`](https://github.com/knowledgemd/backend/commit/d8173f947d9af9d64c8da6b9c853a5b26e632822))
