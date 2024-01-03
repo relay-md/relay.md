@@ -1,7 +1,7 @@
 nav.navbar(role='navigation' aria-label='main navigation')
   .navbar-brand
     a.navbar-item(href='/')
-      img.brand-logo(src="{{ url_for('static', path='img/logo-navbar.svg') }}" width='32')
+      img.brand-logo(src="{{ url_for('static', path='img/logo-navbar.svg') }}" width='32' alt="relay.md navbar logo")
     a.navbar-burger(role='button' aria-label='menu' aria-expanded='false' data-target='navBarBurger')
       span(aria-hidden='true')
       span(aria-hidden='true')
@@ -26,7 +26,7 @@ nav.navbar(role='navigation' aria-label='main navigation')
          .button.is-warning
           span.icon
             figure.image.is-24x24
-              img.is-rounded(src='{{user.profile_picture_url}}')
+              img.is-rounded(src='{{user.profile_picture_url}}' alt="profile picture")
           span
             strong {{ user.username }}
         .navbar-dropdown
