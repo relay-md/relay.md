@@ -1,3 +1,6 @@
+window.htmx = require('htmx.org');
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
     /* Burger Menu
@@ -217,8 +220,15 @@ async function get_document(id) {
     return await response.text();
 }
 
+
+
+
 /* Postprocess markdown to something nicer to read
 ***************************************************************/
+const showdown = require('showdown');
+const jsyaml = require('js-yaml');
+const hljs = require('highlight.js/lib/common');
+
 function post_process_markdown(doc) {
     var FRONTMATTER_EXPR = /---\n(.*)?\n---/s
     var body = doc.replace(FRONTMATTER_EXPR, "");

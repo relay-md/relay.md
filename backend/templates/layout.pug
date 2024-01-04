@@ -4,36 +4,17 @@ head
   meta(http-equiv='X-UA-Compatible' content='IE=edge')
   meta(name='viewport' content='width=device-width, initial-scale=1')
   link#favicon(rel='icon' type='image/x-icon' href='/static/img/favicon.ico')
-  title relay.md - simple, efficient communication using markdown
-  link(href='https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css' rel='stylesheet')
-  link(href='https://cdn.jsdelivr.net/npm/bulma-pricingtable@0.2.0/dist/css/bulma-pricingtable.min.css' rel='stylesheet')
-  link(href='https://cdn.jsdelivr.net/npm/bulma-list@1.2.0/css/bulma-list.min.css' rel='stylesheet')
-  link(href='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/default.min.css' rel='stylesheet')
-  link(href='https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tagsinput@1.0.3/dist/css/bulma-tagsinput.min.css' rel='stylesheet')
-  link(href='https://cdn.jsdelivr.net/npm/bulma-switch@2.0.4/dist/css/bulma-switch.min.css' rel='stylesheet')
-  link(href='https://cdn.jsdelivr.net/npm/bulma-tooltip@3.0.2/dist/css/bulma-tooltip.min.css' rel='stylesheet')
-  link(href="https://cdn.jsdelivr.net/npm/bulma-timeline@3.0.5/dist/css/bulma-timeline.min.css" rel="stylesheet")
-  link(href="{{ url_for('static', path='css/style.css') }}" rel='stylesheet')
+  title simple, efficient communication using markdown
+  meta(name="description" content="Relay your markdown files to your team members")
+  meta(http-equiv="content-language" content="en")
+  link(href="{{ url_for('static', path='css/main.css') }}" rel='stylesheet')
 
  body
   {% include "navbar.pug" %}
   {% block content %}{% endblock %}
   {% include "footer.pug" %}
 
- script(src="{{ url_for('static', path='js/script.js') }}")
- script(src='https://unpkg.com/htmx.org@1.9.6')
- script(src='https://unpkg.com/htmx.org/dist/ext/loading-states.js')
  script(src='https://kit.fontawesome.com/15181efa86.js' crossorigin='anonymous')
- script(src='https://unpkg.com/htmx.org@1.9.8' integrity='sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr' crossorigin='anonymous')
- script(src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js')
- script(src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/go.min.js')
- script(src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js')
- script(src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/javascript.min.js')
- script(src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js')
- script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/bulma-tagsinput@2.0.0/dist/js/bulma-tagsinput.min.js')
- script(src='https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js' integrity='sha512-LhccdVNGe2QMEfI3x4DVV3ckMRe36TfydKss6mJpdHjNFiV07dFpS2xzeZedptKZrwxfICJpez09iNioiSZ3hA==' crossorigin='anonymous' referrerpolicy='no-referrer')
- script(src='https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js' integrity='sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q==' crossorigin='anonymous' referrerpolicy='no-referrer')
- link(href=' https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css ' rel='stylesheet')
  script.
   var _paq = window._paq = window._paq || [];
   _paq.push(['trackPageView']);
@@ -45,6 +26,6 @@ head
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
   })();
-
+ script(src="{{ url_for('static', path='js/main.js') }}")
  {% block javascript %}
  {% endblock %}

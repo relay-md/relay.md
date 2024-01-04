@@ -28,13 +28,13 @@ script
 
       // iterate over relay_to
       for (var to of metadata["relay-to"]) {
-    metadata_html += `<div class="control">
+       metadata_html += `<div class="control">
           <div class="tags has-addons">
-        <span class="tag is-dark">to</span>
-        <span class="tag is-info">${to}</span>
+           <span class="tag is-dark">to</span>
+           <span class="tag is-info">${to}</span>
           </div>
         </div>
-      `;
+       `;
       }
       document.getElementById('frontmatter').innerHTML = metadata_html;
     })
