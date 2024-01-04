@@ -228,14 +228,6 @@ async function get_document(id) {
 const showdown = require('showdown');
 const jsyaml = require('js-yaml');
 const hljs = require('highlight.js/lib/common');
-const go = require('highlight.js/lib/languages/go')
-const python = require('highlight.js/lib/languages/python');
-const javascript = require('highlight.js/lib/languages/javascript');
-const json = require('highlight.js/lib/languages/json');
-hljs.registerLanguage('go', go);
-hljs.registerLanguage('python', python);
-hljs.registerLanguage('javascript', javascript);
-hljs.registerLanguage('json', json);
 
 function post_process_markdown(doc) {
     var FRONTMATTER_EXPR = /---\n(.*)?\n---/s
