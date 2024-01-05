@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.0 (2024-01-05)
+### Feature
+* **sitemap:** Initial implementation of sitemap ([`76993b9`](https://github.com/knowledgemd/backend/commit/76993b9f0d2d506b5e8897625e3615660a873f72))
+* **esbuild+sass:** Make better use of web tools instead of loading external assets ([`94ba669`](https://github.com/knowledgemd/backend/commit/94ba6691c20389deb790929f2f175885a4075fd9))
+
+### Fix
+* Team hide is a premium feature, really ([`9f1adec`](https://github.com/knowledgemd/backend/commit/9f1adec74382b5f0dbfada9f898ff1157635296e))
+* Ensure we have the required files handy, even if empty (requires build with esbuild) ([`e2e5edf`](https://github.com/knowledgemd/backend/commit/e2e5edfedc4f84a03bfd1bac22953003ddd95a1f))
+* **seo:** Make requested changes to layout ([`9be9639`](https://github.com/knowledgemd/backend/commit/9be9639781a89480bb34f0109034faf6b1baf9e4))
+
 ## v1.1.0 (2024-01-02)
 ### Feature
 * **matomo:** Add tracking code ([`fa11c00`](https://github.com/knowledgemd/backend/commit/fa11c001c6bbde6f17beb059ca812391cc65b555))
