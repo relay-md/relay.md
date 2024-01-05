@@ -77,17 +77,17 @@ td.has-text-light
            i.fas.fa-expand
         span(id="updated_team_headline")
 
-    .field.is-horizontal
-     .field-label.is-normal Hide Team
-     .field-body
-      .control
-       {% if team.hide %}
-       input.switch(id="hide_team" checked="checked" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
-       {% else %}
-       input.switch(id="hide_team" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
-       {% endif %}
-       label(for="hide_team")
-       span(id="updated_team_hide")
+    // .field.is-horizontal
+    //  .field-label.is-normal Hide Team
+    //  .field-body
+    //   .control
+    //    {% if team.hide %}
+    //    input.switch(id="hide_team" checked="checked" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+    //    {% else %}
+    //    input.switch(id="hide_team" type="checkbox" name="hide" hx-post="{{url_for('update_team_hide', team_name=team.name)}}" hx-target="#updated_team_hide")
+    //    {% endif %}
+    //    label(for="hide_team")
+    //    span(id="updated_team_hide")
 
    .section
     .title.is-3 Permissions
