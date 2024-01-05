@@ -25,34 +25,61 @@ body {
 // You can easily customize Bulma with your own variables.
 // Just uncomment the following block to see the result.
 
-/*
-// 1. Import the initial variables
-@import "../node_modules/bulma/sass/utilities/initial-variables";
+@import "bulma/sass/utilities/initial-variables";
+// customize bulma here
 
-// 2. Set your own initial variables
-// Update the blue shade, used for links
-$blue: #06bcef;
-// Add pink and its invert
-$pink: #ff8080;
-$pink-invert: #fff;
-// Update the sans-serif font family
-$family-sans-serif: "Helvetica", "Arial", sans-serif;
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/base/_all.sass";
 
-// 3. Set the derived variables
-// Use the new pink as the primary color
-$primary: $pink;
-$primary-invert: $pink-invert;
+@import "bulma/sass/components/navbar.sass";
+@import "bulma/sass/components/card.sass";
+@import "bulma/sass/components/dropdown.sass";
+@import "bulma/sass/components/level.sass";
+@import "bulma/sass/components/media.sass";
+@import "bulma/sass/components/menu.sass";
+@import "bulma/sass/components/message.sass";
+//@import "bulma/sass/components/modal.sass";
+@import "bulma/sass/components/pagination.sass";
+//@import "bulma/sass/components/panel.sass";
+//@import "bulma/sass/components/tabs.sass";
+@import "bulma/sass/elements/box.sass";
+@import "bulma/sass/elements/button.sass";
+@import "bulma/sass/elements/container.sass";
+@import "bulma/sass/elements/content.sass";
+@import "bulma/sass/elements/form.sass";
+@import "bulma/sass/elements/icon.sass";
+@import "bulma/sass/elements/image.sass";
+@import "bulma/sass/elements/notification.sass";
+@import "bulma/sass/elements/other.sass";
+@import "bulma/sass/elements/progress.sass";
+@import "bulma/sass/elements/table.sass";
+@import "bulma/sass/elements/tag.sass";
+@import "bulma/sass/elements/title.sass";
 
-// 4. Import the rest of Bulma
-*/
+@import "bulma/sass/form/shared.sass";
+@import "bulma/sass/form/input-textarea.sass";
+@import "bulma/sass/form/checkbox-radio.sass";
+//@import "bulma/sass/form/file.sass";
+@import "bulma/sass/form/select.sass";
+@import "bulma/sass/form/tools.sass";
 
-// Bulma imports
-@import "../../../node_modules/bulma/bulma";
-@import "../../../node_modules/bulma-extensions/bulma-pricingtable/src/sass";
-@import "../../../node_modules/bulma-extensions/bulma-tooltip/src/sass";
-@import "../../../node_modules/bulma-extensions/bulma-switch/src/sass";
-@import "../../../node_modules/bulma-extensions/bulma-timeline/src/sass";
-@import "../../../node_modules/bulma-list/sass/bulma-list.sass";
+@import "bulma/sass/grid/_all.sass";
+@import "bulma/sass/helpers/_all.sass";
+@import "bulma/sass/layout/_all.sass";
+
+// Bulma extensions
+@import "bulma-extensions/bulma-pricingtable/src/sass";
+@import "bulma-extensions/bulma-tooltip/src/sass";
+@import "bulma-extensions/bulma-switch/src/sass";
+@import "bulma-extensions/bulma-timeline/src/sass";
+@import "bulma-list/sass/bulma-list.sass";
 
 // HighlightJS
-@import "../../../node_modules/highlight.js/styles/atom-one-dark"
+@import "highlight.js/styles/atom-one-dark";
+
+// fontawesome
+$fa-font-path: "@fortawesome/fontawesome-free/webfonts/";
+@import "@fortawesome/fontawesome-free/scss/fontawesome";
+@import "@fortawesome/fontawesome-free/scss/regular";
+@import "@fortawesome/fontawesome-free/scss/solid";
+@import "@fortawesome/fontawesome-free/scss/brands";
