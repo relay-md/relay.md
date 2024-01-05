@@ -1,7 +1,7 @@
 import * as esbuild from 'esbuild'
 
 const config = {
-    entryPoints: ['backend/static/javascript/main.js'],
+    entryPoints: ['backend/static/es/main.js'],
     outdir: 'backend/static/js',
     bundle: true,
     minify: true,
