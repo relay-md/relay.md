@@ -1,30 +1,21 @@
-FROM python:3.8-alpine3.15
+FROM python:3.8-slim
 
 # Copy over the requirements.txt file
 COPY requirements.txt /requirements.txt
 
 # Install system dependencies
-RUN \
-    apk add --no-cache --virtual .build-deps \
-        build-base \
-        musl-dev \
-        libffi-dev \
-        libressl-dev \
-        openssl-dev \
-        libxml2-dev \
-        libxslt-dev \
-        libgcc \
-        openssl-dev \
-    && apk add --no-cache \
-        python3-dev \
-        git \
-        curl \
+RUN apt-get update -y \
+    && apt-get install --no-install-recommends -y \
+        gcc \
+        default-libmysqlclient-dev \
+        python3.8-dev \
+        python3-pip \
+        nodejs npm \
+        gettext-base \
         bash \
-        wget \
-        gettext \
-        mariadb-connector-c-dev \
     && CRYPTOGRAPHY_DONT_BUILD_RUST=1 pip3 install --no-cache-dir -r /requirements.txt \
-    && apk del .build-deps
+    && apt-get clean \
+    && rm -rf /var/cache/apt /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install app
 COPY . /app
@@ -32,15 +23,21 @@ COPY . /app
 # Define $HOME
 ENV HOME /app
 
+# make sure all messages always reach console
+ENV PYTHONUNBUFFERED=1
+
 # Working dir inside the app
 WORKDIR /app
+
+# Node
+RUN npm ci && npm run build
 
 # Expose port 5000 for uvicorn
 EXPOSE 5000
 
 # Creates a non-root user and adds permission to access the /app folder
-RUN    addgroup -S appgroup \
-    && adduser -S appuser -G appgroup \
+#
+RUN    useradd --create-home appuser \
     && chown -R appuser /app
 USER appuser
 

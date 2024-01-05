@@ -9,3 +9,5 @@ htmlcov
 *.db
 tests
 .git
+__pycache__
+node_modules/

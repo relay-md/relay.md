@@ -70,3 +70,6 @@ docs/html
 docs/default.db
 
 *.db
+
+backend/static/js/*
+backend/static/css/*
