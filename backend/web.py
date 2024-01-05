@@ -17,6 +17,7 @@ from .routes import (
     document,
     home,
     login,
+    sitemap,
     stripe,
     subscribe,
     team,
@@ -65,6 +66,7 @@ app.include_router(billing.router)
 app.include_router(stripe.router)
 app.include_router(contact.router)
 app.include_router(admin.router)
+app.include_router(sitemap.router)
 
 # TODO:
 # exception handling:
