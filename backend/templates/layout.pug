@@ -4,7 +4,18 @@ head
   meta(http-equiv="content-language" content="en")
   meta(http-equiv='X-UA-Compatible' content='IE=edge')
   meta(name='viewport' content='width=device-width, initial-scale=1')
-  meta(name="description" content="Relay your markdown files to your team members")
+  meta(name="description" content="Relay.md revolutionizes team collaboration by seamlessly merging the power of Obsidian, the markdown-based knowledge platform, with effortless document sharing. Our platform empowers Obsidian users to communicate and share markdown documents with members of their teams. By integrating with third-party platforms, Relay.md expands the reach beyond the Obsidian user base, ensuring wider accessibility for shared documents. Real-time collaboration and editing functionalities elevate the experience, making Relay.md the ultimate solution for team collaboration on markdown files.")
+
+  meta(property='og:title' content='Relay.md: Share your markdown documents')
+  meta(property='og:description' content='Simple collaboration with markdown. Obsidian plugin included')
+  meta(property='og:image' content='{{ url_for('static', path='img/logo-navbar.svg') }}')
+  meta(property='og:url' content='https://relay.md')
+
+  // TODO: as soon as we have a Twitter account
+  // meta(name='twitter:title' content='Add title here')
+  // meta(name='twitter:description' content='Add description here')
+  // meta(name='twitter:url' content='https://your-website.com/twitter-image.png')
+  // meta(name='twitter:card' content='summary')
 
   link#favicon(rel='icon' type='image/x-icon' href='/static/img/favicon.ico')
   link(href="{{ url_for('static', path='css/main.css') }}" rel='stylesheet')

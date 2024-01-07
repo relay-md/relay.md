@@ -3,6 +3,7 @@ import os
 
 import sentry_sdk
 from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.sessions import SessionMiddleware
@@ -79,3 +80,13 @@ Instrumentator().instrument(app).expose(app)
 @app.get("/health")
 def health():
     return "ok"
+
+
+@app.get(
+    "/robots.txt",
+    response_class=PlainTextResponse,
+)
+async def robotstxt():
+    return """User-Agent: *
+Disallow: /document/
+"""

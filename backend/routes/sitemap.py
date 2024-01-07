@@ -21,16 +21,20 @@ site_map_routes = [
 
 def generate_sitemap(request: Request):
     # Retrieve the list of URLs to include in the sitemap
+    lastmod = (
+        datetime.utcnow().replace(microsecond=0, second=0, minute=0, hour=0).isoformat()
+    )
     sitemap_data = {
+        "@xmlns": "http://www.sitemaps.org/schemas/sitemap/0.9",
         "url": [
             {
                 "loc": request.url_for(site),
-                "lastmod": datetime.utcnow().isoformat(),
+                "lastmod": lastmod,
                 "changefreq": "daily",
                 "priority": 1.0,
             }
             for site in site_map_routes
-        ]
+        ],
     }
 
     # Convert the data to XML string
