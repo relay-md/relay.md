@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.1 (2024-01-07)
+### Fix
+* More meta details in layout ([`597096e`](https://github.com/knowledgemd/backend/commit/597096e3a4fa85520954c6023486e874292716a5))
+* Target: _blank with noopener ([`c8bf0d3`](https://github.com/knowledgemd/backend/commit/c8bf0d37d3712ae8043170f70a669fd6e865afa2))
+
 ## v1.2.0 (2024-01-05)
 ### Feature
 * **sitemap:** Initial implementation of sitemap ([`76993b9`](https://github.com/knowledgemd/backend/commit/76993b9f0d2d506b5e8897625e3615660a873f72))
