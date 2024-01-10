@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import select
+from typing import List
+
+from sqlalchemy import and_, select
 
 from ..models.permissions import Permissions
 from ..models.team import Team
@@ -52,3 +54,10 @@ class TeamTopicRepo(DatabaseAbstractRepository):
         self._db.commit()
         self._db.refresh(new_team_topic)
         return new_team_topic
+
+    def search_names(self, team: Team, name: str) -> List[Topic]:
+        return self._db.scalars(
+            select(Topic)
+            .join(TeamTopic)
+            .filter(and_(Topic.name.like(f"%{name}%"), TeamTopic.team_id == team.id))
+        )
