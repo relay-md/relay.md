@@ -4,32 +4,6 @@ window.Handlebars = require("handlebars");
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* Burger Menu
-    ***************************************************************/
-    function dropdown(el) {
-        el.addEventListener('click', () => {
-
-            // Get the target from the "data-target" attribute
-            const target = el.dataset.target;
-            const $target = document.getElementById(target);
-
-            // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-            el.classList.toggle('is-active');
-            $target.classList.toggle('is-active');
-
-        });
-    }
-    // Get all "navbar-burger" elements
-    const $navbarBurgers = document.querySelectorAll('.navbar-burger');
-    $navbarBurgers.forEach(el => {
-        dropdown(el);
-    });
-    // Get all "navbar-burger" elements
-    const $dropdownMenu = document.querySelectorAll('.has-dropdown');
-    $dropdownMenu.forEach(el => {
-        dropdown(el);
-    });
-
     /* Light/dark switcher
     ***************************************************************/
     var DARK = "dark";
@@ -267,3 +241,6 @@ function post_process_markdown(doc) {
     });
     return [converter.makeHtml(body), metadata];
 }
+
+window.get_document = get_document;
+window.post_process_markdown = post_process_markdown;
