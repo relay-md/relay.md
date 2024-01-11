@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.3.1 (2024-01-11)
+### Fix
+* Js functions were unavailable in browser ([`bc06e46`](https://github.com/knowledgemd/backend/commit/bc06e460903234d31c80b6a1c703ec54501a57ea))
+
 ## v1.3.0 (2024-01-11)
 ### Feature
 * **htmx:** Searchable topics ([`be0f8b3`](https://github.com/knowledgemd/backend/commit/be0f8b30c5570a8097f44a47d0d09da702c85da5))
