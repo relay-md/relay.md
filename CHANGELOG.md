@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.3.0 (2024-01-11)
+### Feature
+* **htmx:** Searchable topics ([`be0f8b3`](https://github.com/knowledgemd/backend/commit/be0f8b30c5570a8097f44a47d0d09da702c85da5))
+
+### Fix
+* Sitemap.xml format was not accepted by google due to datetime and missing namespace ([`d4a0715`](https://github.com/knowledgemd/backend/commit/d4a0715012c1780bc29798fcd7bfbd387520f385))
+* Typo ([`6455051`](https://github.com/knowledgemd/backend/commit/6455051e1678ef81a429b9cb65a46dcf4a17158b))
+
 ## v1.2.1 (2024-01-07)
 ### Fix
 * More meta details in layout ([`597096e`](https://github.com/knowledgemd/backend/commit/597096e3a4fa85520954c6023486e874292716a5))
