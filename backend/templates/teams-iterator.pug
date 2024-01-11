@@ -16,9 +16,9 @@
     .media-content
      a(href="{{url_for('show_team', team_name=team.name)}}").title.is-4 {{team.name}}
      .subtitle.is-6.mb-0.mt-0 {{team.headline | default("")}}
-     nav.level.is-mobile.m-0
-      .level-left
-       .level-item {{member_count}} members
+     //nav.level.is-mobile.m-0
+     // .level-left
+     //  .level-item {{member_count}} members
     .media-left.mr-0
      {% if team.favorit %}
      span.icon.has-text-warning

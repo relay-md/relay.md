@@ -13,6 +13,7 @@ from ..database import Session, get_session
 from ..models.permissions import Permissions
 from ..repos.billing import SubscriptionRepo
 from ..repos.team import Team, TeamRepo
+from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
 from ..templates import templates
@@ -361,6 +362,94 @@ async def update_team_seats(
         return """<p id="validate-team-name" class="help is-danger">No Subscription available, cannot set seats!</p>"""
     team_repo.update_seats(team, subscription, seats)
     return """<p id="validate-team-name" class="help is-success">Seats updated!</p>"""
+
+
+@router.post("/{team_name}/topic/create", response_class=PlainTextResponse)
+async def create_topic_htx(
+    request: Request,
+    topic: str = Form(default=False),
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    TeamRepo(db)
+    if not team.user_id == user.id:
+        return """<p id="validate-team-name" class="help is-danger">You cannot update the headline!</p>"""
+    team_topic_repo = TeamTopicRepo(db)
+    try:
+        team_topic_repo.from_string(f"{topic}@{team.name}", user)
+    except exceptions.BaseAPIException as exc:
+        return f"""<p id="validate-team-name" class="help is-danger">{exc}!</p>"""
+    return """<p id="validate-team-name" class="help is-success">Topic Created!</p>"""
+
+
+# TODO: this is duplicate code with the .get, except for the extra filtering of
+# topics
+@router.post("/{team_name}/api/topic/list")
+async def api_list_topics_in_team_post(
+    request: Request,
+    search: str = Form(""),
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    user_repo = UserRepo(db)
+    team_topic_repo = TeamTopicRepo(db)
+    topics = team_topic_repo.search_names(team, search.lower())
+    ret = list()
+    for topic in topics:
+        subscribed = bool(user_repo.is_subscribed(user, team, topic))
+        if subscribed:
+            toggle_link = request.url_for(
+                "unsubscribe", team_topic_name=topic.name + "@" + team.name
+            )
+        else:
+            toggle_link = request.url_for(
+                "subscribe", team_topic_name=topic.name + "@" + team.name
+            )
+        ret.append(
+            dict(
+                name=topic.name,
+                id=topic.id,
+                subscribed=subscribed,
+                toggle_url=str(toggle_link),
+            )
+        )
+    return ret
+
+
+@router.get("/{team_name}/api/topic/list")
+async def api_list_topics_in_team(
+    request: Request,
+    team: Team = Depends(get_team),
+    config: Settings = Depends(get_config),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    user_repo = UserRepo(db)
+    # FIXME: this can be made more efficient with a join query
+    ret = list()
+    for topic in team.topics:
+        subscribed = bool(user_repo.is_subscribed(user, team, topic))
+        if subscribed:
+            toggle_link = request.url_for(
+                "unsubscribe", team_topic_name=topic.name + "@" + team.name
+            )
+        else:
+            toggle_link = request.url_for(
+                "subscribe", team_topic_name=topic.name + "@" + team.name
+            )
+        ret.append(
+            dict(
+                name=topic.name,
+                id=topic.id,
+                subscribed=subscribed,
+                toggle_url=str(toggle_link),
+            )
+        )
+    return ret
 
 
 @router.get("/{team_name}/billing")

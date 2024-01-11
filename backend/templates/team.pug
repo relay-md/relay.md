@@ -51,6 +51,7 @@
 
    .block
     .title.is-3 Topics
+
     p.block
      span.tag.is-primary Subscribed
      span.tag Unsubscribed
@@ -58,21 +59,55 @@
     {% if not team.can(Permissions.can_read, user, membership) %}
     span.is-italic confidential
     {% else %}
-    {% for topic in team.topics %}
-    {% if user and user_repo.is_subscribed(user, team, topic) %}
-    a(href="{{url_for('unsubscribe', team_topic_name=topic.name+'@'+team.name)}}" data-tooltip="Subscribe to topic")
-     .button.is-primary
-       span.icon
-        i.fas.fa-sign-out
-       span {{topic.name | capitalize}}
-    {% else %}
-    a(href="{{url_for('subscribe', team_topic_name=topic.name+'@'+team.name)}}" data-tooltip="Unsubscribe from topic")
-     .button
-       span.icon
-        i.fas.fa-sign-in
-       span {{topic.name | capitalize}}
-    {% endif %}
-    {% endfor %}
+
+    div(hx-ext="client-side-templates")
+      template#list_topics
+        {% raw %}
+        {{#each this}}
+        tr
+         td {{name}}
+         td
+          {{#if subscribed}}
+          a(href="{{toggle_url}}" data-tooltip="Subscribe to topic")
+            .button.is-primary
+              span.icon
+                i.fas.fa-sign-out
+          {{else}}
+          a(href="{{toggle_url}}" data-tooltip="Unsubscribe from topic")
+            .button
+              span.icon
+                i.fas.fa-sign-in
+          {{/if}}
+        {{/each}}
+        {% endraw %}
+      .field.is-horizontal
+        .field-body
+          .control.has-icons-left
+            input.input#team_name(hx-post="{{url_for('api_list_topics_in_team', team_name=team.name)}}"
+              hx-swap="innerHTML"
+              hx-target="#table_content"
+              hx-trigger="input changed delay:500ms, search"
+              handlebars-array-template="list_topics"
+              placeholder="Search Topics"
+              name="search")
+            span.icon.is-left
+             i.fas.fa-search
+      table.table.is-narrow.is-striped(hx-get="{{url_for('api_list_topics_in_team', team_name=team.name)}}"
+          hx-swap="innerHTML"
+          hx-target="#table_content"
+          hx-trigger="load"
+          handlebars-array-template="list_topics")
+        thead
+          th Topic
+          th Un-/Subscribe
+        tbody#table_content
+      .field.is-horizontal
+        .field-body
+          .control.has-icons-left
+            input.input#team_name(type="string" placeholder="New Topic" name="topic" hx-post="{{url_for('create_topic_htx', team_name=team.name)}}" hx-target="#topic_created")
+            span.icon.is-left
+              i.fas.fa-plus
+          span(id="topic_created")
     {% endif %}
 
    .block
