@@ -21,16 +21,16 @@ site_map_routes = [
 
 def generate_sitemap(request: Request):
     # Retrieve the list of URLs to include in the sitemap
-    lastmod = (
-        datetime.utcnow().replace(microsecond=0, second=0, minute=0, hour=0).isoformat()
-    )
+    lastmod = datetime.utcnow()
     sitemap_data = {
         "@xmlns": "http://www.sitemaps.org/schemas/sitemap/0.9",
+        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "@xsi:schemaLocation": "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd",
         "url": [
             {
                 "loc": request.url_for(site),
-                "lastmod": lastmod,
-                "changefreq": "daily",
+                "lastmod": lastmod.strftime("%Y-%m-%d"),
+                "changefreq": "weekly",
                 "priority": 1.0,
             }
             for site in site_map_routes
