@@ -24,7 +24,7 @@ async def get_teams(
 ):
     user_repo = UserRepo(db)
     team_repo = TeamRepo(db)
-    teams = team_repo.list_selected_teams()
+    teams = team_repo.list_selected_teams(user)
     return templates.TemplateResponse(
         "teams.pug", context=dict(**locals(), Permissions=Permissions)
     )
@@ -43,7 +43,7 @@ async def search_team(
 ):
     team_repo = TeamRepo(db)
     if len(name) < 3:
-        teams = team_repo.list_selected_teams()
+        teams = team_repo.list_selected_teams(user)
     else:
         teams = team_repo.search_with_count(name)
     return templates.TemplateResponse(

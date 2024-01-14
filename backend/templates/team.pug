@@ -5,14 +5,16 @@
   .column.is-8.is-offset-2
    .title.is-1 {{team.name}}
    .subtitle.is-5.text-icon
-     {% if team.is_public %}
-     span.icon
-      i.fas.fa-globe
-     span Public Team
+     {% if team.is_paid %}
+     span.icon-text
+      span.icon
+        👑
+      span Pro Team
      {% else %}
-     span.icon
-      i.fas.fa-lock
-     span Private Team
+     span.icon-text
+      span.icon
+        i.fas.fa-globe
+      span Team
      {% endif %}
 
    .block

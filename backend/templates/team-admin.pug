@@ -118,10 +118,10 @@ td.has-text-light
           span Public
         .level-item
          {% if not team.is_paid %}
-         a.button.is-small.is-primary(href="{{ url_for('team_billing', team_name=team.name) }}")
+         a.button.is-small.is-dark(href="{{ url_for('team_billing', team_name=team.name) }}")
           span.text-icon
            span.icon
-            i.fas.fa-unlock
+            👑
            span upgrade
          {% endif %}
      tr
