@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.3.2 (2024-01-14)
+### Fix
+* Layout.pug had wrong intendation and missing tag ([`2f47ce8`](https://github.com/knowledgemd/backend/commit/2f47ce8911b254363927f6633c271d3cfb49bddb))
+
 ## v1.3.1 (2024-01-11)
 ### Fix
 * Js functions were unavailable in browser ([`bc06e46`](https://github.com/knowledgemd/backend/commit/bc06e460903234d31c80b6a1c703ec54501a57ea))
