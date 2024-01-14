@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import requests
 from email_validator import EmailNotValidError, validate_email
 from fastapi import APIRouter, Depends, Form
 from fastapi.exceptions import HTTPException
 from fastapi.responses import HTMLResponse
 
-from ..config import get_config
+from backend.repos.newsletter import NewsletterRepo
+
 from ..database import Session, get_session
+from ..exceptions import AlreadySubscribed
 
 router = APIRouter(prefix="/mail")
 
@@ -65,28 +66,19 @@ async def submitmail(
     except EmailNotValidError:
         return "invalid email"
 
-    req = requests.post(
-        f"https://{get_config().MAILCHIMP_API_SERVER}.api.mailchimp.com/3.0/lists/{get_config().MAILCHIMP_LIST_ID}/members",
-        auth=("key", get_config().MAILCHIMP_API_KEY),
-        headers={"content-type": "application/json"},
-        json={
-            "email_address": email,
-            "status": "pending",
-            "merge_fields": {"FNAME": first_name, "LNAME": last_name},
-        },
-    )
-    res = req.json()
-    if not req.ok:
-        if res.get("title") == "Member Exists":
-            return HTMLResponse(
-                """
-            <div class="notification is-warning">
-            This email address has already registered
-            </div>
+    newsletter_repo = NewsletterRepo()
+    try:
+        newsletter_repo.subscribe(email, first_name, last_name)
+    except AlreadySubscribed:
+        return HTMLResponse(
             """
-            )
-        else:
-            return res.get("title", "An error occured!")
+          <div class="notification is-warning">
+          This email address has already registered
+          </div>
+          """
+        )
+    except Exception as exc:
+        return str(exc)
 
     return HTMLResponse(
         """

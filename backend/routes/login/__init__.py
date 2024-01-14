@@ -2,13 +2,16 @@
 from typing import Optional
 
 from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import PlainTextResponse
 from starlette.responses import RedirectResponse
 
 from ...config import Settings, get_config
+from ...database import Session, get_session
+from ...repos.user import User, UserRepo
 from ...templates import templates
 from ...utils.url import add_next_url, get_next_url
-from ...utils.user import User, get_optional_user, require_user
+from ...utils.user import get_optional_user, require_user
 
 router = APIRouter(prefix="")
 oauth = OAuth()
@@ -63,3 +66,15 @@ async def configure_obsidian(request: Request, user: User = Depends(require_user
     return RedirectResponse(
         url=f"obsidian://relay.md:access-token?token={access_token}"
     )
+
+
+@router.post("/onboarding/check-username", response_class=PlainTextResponse)
+async def onboarding_check_username(
+    request: Request,
+    username: str = Form(default=""),
+    db: Session = Depends(get_session),
+):
+    user_repo = UserRepo(db)
+    if user_repo.get_by_kwargs(username=username):
+        return "<span class='help is-danger'>User exists</span><script>invalidUsername();</script>"
+    return "<script>validUsername();</script>"

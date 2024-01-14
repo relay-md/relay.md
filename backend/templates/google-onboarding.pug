@@ -15,7 +15,7 @@
       .field
        label.label Username
        .control.has-icons-left.block
-        input.input(type="text" name="username" hx-post="{{url_for('onboarding_google_check_username')}}" hx-trigger="input changed delay:500ms, search" hx-target="#username-validation")
+        input.input(type="text" name="username" hx-post="{{url_for('onboarding_check_username')}}" hx-trigger="input changed delay:500ms, search" hx-target="#username-validation")
         span.icon.is-left
          i.fas.fa-user
        .div(id="username-validation")

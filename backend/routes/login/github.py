@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
+import json
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request, status
 from starlette.responses import RedirectResponse
 
-from ...config import get_config
+from ...config import Settings, get_config
 from ...database import Session, get_session
 from ...exceptions import BadRequest
 from ...models.user import OauthProvider
 from ...repos.access_token import AccessTokenRepo
+from ...repos.newsletter import NewsletterRepo
 from ...repos.user import UserRepo
+from ...templates import templates
 from ...utils.url import get_next_url
 from . import oauth
 
@@ -45,23 +48,66 @@ async def auth_github(request: Request, db: Session = Depends(get_session)):
     user_repo = UserRepo(db)
     access_token_repo = AccessTokenRepo(db)
     user = user_repo.get_by_kwargs(
-        username=github_user["login"].lower(), oauth_provider=OauthProvider.GITHUB
+        email=email.lower(), oauth_provider=OauthProvider.GITHUB
     )
-    if not github_user.get("name"):
-        raise BadRequest(
-            "A username in github is required. Please add a username to your github profile!"
-        )
     if not user:
-        user = user_repo.create_from_kwargs(
-            username=github_user["login"].lower(),
-            email=email.lower(),
-            name=github_user["name"].lower(),
-            oauth_provider=OauthProvider.GITHUB,
-            profile_picture_url=github_user["avatar_url"],
-        )
-        access_token = access_token_repo.create_from_kwargs(user_id=user.id)
+        # Store token in session and head over to asking for a username
+        request.session["token"] = json.dumps(token)
+        return RedirectResponse(url=request.url_for("onboarding_github"))
     else:
         access_token = access_token_repo.get_by_kwargs(user_id=user.id)
     request.session["user_id"] = str(user.id)
     request.session["access_token"] = str(access_token.token)
     return RedirectResponse(url=get_next_url(request) or "/")
+
+
+@router.get("/onboarding")
+async def onboarding_github(request: Request, config: Settings = Depends(get_config)):
+    return templates.TemplateResponse("github-onboarding.pug", context=locals())
+
+
+@router.post("/onboarding")
+async def onboarding_github_post(
+    request: Request,
+    username: str = Form(default=""),
+    first_name: str = Form(default=""),
+    last_name: str = Form(default=""),
+    accept_tos: bool = Form(default=False),
+    accept_privacy: bool = Form(default=False),
+    accept_newsletter: bool = Form(default=False),
+    db: Session = Depends(get_session),
+):
+    if not accept_tos or not accept_privacy:
+        raise BadRequest("You need to accept tos and privacy policy!")
+    token = request.session.get("token")
+    if not token:
+        return RedirectResponse(url=get_next_url(request) or "/")
+    token = json.loads(token)
+    resp = await oauth.github.get("user", token=token)
+    github_user = resp.json()
+    email = github_user.get("email")
+    user_repo = UserRepo(db)
+    access_token_repo = AccessTokenRepo(db)
+    user = user_repo.create_from_kwargs(
+        username=username,
+        email=email.lower(),
+        name=f"{first_name} {last_name}",
+        oauth_provider=OauthProvider.GITHUB,
+        profile_picture_url=github_user["avatar_url"],
+    )
+    access_token = access_token_repo.get_by_kwargs(user_id=user.id)
+    if not access_token:
+        access_token = access_token_repo.create_from_kwargs(user_id=user.id)
+    if accept_newsletter:
+        newsletter_repo = NewsletterRepo()
+        try:
+            newsletter_repo.subscribe(email, first_name, last_name, status="subscribed")
+        except Exception:
+            pass
+    request.session["user_id"] = str(user.id)
+    request.session["access_token"] = str(access_token.token)
+    # Remove token from session, we don't need it anymore
+    request.session.pop("token")
+    return RedirectResponse(
+        url=get_next_url(request) or "/", status_code=status.HTTP_302_FOUND
+    )

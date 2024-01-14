@@ -57,6 +57,10 @@ class BillingException(BaseAPIException):
     code = status.HTTP_400_BAD_REQUEST
 
 
+class AlreadySubscribed(Exception):
+    pass
+
+
 class LoginRequiredException(BaseAPIException):
     """401"""
 

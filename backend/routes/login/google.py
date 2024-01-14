@@ -3,7 +3,6 @@ import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Form, Request, status
-from fastapi.responses import PlainTextResponse
 from starlette.responses import RedirectResponse
 
 from ...config import Settings, get_config
@@ -58,18 +57,6 @@ async def auth_google(request: Request, db: Session = Depends(get_session)):
 @router.get("/onboarding")
 async def onboarding_google(request: Request, config: Settings = Depends(get_config)):
     return templates.TemplateResponse("google-onboarding.pug", context=locals())
-
-
-@router.post("/onboarding/check-username", response_class=PlainTextResponse)
-async def onboarding_google_check_username(
-    request: Request,
-    username: str = Form(default=""),
-    db: Session = Depends(get_session),
-):
-    user_repo = UserRepo(db)
-    if user_repo.get_by_kwargs(username=username, oauth_provider=OauthProvider.GOOGLE):
-        return "<span class='help is-danger'>User exists</span>"
-    return "<span class='help is-success'>Username available</span>"
 
 
 @router.post("/onboarding")

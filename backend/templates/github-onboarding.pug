@@ -1,0 +1,96 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5
+ .columns
+  .column.is-8.is-offset-2
+   h1.title.is-1 Welcome to Relay.md
+   p.subtitle Please complete the onboarding process
+
+   .card.block
+    .card-header
+     .card-header-title Onboarding
+    .card-content
+     form(method="POST" action="{{url_for('onboarding_github_post')}}")
+      .field.is-grouped
+       label.label Name
+        sup.is-size-7.has-text-danger *
+      .field.is-grouped
+       .control
+        input.input#first_name(type="text" name="first_name" placeholder="First Name" onchange="checkSubmit()")
+       .control
+        input.input#last_name(type="text" name="last_name" placeholder="Last Name" onchange="checkSubmit()")
+      .field
+       label.label Username
+        sup.is-size-7.has-text-danger *
+       .control.has-icons-left.block
+        input.input#username(type="text" name="username" hx-post="{{url_for('onboarding_check_username')}}" hx-trigger="input changed delay:500ms, search" hx-target="#username-validation")
+        span.icon.is-left
+         i.fas.fa-user
+        span#username-validation
+      .field
+       label.label
+        a(target="_blank" rel="noopener" href="{{url_for('tos')}}/#tos") Terms of Service
+        sup.is-size-7.has-text-danger *
+        div.is-size-6.has-text-weight-normal The ToS tell you how this service works, what to expect, rights and obligations.
+       .control.has-icons-left.block
+        input#accept_tos.switch.is-medium.is-rounded.is-success(type="checkbox" name="accept_tos" onclick="checkSubmit()")
+        label(for='accept_tos')
+      .field
+       label.label
+        a(target="_blank" rel="noopener" href="{{url_for('tos')}}/#privacy") Privacy Policy
+        sup.is-size-7.has-text-danger *
+        div.is-size-6.has-text-weight-normal The privacy policy details what data we store and process about you.
+       .control.has-icons-left.block
+        input#accept_privacy.switch.is-medium.is-rounded.is-success(type="checkbox" name="accept_privacy" onclick="checkSubmit()")
+        label(for='accept_privacy')
+      .field
+       label.label Newsletter
+        div.is-size-6.has-text-weight-normal We would like to send you mails occationally.
+       .control.has-icons-left.block
+        input#accept_newsletter.switch.is-medium.is-rounded.is-success(type="checkbox" name="accept_newsletter")
+        label(for='accept_newsletter')
+      .field
+        sup.is-size-7.has-text-danger *
+        span.is-size-6.has-text-weight-normal Required
+      .field.is-grouped
+       .control
+        button#onboardingSubmit.button(type=submit).is-link Submit
+       .control
+        button.button(type=submit).is-link.is-light Cancel
+
+{% endblock %}
+
+{% block javascript %}
+script
+.
+  const submit = document.getElementById("onboardingSubmit");
+  const tos = document.getElementById("accept_tos");
+  const privacy = document.getElementById("accept_privacy");
+  const username = document.getElementById("username");
+  const first_name = document.getElementById("first_name");
+  const last_name = document.getElementById("last_name");
+
+  first_name.addEventListener('input', checkSubmit);
+  last_name.addEventListener('input', checkSubmit);
+
+  let username_valid = false;
+  function setSubmit(b) {
+    if (b)
+      submit.disabled = false;
+    else
+      submit.disabled = true;
+  }
+  function checkSubmit(e) {
+    setSubmit(tos.checked && privacy.checked && username_valid && first_name.value && last_name.value)
+  }
+  function invalidUsername() {
+    username_valid = false;
+    checkSubmit();
+  }
+  function validUsername() {
+    username_valid = true;
+    checkSubmit();
+  }
+
+  checkSubmit();
+{% endblock %}
