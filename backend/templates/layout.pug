@@ -1,5 +1,6 @@
 doctype html
-head
+html
+ head
   meta(charset='utf-8')
   meta(http-equiv="content-language" content="en")
   meta(http-equiv='X-UA-Compatible' content='IE=edge')
@@ -33,11 +34,11 @@ head
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
-    var u="https://matomo.infra.chainsquad.com/";
+    var u="//matomo.infra.chainsquad.com/";
     _paq.push(['setTrackerUrl', u+'matomo.php']);
     _paq.push(['setSiteId', '1']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
   })();
- {% block javascript %}
- {% endblock %}
+{% block javascript %}
+{% endblock %}
