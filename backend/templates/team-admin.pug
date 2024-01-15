@@ -14,20 +14,24 @@ span.icon
 {% endmacro %}
 
 {% macro permissions(type, team_perms) %}
-table.table
+table.table.is-striped.is-normal
  {% for perm in Permissions %}
  tr
   td {{perm.name | replace("_", "-")}}
   td
+   {% if not team.is_paid and type == "public" %}
+   {% if perm in Permissions(team_perms) %}
+   i.fa.fa-check
+   {% else %}
+   i.fa.fa-times
+   {% endif %}
+   {% else %}
    a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm.value, type=type) | safe}}")
     {% if perm in Permissions(team_perms) %}
     i.fa.fa-check
     {% else %}
     i.fa.fa-times
     {% endif %}
-   {% if not team.is_paid and type == "public" and perm.name in ["can_read", "can_post"] %}
-   span.icon(data-tooltip="Disabling this permission requires a paid subscription").has-text-info.is-small
-    i.fas.fa-exclamation
    {% endif %}
  {% endfor %}
 {% endmacro %}
@@ -106,10 +110,20 @@ td.has-text-light
          i.fa.fa-shield
         span Member
       th
-       .icon-text
-        .span.icon
-         i.fa.fa-globe
-        span Public
+       .level
+        .level-item
+         .icon-text
+          .span.icon
+           i.fa.fa-globe
+          span Public
+        .level-item
+         {% if not team.is_paid %}
+         a.button.is-small.is-dark(href="{{ url_for('team_billing', team_name=team.name) }}")
+          span.text-icon
+           span.icon
+            👑
+           span upgrade
+         {% endif %}
      tr
       td
        {{permissions("owner", team.owner_permissions)}}

@@ -154,15 +154,9 @@ async def toggle_team_perms(
         # Changing this flag requries upgrade
         new_perm = team.public_permissions ^ Permissions(perm)
         if not team.is_paid:
-            if any(
-                [
-                    x not in Permissions(new_perm)
-                    for x in [Permissions.can_read, Permissions.can_post]
-                ]
-            ):
-                return RedirectResponse(
-                    url=request.url_for("team_billing", team_name=team.name)
-                )
+            return RedirectResponse(
+                url=request.url_for("team_billing", team_name=team.name)
+            )
 
         team_repo.update(team, public_permissions=(new_perm).value)
     else:

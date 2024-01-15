@@ -32,7 +32,7 @@ class User(Base):
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
-    username: Mapped[str] = mapped_column(String(256))
+    username: Mapped[str] = mapped_column(String(256), unique=True)
     email: Mapped[str] = mapped_column(String(128), unique=True)
     name: Mapped[str] = mapped_column(String(64))
     oauth_provider: OauthProvider = Column(

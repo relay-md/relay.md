@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import func, select
+from typing import Optional
+
+from sqlalchemy import and_, func, or_, select
 
 from ..models.billing import Subscription
 from ..models.team import Team
+from ..models.user import User
 from ..models.user_team import UserTeam
 from .base import DatabaseAbstractRepository
 
@@ -23,12 +26,18 @@ class TeamRepo(DatabaseAbstractRepository):
     def team_name_search(self, team_name):
         return self._db.scalar(select(Team).filter_by(name=team_name))
 
-    def list_selected_teams(self):
+    def list_selected_teams(self, user: Optional[User]):
         member_count = func.count(UserTeam.team_id)
+        filters = [
+            and_(Team.hide.is_(False), Team.favorit.is_(True)),
+        ]
+        if user:
+            filters.append(Team.user_id == user.id)
+        print(filters)
         return self._db.execute(
             select(Team, member_count)
             .outerjoin(UserTeam)
-            .filter(Team.hide.is_(False), Team.favorit.is_(True))
+            .filter(or_(*filters))
             .group_by(Team.id)
             .order_by(member_count.desc())
         )
