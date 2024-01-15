@@ -26,7 +26,9 @@ class AccessToken(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship(backref="access_tokens")  # noqa
 
-    latest_document_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    latest_document_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime(2020, 1, 1)
+    )
 
     def __repr__(self):
         return f"<{self.__class__.__name__}@{self.user.username}>"
