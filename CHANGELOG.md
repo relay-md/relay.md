@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.4.0 (2024-01-15)
+### Feature
+* Separate onboarding stage to have tos/privacy confirmed ([`dee3010`](https://github.com/knowledgemd/backend/commit/dee30107a6f57e88045c6234747fa04d5370d881))
+* **pricing:** Any change to public perms requires payment ([`fa2dd53`](https://github.com/knowledgemd/backend/commit/fa2dd5377965c544a02f9ae137f1f5a145e10a26))
+
+### Fix
+* Set initial datetime for access token to 2020 ([`73a95eb`](https://github.com/knowledgemd/backend/commit/73a95eb24b3f9c9f265d612f8c2381f80922e165))
+
 ## v1.3.2 (2024-01-14)
 ### Fix
 * Layout.pug had wrong intendation and missing tag ([`2f47ce8`](https://github.com/knowledgemd/backend/commit/2f47ce8911b254363927f6633c271d3cfb49bddb))
