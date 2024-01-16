@@ -5,7 +5,7 @@ section.hero.is-link
   .title
    figure.image.is-128x128
      img.is-rounded(src="{{user.profile_picture_url}}")
-  .subtitle User Profile
+  .subtitle {{user.name | capitalize }} ({{user.username}})
 
 .column
  section.section
@@ -14,43 +14,25 @@ section.hero.is-link
   table.table
    tr
     td
-     span.icon-text
-      span.icon
-       i.fas.fa-user
-      span username
-    td {{user.username}}
-   tr
-    td
-     span.icon-text
-      span.icon
-       i.fas.fa-user
-      span Name
-    td {{user.name}}
-   tr
-    td
-     span.icon-text
-      span.icon
-       i.fas.fa-mailbox
-      span email
+     span.icon
+       i.fas.fa-envelope
     td {{user.email}}
-
 
  section.section
   .title API
   .subtitle Access Token
   {% for access_token in user.access_tokens %}
-  .media.box
-   .media-left
-    span.icon-text
-     span.icon
-      i.fas.fa-key
-   .media-content
-    .content
-     p.mb-0
-      tt
-       strong {{access_token.token}}
-     p.mt-0
-      small Last Used: &nbsp; {{access_token.latest_document_at }}
+  div.icon-text
+   span.icon
+    i.fas.fa-key
+   span
+    tt
+     strong {{access_token.token}}
+   a(data-target="{{access_token.token}}" class="clipboard-this")
+    span.icon
+     i.fas.fa-copy
+  div.mt-0
+   small Last Used: &nbsp; {{access_token.latest_document_at }}
   {% endfor %}
 
 {% endblock %}

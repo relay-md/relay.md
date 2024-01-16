@@ -1,10 +1,10 @@
 #howitworks.block.content
- .column.is-6.is-offset-3.p-5
+ .column.is-6.is-offset-3
   .title.is-4 How it works
   .subtitle.is-6 The power of Markdown, Frontmatter and Obsidian
 
   .media
-    figure.media-left
+    figure.media-left.ml-2
       p.image.is-128x128
         img(src='{{url_for("static", path="img/howto/plugin-configuration.png")}}').is-rounded
     .media-content
@@ -14,7 +14,7 @@
         p After installing the plugin, a single click in the plugin's settings is enough to link your Relay.md account in Obsidian. No more configuration is required. It couldn't be more easy to set up.
 
   .media
-    figure.media-left
+    figure.media-left.ml-2
       p.image.is-128x128
         img(src='{{url_for("static", path="img/howto/frontmatter.png")}}').is-rounded
     .media-content
@@ -29,7 +29,7 @@
           a(href="{{url_for('relay_basics')}}") Find out more.
 
   .media
-    figure.media-left
+    figure.media-left.ml-2
       p.image.is-128x128
         img(src='{{url_for("static", path="img/howto/downloaded-articles-in-base-folder.png")}}').is-rounded
     .media-content
@@ -39,7 +39,7 @@
         p You will receive documents shared with you automatically into your vault, sorted into corresponding teams and topics. Each document will contain a unique identifier that allows the plugin to locate the document anywhere in your vault for updates. We recommend you move received documents into your usual hierarchy.
 
   .media
-    figure.media-left
+    figure.media-left.ml-2
       p.image.is-128x128
         img(src='{{url_for("static", path="img/howto/document-search.png")}}').is-rounded
     .media-content
@@ -49,7 +49,7 @@
         p Public documents can be access through the website by means of the unique document id. Simply share the document-id and people can read the document through the search online.
 
   .media
-    figure.media-left
+    figure.media-left.ml-2
       p.image.is-128x128
         img(src='{{url_for("static", path="img/howto/api.png")}}').is-rounded
     .media-content
