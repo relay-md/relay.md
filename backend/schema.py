@@ -75,3 +75,7 @@ class DocumentIdentifierResponse(BaseModel):
 
 class VersionResponse(BaseModel):
     version: str
+
+
+class AssetReponse(BaseModel):
+    id: UUID
