@@ -51,7 +51,7 @@ class MinioAbstractRepo(AbstractRepository):
         response = None
         try:
             response = self._client.get_object(self.BUCKET, self.get_file_name(id))
-            return response.data.decode("utf-8")
+            return response.data
         finally:
             if response:
                 try:

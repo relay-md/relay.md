@@ -2,11 +2,13 @@
 
 import hashlib
 from typing import Optional
+from uuid import UUID
 
 from fastapi import Depends, Request
+from fastapi.responses import StreamingResponse
 
 from ...database import Session, get_session
-from ...exceptions import BadRequest
+from ...exceptions import BadRequest, NotAllowed, NotFound
 from ...models.document import Document
 from ...models.user import User
 from ...repos.asset import AssetContentRepo, AssetRepo
@@ -67,3 +69,29 @@ async def post_asset(
             asset_content_repo.create(asset.id, body)
             asset = asset_repo.update(asset, filesize=len(body), checksum_sha256=sha256)
     return dict(result=dict(id=asset.id))
+
+
+@router.get("/assets/{id}", tags=["v1"])
+async def get_asset(
+    id: UUID,
+    user: User = Depends(require_authenticated_user),
+    db: Session = Depends(get_session),
+):
+    asset_repo = AssetRepo(db)
+    asset = asset_repo.get_by_kwargs(id=id)
+    if not asset:
+        raise NotFound()
+    if asset.user_id != user.id:
+        # FIXME: need to figure out if the document (and thus asset) was shared
+        # by/to a team user is allowed to read
+        raise NotAllowed("Not your asset")
+    asset_content_repo = AssetContentRepo()
+    data = asset_content_repo.get_by_id(id)
+
+    # https://stackoverflow.com/questions/55873174/how-do-i-return-an-image-in-fastapi
+    def yield_data():
+        yield data
+
+    return StreamingResponse(
+        content=yield_data(), media_type="application/octet-stream"
+    )
