@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.4.1 (2024-01-18)
+### Fix
+* **billing:** An additional activation path fr the subscriptin ([`5f3c2ee`](https://github.com/knowledgemd/backend/commit/5f3c2ee42c8318cedaff472397e9d408f3b35fa8))
+
 ## v1.4.0 (2024-01-15)
 ### Feature
 * Separate onboarding stage to have tos/privacy confirmed ([`dee3010`](https://github.com/knowledgemd/backend/commit/dee30107a6f57e88045c6234747fa04d5370d881))
