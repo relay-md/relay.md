@@ -151,10 +151,6 @@ class StripePayments(AbstractPaymentGateway):
             if stripe_invoice["paid"]:
                 invoice_repo.succeed_invoice_payment(invoice)
 
-            # TODO:
-            # need to get the subscription from
-            # invoice["subscription"] and check for "active==True"
-
         # Subscription specific webhook ################################
         # https://stripe.com/docs/api/subscriptions/object
         ################################################################
@@ -178,7 +174,7 @@ class StripePayments(AbstractPaymentGateway):
                 else:
                     price = get_config().PRICING_TEAM_MONTHLY
                 subscription = subscription_repo.update(
-                    subscription, price=price, quantity=quantity
+                    subscription, price=price, quantity=quantity, active=True
                 )
             end_date = datetime.utcfromtimestamp(
                 stripe_subscription["current_period_end"]
