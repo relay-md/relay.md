@@ -2,24 +2,48 @@ window.htmx = require('htmx.org');
 import('htmx.org/dist/ext/client-side-templates');
 window.Handlebars = require("handlebars");
 
-document.addEventListener('DOMContentLoaded', () => {
+/* Burger Menu
+***************************************************************/
+function dropdown(el) {
+    el.addEventListener('click', () => {
 
-    /* Light/dark switcher
-    ***************************************************************/
-    var DARK = "dark";
-    var LIGHT = "light";
-    var mode = "light";
-    var LOCAL_STORAGE_KEY = "relaymd-dark"
-    try {
-        store = localStorage
-    } catch (err) {
-        // Do nothing. The user probably blocks cookies.
-    }
-    function loadCss() {
-        // fix css loading via vite
-        // https://github.com/vitejs/vite/issues/8976
-        const css = document.createElement('style')
-        css.innerHTML = `
+        // Get the target from the "data-target" attribute
+        const target = el.dataset.target;
+        const $target = document.getElementById(target);
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        el.classList.toggle('is-active');
+        $target.classList.toggle('is-active');
+
+    });
+}
+// Get all "navbar-burger" elements
+const $navbarBurgers = document.querySelectorAll('.navbar-burger');
+$navbarBurgers.forEach(el => {
+    dropdown(el);
+});
+// Get all "navbar-burger" elements
+const $dropdownMenu = document.querySelectorAll('.has-dropdown');
+$dropdownMenu.forEach(el => {
+    dropdown(el);
+});
+
+/* Light/dark switcher
+***************************************************************/
+var DARK = "dark";
+var LIGHT = "light";
+var mode = "light";
+var LOCAL_STORAGE_KEY = "relaymd-dark"
+try {
+    store = localStorage
+} catch (err) {
+    // Do nothing. The user probably blocks cookies.
+}
+function loadCss() {
+    // fix css loading via vite
+    // https://github.com/vitejs/vite/issues/8976
+    const css = document.createElement('style')
+    css.innerHTML = `
 /* Prevent inconsistencies for positioning */
 .nightowl-light body{
 filter: invert(0%);
@@ -58,116 +82,114 @@ filter: invert(6%);
 color: #666;
 }
 `
-        document.head.appendChild(css)
-    }
+    document.head.appendChild(css)
+}
 
-    window.addEventListener('load', () => {
-        loadCss()
-        checkForRememberedValue()
-        updateMode()
-        initializeSwitcher()
+window.addEventListener('load', () => {
+    loadCss()
+    checkForRememberedValue()
+    updateMode()
+    initializeSwitcher()
+})
+
+function enableDarkMode() {
+    mode = DARK
+    const htmlElement = document.querySelector('html')
+    if (htmlElement) {
+        htmlElement.classList.remove('nightowl-light')
+        htmlElement.classList.add('nightowl-dark')
+    }
+}
+
+function enableLightMode() {
+    mode = LIGHT
+    const htmlElement = document.querySelector('html')
+    if (htmlElement) {
+        htmlElement.classList.remove('nightowl-dark')
+        htmlElement.classList.add('nightowl-light')
+    }
+}
+
+function toggleMode() {
+    mode = mode === DARK ? LIGHT : DARK
+    updateMode()
+}
+
+function updateMode() {
+    if (mode === DARK) {
+        enableDarkMode()
+    } else {
+        enableLightMode()
+    }
+    setSwitcherIcon()
+}
+
+function setSwitcherIcon() {
+    const switcher = document.getElementById('switcher-default')
+    if (switcher) {
+        const lightIcon =
+            '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 25px; height:25px;">\n' +
+            '  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />\n' +
+            '</svg>'
+        const darkIcon =
+            '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 25px; height:25px;">\n' +
+            '  <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />\n' +
+            '</svg>'
+        switcher.innerHTML = mode === LIGHT ? darkIcon : lightIcon
+    }
+}
+
+function initializeSwitcher() {
+    const switcher = document.getElementById('switcher-default');
+    switcher.style.width = '24px'
+    switcher.style.height = '24px'
+    switcher.style.cursor = 'pointer'
+    switcher.style.transition = 'all 0.3s ease-in-out'
+    switcher.style.overflow = 'hidden'
+    switcher.style.color = 'black'
+
+    switcher.addEventListener('click', () => {
+        toggleMode()
+        storeModeInLocalStorage()
     })
+    setSwitcherIcon()
+}
 
-    function enableDarkMode() {
-        mode = DARK
-        const htmlElement = document.querySelector('html')
-        if (htmlElement) {
-            htmlElement.classList.remove('nightowl-light')
-            htmlElement.classList.add('nightowl-dark')
-        }
-    }
-
-    function enableLightMode() {
-        mode = LIGHT
-        const htmlElement = document.querySelector('html')
-        if (htmlElement) {
-            htmlElement.classList.remove('nightowl-dark')
-            htmlElement.classList.add('nightowl-light')
-        }
-    }
-
-    function toggleMode() {
-        mode = mode === DARK ? LIGHT : DARK
-        updateMode()
-    }
-
-    function updateMode() {
-        if (mode === DARK) {
-            enableDarkMode()
-        } else {
-            enableLightMode()
-        }
-        setSwitcherIcon()
-    }
-
-    function setSwitcherIcon() {
-        const switcher = document.getElementById('switcher-default')
-        if (switcher) {
-            const lightIcon =
-                '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 25px; height:25px;">\n' +
-                '  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />\n' +
-                '</svg>'
-            const darkIcon =
-                '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 25px; height:25px;">\n' +
-                '  <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />\n' +
-                '</svg>'
-            switcher.innerHTML = mode === LIGHT ? darkIcon : lightIcon
-        }
-    }
-
-    function initializeSwitcher() {
-        const switcher = document.getElementById('switcher-default');
-        switcher.style.width = '24px'
-        switcher.style.height = '24px'
-        switcher.style.cursor = 'pointer'
-        switcher.style.transition = 'all 0.3s ease-in-out'
-        switcher.style.overflow = 'hidden'
-        switcher.style.color = 'black'
-
-        switcher.addEventListener('click', () => {
-            toggleMode()
-            storeModeInLocalStorage()
-        })
-        setSwitcherIcon()
-    }
-    function storeModeInLocalStorage() {
-        if (mode !== null) {
-            try {
-                if (store) {
-                    store.setItem(LOCAL_STORAGE_KEY, mode)
-                }
-            } catch (err) {
-                // Do nothing. The user probably blocks cookies.
-            }
-        }
-    }
-    function checkForRememberedValue() {
-        let rememberedValue = null
+function storeModeInLocalStorage() {
+    if (mode !== null) {
         try {
             if (store) {
-                rememberedValue = store.getItem(LOCAL_STORAGE_KEY)
+                store.setItem(LOCAL_STORAGE_KEY, mode)
             }
         } catch (err) {
             // Do nothing. The user probably blocks cookies.
         }
-        if (rememberedValue && [DARK, LIGHT].includes(rememberedValue)) {
-            mode = rememberedValue
-        } else if (hasNativeDarkPrefersColorScheme()) {
-            mode = DARK
+    }
+}
+
+function checkForRememberedValue() {
+    let rememberedValue = null
+    try {
+        if (store) {
+            rememberedValue = store.getItem(LOCAL_STORAGE_KEY)
         }
+    } catch (err) {
+        // Do nothing. The user probably blocks cookies.
     }
-    function hasNativeDarkPrefersColorScheme() {
-        return (
-            window.matchMedia &&
-            (window.matchMedia('(prefers-color-scheme: dark)').matches ||
-                window.matchMedia('(prefers-color-scheme:dark)').matches)
-        )
+    if (rememberedValue && [DARK, LIGHT].includes(rememberedValue)) {
+        mode = rememberedValue
+    } else if (hasNativeDarkPrefersColorScheme()) {
+        mode = DARK
     }
+}
 
-});
-
-
-
+function hasNativeDarkPrefersColorScheme() {
+    return (
+        window.matchMedia &&
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ||
+            window.matchMedia('(prefers-color-scheme:dark)').matches)
+    )
+}
 
 /* Get documents per api
 ***************************************************************/
@@ -194,9 +216,6 @@ async function get_document(id) {
     }
     return await response.text();
 }
-
-
-
 
 /* Postprocess markdown to something nicer to read
 ***************************************************************/
@@ -242,5 +261,27 @@ function post_process_markdown(doc) {
     return [converter.makeHtml(body), metadata];
 }
 
+async function copyTextToClipboard(event) {
+    let a_link = event.currentTarget;
+    let textToCopy = a_link.dataset.target;
+    try {
+        if (navigator?.clipboard?.writeText) {
+            await navigator.clipboard.writeText(textToCopy);
+
+            // Replace link
+            a_link.querySelector("i").classList.replace('fa-copy', 'fa-check')
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// iterate through all results of a css selector
+for (let link of document.querySelectorAll('a.clipboard-this')) {
+    link.addEventListener('click', (e) => {
+        copyTextToClipboard(e)
+    })
+}
 window.get_document = get_document;
 window.post_process_markdown = post_process_markdown;
+window.copyTextToClipboard = copyTextToClipboard;

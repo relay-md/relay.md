@@ -4,7 +4,7 @@
       h1.title.colored.is-4
         | Sign up for the newsletter
       form(hx-post="{{url_for('submitmail')}}")
-        .field.is-horizontal
+        .field.is-horizontal.p-2
           .field-body
             .field
               .control.has-icons-left
@@ -16,7 +16,7 @@
                 input.input.is-medium(type='text' name='last_name' placeholder='Smith')
                 span.icon.is-small.is-left
                   i.fas.fa-user
-        .field(hx-target='this' hx-swap='outerHTML')
+        .field(hx-target='this' hx-swap='outerHTML').p-2
           .control.has-icons-left.has-icons-right
             input.input.is-medium(type='email' name='email' placeholder='bob@smith.com' hx-post="{{url_for('validatemail')}}")
             span.icon.is-small.is-left
