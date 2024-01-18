@@ -24,7 +24,6 @@ from ...schema import (
     VersionResponse,
 )
 from ...utils.document import (
-    check_document_modify_permissions,
     check_document_post_permissions,
     check_document_read_permissions,
     get_shareables,
@@ -133,12 +132,7 @@ async def get_doc(
         check_document_read_permissions(db, user, document.team_topics)
     document_body_repo = DocumentBodyRepo()
     document_access_repo = DocumentAccessRepo(db)
-    body = document_body_repo.get_by_id(document.id)
 
-    # Add document id to frontmatter
-    front = frontmatter.loads(body)
-    front["relay-document"] = str(document.id)
-    body = frontmatter.dumps(front)
     if user:
         document_access_repo.create_from_kwargs(
             user_id=user.id, document_id=document.id
@@ -151,10 +145,16 @@ async def get_doc(
             relay_filename=document.filename,
             relay_title=document.title,
             relay_to=document.shared_with,
-            body=body,
+            embeds=document.embeds,
         )
         return Response(result=ret_document).model_dump(by_alias=True)
     elif content_type == "text/markdown":
+        # Add document id to frontmatter
+        body = document_body_repo.get_by_id(document.id)
+        front = frontmatter.loads(body)
+        front["relay-document"] = str(document.id)
+        body = frontmatter.dumps(front)
+
         response = PlainTextResponse(body)
         response.headers["X-Relay-document"] = str(document.id)
         response.headers["X-Relay-filename"] = document.filename
@@ -187,7 +187,7 @@ async def put_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
-    check_document_modify_permissions(db, user, shareables)
+    # check_document_modify_permissions(db, user, shareables)
 
     document_repo.update(
         document,

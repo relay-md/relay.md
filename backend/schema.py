@@ -58,8 +58,16 @@ class DocumentFrontMatter(BaseModel):
         return value
 
 
+class Embed(BaseModel):
+    id: UUID
+    filename: str
+    filesize: int
+    checksum_sha256: str
+    model_config = ConfigDict(from_attributes=True)
+
+
 class DocumentResponse(DocumentFrontMatter):
-    body: Optional[str] = None
+    embeds: List[Embed] = []
     model_config = ConfigDict(from_attributes=True)
 
 

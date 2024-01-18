@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -22,10 +22,13 @@ class Asset(Base):
 
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("document.id"))
-    filename: Mapped[str] = mapped_column(String(length=256))
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     last_updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     user: Mapped["User"] = relationship(back_populates="owned_assets")  # noqa
+
+    filename: Mapped[str] = mapped_column(String(256))
+    filesize: Mapped[int] = mapped_column(BigInteger())
+    checksum_sha256: Mapped[str] = mapped_column(String(length=64), nullable=True)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.filename}>"
