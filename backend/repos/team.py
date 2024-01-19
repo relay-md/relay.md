@@ -33,7 +33,6 @@ class TeamRepo(DatabaseAbstractRepository):
         ]
         if user:
             filters.append(Team.user_id == user.id)
-        print(filters)
         return self._db.execute(
             select(Team, member_count)
             .outerjoin(UserTeam)

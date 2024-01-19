@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from uuid import UUID
 
 import click
@@ -57,3 +58,13 @@ def edit(id):
 def show(id):
     db = next(get_session())
     show_item(db, MODEL, id)
+
+
+@access_token.command()
+@click.argument("id", type=UUID)
+def reset(id):
+    db = next(get_session())
+    item = db.get(MODEL, id)
+    if item:
+        item.latest_document_at = datetime(2020, 1, 1)
+        db.commit()
