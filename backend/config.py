@@ -116,6 +116,9 @@ class Settings(BaseSettings):
     ]
     PRERENDER_REDIRECT: str = "https://prerender.infra.chainsquad.com/"
 
+    RATE_LIMITS_DEFAULT: str = "100/minute"
+    RATE_LIMITS_REDIS: Optional[str] = None
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

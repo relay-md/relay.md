@@ -2,6 +2,9 @@
 import sentry_sdk
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
+from slowapi import Limiter
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 
@@ -39,6 +42,16 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["Content-Range"],
 )
+
+# Rate limitations
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[get_config().RATE_LIMITS_DEFAULT],
+    storage_uri=get_config().RATE_LIMITS_REDIS,
+)
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+
 exceptions.include_app(app)
 Instrumentator().instrument(app).expose(app)
 
