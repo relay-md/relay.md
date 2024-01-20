@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v1.5.0 (2024-01-20)
+### Feature
+* **rate-limits:** Implement rate limits ([`498e06d`](https://github.com/knowledgemd/backend/commit/498e06d09e26949e6f4458a8d382e44574a733a2))
+* **prerender:** Make use of prerender to show documents ([`2e59a8d`](https://github.com/knowledgemd/backend/commit/2e59a8d3a6954e896520e0bab800488cc03cd159))
+* List news sites in sitemap ([`d8a18fe`](https://github.com/knowledgemd/backend/commit/d8a18fed34bf7c754cde029a5dff3b2afd93675c))
+
+### Fix
+* Set initial datetime for access token to 2020 ([`d47570f`](https://github.com/knowledgemd/backend/commit/d47570fb4c0fe4a880fed938cdc54c842d79b9da))
+
 ## v1.4.1 (2024-01-18)
 ### Fix
 * **billing:** An additional activation path fr the subscriptin ([`5f3c2ee`](https://github.com/knowledgemd/backend/commit/5f3c2ee42c8318cedaff472397e9d408f3b35fa8))
