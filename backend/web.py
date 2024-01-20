@@ -2,8 +2,8 @@
 import os
 
 import sentry_sdk
-from fastapi import FastAPI
-from fastapi.responses import PlainTextResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.sessions import SessionMiddleware
@@ -88,5 +88,15 @@ def health():
 )
 async def robotstxt():
     return """User-Agent: *
-Disallow: /document/
+# Disallow: /document/
 """
+
+
+# after the `app` variable
+@app.middleware("http")
+async def prerender(request: Request, call_next):
+    user_agent = request.headers.get("user-agent")
+    if any([x in user_agent.lower() for x in get_config().PRERENDER_USER_AGENTS]):
+        return RedirectResponse(f"{get_config().PRERENDER_REDIRECT}{str(request.url)}")
+    response = await call_next(request)
+    return response

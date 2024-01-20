@@ -7,6 +7,9 @@ import xmltodict
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 
+from backend.database import Session, get_session
+from backend.repos.document import DocumentRepo
+
 router = APIRouter(prefix="")
 site_map_routes = [
     "contact",
@@ -19,22 +22,35 @@ site_map_routes = [
 ]
 
 
-def generate_sitemap(request: Request):
+def generate_sitemap(request: Request, db: Session = Depends(get_session)):
+    document_repo = DocumentRepo(db)
+    news_documents = document_repo.latest_news(size=50)
+
     # Retrieve the list of URLs to include in the sitemap
     lastmod = datetime.utcnow()
-    sitemap_data = {
-        "@xmlns": "http://www.sitemaps.org/schemas/sitemap/0.9",
-        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-        "@xsi:schemaLocation": "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd",
-        "url": [
+    urls = [
+        {
+            "loc": request.url_for(site),
+            "lastmod": lastmod.strftime("%Y-%m-%d"),
+            "changefreq": "weekly",
+            "priority": 1.0,
+        }
+        for site in site_map_routes
+    ]
+    for document in news_documents:
+        urls.append(
             {
-                "loc": request.url_for(site),
+                "loc": request.url_for("get_document_from_id", id=str(document.id)),
                 "lastmod": lastmod.strftime("%Y-%m-%d"),
                 "changefreq": "weekly",
                 "priority": 1.0,
             }
-            for site in site_map_routes
-        ],
+        )
+    sitemap_data = {
+        "@xmlns": "http://www.sitemaps.org/schemas/sitemap/0.9",
+        "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "@xsi:schemaLocation": "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd",
+        "url": urls,
     }
 
     # Convert the data to XML string
@@ -51,5 +67,7 @@ def generate_sitemap(request: Request):
 
 
 @router.get("/sitemap.xml")
-async def generate_sitemap_endpoint(sitemap: str = Depends(generate_sitemap)):
+async def generate_sitemap_endpoint(
+    sitemap: str = Depends(generate_sitemap),
+):
     return sitemap

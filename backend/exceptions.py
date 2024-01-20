@@ -7,6 +7,8 @@ import urllib
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from starlette.responses import RedirectResponse
 
 from .config import Settings, get_config
@@ -160,6 +162,7 @@ async def redirect_to_login(
 def include_app(app):
     app.add_exception_handler(BaseAPIException, handle_exception)
     app.add_exception_handler(HTTPException, handle_http_exception)
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     app.add_exception_handler(Exception, unhandled_exception)
 
 
