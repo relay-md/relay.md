@@ -79,8 +79,8 @@ class Settings(BaseSettings):
     PRICING_TEAM_MONTHLY: float = 3.0
 
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
-
     RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID] = None
+
     FASTAPI_CONFIG: dict = {
         "title": "Relay.md Developer Access",
         "description": "Access relay.md features through API",
@@ -95,6 +95,26 @@ class Settings(BaseSettings):
     }
 
     SENTRY_DSN: Optional[str] = ""
+
+    PRERENDER_USER_AGENTS: List[str] = [
+        "googlebot",
+        "bingbot",
+        "yandex",
+        "baiduspider",
+        "twitterbot",
+        "facebookexternalhit",
+        "rogerbot",
+        "linkedinbot",
+        "embedly",
+        "quora link preview",
+        "showyoubot",
+        "outbrain",
+        "pinterest",
+        "slackbot",
+        "vkShare",
+        "W3C_Validator",
+    ]
+    PRERENDER_REDIRECT: str = "https://prerender.infra.chainsquad.com/"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
