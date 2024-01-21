@@ -1,0 +1,45 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.mt-5.mb-5
+ .columns
+  .column.is-8.is-offset-2
+   h1.title.is-1 Blog
+
+   {% for article in articles %}
+   .card.block
+    .card-header
+     .card-header-title {{article.title}}
+    .card-content.content
+     div(data-document="{{article.id}}").document-body
+      progress.progress.is-small.is-dark(max="100") 15%
+    .card-footer.is-small
+     // TODO: make this look nicer
+     .card-footer-item published {{article.created_at.strftime("%Y/%m/%d")}}
+     .
+   {% endfor %}
+{% endblock %}
+
+{% block javascript %}
+script#access_token {{access_token}}
+script
+.
+ window.prerenderReady = false;
+ // we wrap this into a promise so we can figure out when its completely loaded
+ var bar = new Promise((resolve, reject) => {
+  documents = document.querySelectorAll('[data-document]');
+  documents.forEach((dom_doc, index, array) => {
+   var id = dom_doc.dataset.document;
+   get_document(id)
+     .then((doc) => {
+       const [html, metadata] = post_process_markdown(doc)
+       dom_doc.innerHTML = html;
+     }).catch((msg) => {
+       dom_doc.innerHTML = msg;
+     }).finally(() => {
+       if (index === array.length - 1) resolve();
+     });
+  });
+ }).then(() => {
+  window.prerenderReady = true;
+ });
+{% endblock %}

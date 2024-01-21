@@ -65,22 +65,22 @@ async def my_documents(
 
 
 @router.get(
-    "/news",
+    "/blog",
     response_class=HTMLResponse,
     tags=["web"],
 )
-async def news(
+async def blog(
     request: Request,
     user: User = Depends(get_optional_user),
     config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
 ):
     document_repo = DocumentRepo(db)
-    news = document_repo.latest_news()
+    articles = document_repo.latest_news()
     access_token = (
         request.session.get("access_token") or "empty"
     )  # in case no user exists
-    return templates.TemplateResponse("news.pug", context=dict(**locals()))
+    return templates.TemplateResponse("blog.pug", context=dict(**locals()))
 
 
 @router.get(
