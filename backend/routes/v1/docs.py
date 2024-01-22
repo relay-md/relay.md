@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import hashlib
 from datetime import datetime
 from typing import List
 
@@ -65,7 +66,8 @@ async def post_doc(
     document_body_repo = DocumentBodyRepo()
 
     # Get body containing the raw markdown
-    body = (await request.body()).decode("utf-8")
+    body_raw = await request.body()
+    body = body_raw.decode("utf-8")
 
     # Parse frontmatter
     front_matter = frontmatter.loads(body)
@@ -96,6 +98,11 @@ async def post_doc(
             "The document you are sending already has a relay-document id"
         )
 
+    # Checksum
+    hashing_obj = hashlib.sha256()
+    hashing_obj.update(body_raw)
+    sha256 = hashing_obj.hexdigest()
+
     # Store document in database
     document = document_repo.create_from_kwargs(
         user_id=user.id,
@@ -104,6 +111,8 @@ async def post_doc(
         team_topics=shareables.team_topics,
         users=shareables.users,
         is_public=shareables.is_public,
+        filesize=len(body),
+        checksum_sha256=sha256,
     )
 
     # Update document content in DocumentBodyRepo
@@ -113,6 +122,8 @@ async def post_doc(
         relay_title=document.title,
         relay_filename=filename,
         relay_to=front.relay_to,
+        checksum_sha256=document.checksum_sha256,
+        filesize=document.filesize,
     )
     return dict(result=ret_document)
 
@@ -144,6 +155,8 @@ async def get_doc(
             relay_filename=document.filename,
             relay_title=document.title,
             relay_to=document.shared_with,
+            checksum_sha256=document.checksum_sha256,
+            filesize=document.filesize,
             embeds=document.embeds,
         )
         return Response(result=ret_document).model_dump(by_alias=True)
@@ -173,7 +186,9 @@ async def put_doc(
     document_body_repo = DocumentBodyRepo()
     UserRepo(db)
 
-    body = (await request.body()).decode("utf-8")
+    body_raw = await request.body()
+    body = body_raw.decode("utf-8")
+
     front_matter = frontmatter.loads(body)
     front = DocumentFrontMatter(**front_matter)
 
@@ -186,22 +201,33 @@ async def put_doc(
     shareables = get_shareables(db, front, user)
     # check_document_modify_permissions(db, user, shareables)
 
-    document_repo.update(
-        document,
-        team_topics=shareables.team_topics,
-        title=title,
-        users=shareables.users,
-        is_public=shareables.is_public,
-        last_updated_at=datetime.utcnow(),
-    )
-    # Update document content in DocumentBodyRepo
-    document_body_repo.update(document.id, body)
+    # Checksum
+    hashing_obj = hashlib.sha256()
+    hashing_obj.update(body_raw)
+    sha256 = hashing_obj.hexdigest()
+
+    if sha256 != document.checksum_sha256:
+        # We skip the update when the doucment hasn't changed!
+        document = document_repo.update(
+            document,
+            team_topics=shareables.team_topics,
+            title=title,
+            users=shareables.users,
+            is_public=shareables.is_public,
+            last_updated_at=datetime.utcnow(),
+            filesize=len(body),
+            checksum_sha256=sha256,
+        )
+        # Update document content in DocumentBodyRepo
+        document_body_repo.update(document.id, body)
+
     ret_document = DocumentResponse(
         relay_document=document.id,
         relay_filename=document.filename,
         relay_title=title,
         relay_to=front.relay_to,
-        body=body,
+        checksum_sha256=document.checksum_sha256,
+        filesize=document.filesize,
     )
     return dict(result=ret_document)
 
@@ -240,6 +266,7 @@ async def get_docs(
                 relay_document=document.id,
                 relay_filename=document.filename,
                 relay_to=document.shared_with,
+                checksum_sha256=document.checksum_sha256,
             )
         )
     return dict(result=ret)

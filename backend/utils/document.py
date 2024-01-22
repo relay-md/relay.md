@@ -30,7 +30,10 @@ def get_title_from_body(body: str) -> str:
             return False
         return True
 
-    return next(filter(line_allowed_for_headline, lines))
+    try:
+        return next(filter(line_allowed_for_headline, lines))
+    except StopIteration:
+        return "unknown"
 
 
 def check_document_read_permissions(
