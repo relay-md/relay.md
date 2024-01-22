@@ -24,6 +24,7 @@ from ...schema import (
     VersionResponse,
 )
 from ...utils.document import (
+    check_document_modify_permissions,
     check_document_post_permissions,
     check_document_read_permissions,
     get_shareables,
@@ -199,7 +200,7 @@ async def put_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
-    # check_document_modify_permissions(db, user, shareables)
+    check_document_modify_permissions(db, user, shareables)
 
     # Checksum
     hashing_obj = hashlib.sha256()

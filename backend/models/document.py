@@ -25,7 +25,8 @@ class Document(Base):
     title: Mapped[str] = mapped_column(String(256), nullable=True)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     filename: Mapped[str] = mapped_column(String(length=256))
-    filesize: Mapped[int] = mapped_column(BigInteger())
+
+    filesize: Mapped[int] = mapped_column(BigInteger(), nullable=True)
     checksum_sha256: Mapped[str] = mapped_column(String(length=64), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)

@@ -26,7 +26,7 @@ def patch_document_body_create():
 def patch_document_body_get():
     with patch(
         "backend.repos.document_body.DocumentBodyRepo.get_by_id",
-        return_value=mocked_up_text,
+        return_value=mocked_up_text.encode("utf-8"),
     ):
         yield
 
@@ -77,7 +77,6 @@ def test_document_upload(account, auth_header, api_client, s3, dbsession, create
     )
 
     ret = req.json()["result"]
-    assert ret["body"] == new_body
     assert ret["relay-document"] == doc_id
     assert ret["relay-to"] == ["mytopic@myteam"]
     assert ret["relay-filename"] == "example.md"
@@ -87,6 +86,7 @@ def test_document_upload(account, auth_header, api_client, s3, dbsession, create
         f"/v1/doc/{doc_id}", headers={**auth_header, "content-type": "text/markdown"}
     )
     req.raise_for_status(), req.text
+    assert req.text == new_body
 
     expected = f"""---
 relay-document: {doc_id}
