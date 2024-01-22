@@ -86,6 +86,11 @@ async def onboarding_github_post(
     resp = await oauth.github.get("user", token=token)
     github_user = resp.json()
     email = github_user.get("email")
+    if not email:
+        resp = await oauth.github.get("user/emails", token=token)
+        emails = resp.json()
+        email = next(filter(lambda x: x["primary"] is True, emails))
+        email = email["email"]
     user_repo = UserRepo(db)
     access_token_repo = AccessTokenRepo(db)
     user = user_repo.create_from_kwargs(
