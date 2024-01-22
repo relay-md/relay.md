@@ -4,7 +4,6 @@
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import PlainTextResponse
 
-from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..models.permissions import Permissions
 from ..repos.team import TeamRepo
@@ -18,7 +17,6 @@ router = APIRouter(prefix="/teams")
 @router.get("")
 async def get_teams(
     request: Request,
-    config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
     user: User = Depends(require_user),
 ):
@@ -37,7 +35,6 @@ async def get_teams(
 async def search_team(
     request: Request,
     name: str = Form(""),
-    config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
     user: User = Depends(get_optional_user),
 ):

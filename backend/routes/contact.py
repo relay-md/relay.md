@@ -22,7 +22,6 @@ router = APIRouter(prefix="/contact")
 async def contact(
     request: Request,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("contact.pug", context=dict(**locals()))
 
@@ -41,7 +40,7 @@ async def contact_post(
     message: str = Form(default=""),
 ):
     send_email(
-        get_config().MAIL_ADMIN,
+        config.MAIL_ADMIN,
         f"[relay.md - contact form] {name}",
         "mail/contact.html",
         **locals(),

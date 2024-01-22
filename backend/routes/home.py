@@ -4,7 +4,6 @@
 from fastapi import APIRouter, Depends, Query, Request
 from starlette.responses import HTMLResponse
 
-from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..repos.document import DocumentRepo
 from ..repos.user import User
@@ -22,7 +21,6 @@ router = APIRouter(prefix="")
 async def welcome(
     request: Request,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("welcome.pug", context=dict(**locals()))
 
@@ -35,7 +33,6 @@ async def welcome(
 async def profile(
     request: Request,
     user: User = Depends(require_user),
-    config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("profile.pug", context=dict(**locals()))
 
@@ -51,7 +48,6 @@ async def my_documents(
     size: int = Query(default=10),
     page: int = Query(default=0),
     user: User = Depends(require_user),
-    config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
 ):
     repo = DocumentRepo(db)
@@ -72,7 +68,6 @@ async def my_documents(
 async def blog(
     request: Request,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
 ):
     document_repo = DocumentRepo(db)
@@ -91,7 +86,6 @@ async def blog(
 async def obsidian_plugin(
     request: Request,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("plugin.pug", context=dict(**locals()))
 
@@ -104,7 +98,6 @@ async def obsidian_plugin(
 async def relay_basics(
     request: Request,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("howto-relay.pug", context=dict(**locals()))
 
@@ -117,7 +110,6 @@ async def relay_basics(
 async def tos(
     request: Request,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("tos.pug", context=dict(**locals()))
 
@@ -130,6 +122,5 @@ async def tos(
 async def pricing(
     request: Request,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     return templates.TemplateResponse("pricing.pug", context=dict(**locals()))

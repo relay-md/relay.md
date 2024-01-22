@@ -120,6 +120,9 @@ class Settings(BaseSettings):
     RATE_LIMITS_DEFAULT: str = "100/minute"
     RATE_LIMITS_REDIS: Optional[str] = None
 
+    MATOMO_URI: Optional[str] = None
+    MATOMO_SITE_ID: Optional[int] = 1
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

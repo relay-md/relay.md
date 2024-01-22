@@ -4,7 +4,6 @@
 from fastapi import APIRouter, Depends, Form, Request, status
 from starlette.responses import RedirectResponse
 
-from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import BadRequest, NotAllowed
 from ..models.billing import Subscription
@@ -25,7 +24,6 @@ router = APIRouter(prefix="/teams/billing")
 @router.post("")
 async def team_billing_post(
     request: Request,
-    config: Settings = Depends(get_config),
     type: str = Form(default="public"),
     yearly: bool = Form(default=False),
     team_name: str = Form(default=""),
@@ -78,7 +76,6 @@ async def team_billing_post(
 @router.post("/payment/new")
 async def team_billing_payment(
     request: Request,
-    config: Settings = Depends(get_config),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
     # Form payload
