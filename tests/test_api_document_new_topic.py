@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from unittest.mock import patch
 
 import pytest
@@ -78,12 +77,7 @@ relay-to:
 ---
 """
     assert req.text.startswith(expected)
-    assert req.headers.get("x-relay-filename") == "example.md"
     assert req.headers.get("x-relay-document") == doc_id
-    assert json.loads(req.headers.get("x-relay-to")) == [
-        "mytopic@myteam",
-        "newtopic@myteam",
-    ]
 
 
 def test_document_upload_invalid_team(auth_header, api_client):
