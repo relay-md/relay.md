@@ -58,8 +58,18 @@ class DocumentFrontMatter(BaseModel):
         return value
 
 
+class Embed(BaseModel):
+    id: UUID
+    filename: str
+    filesize: int
+    checksum_sha256: str
+    model_config = ConfigDict(from_attributes=True)
+
+
 class DocumentResponse(DocumentFrontMatter):
-    body: Optional[str] = None
+    embeds: List[Embed] = []
+    checksum_sha256: Optional[str]
+    filesize: Optional[int]
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -70,8 +80,14 @@ class DocumentIdentifierResponse(BaseModel):
     relay_document: Optional[UUID] = Field(None, alias="relay-document")
     relay_to: Union[str, List[str]] = Field(alias="relay-to")
     relay_filename: Optional[str] = Field(None, alias="relay-filename")
+
+    checksum_sha256: Optional[str]
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class VersionResponse(BaseModel):
     version: str
+
+
+class AssetReponse(BaseModel):
+    id: UUID

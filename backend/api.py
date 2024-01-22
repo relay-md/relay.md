@@ -11,7 +11,8 @@ from starlette.responses import RedirectResponse
 from . import exceptions
 from .config import get_config
 from .database import Base, engine
-from .routes import v1
+from .routes.v1 import assets as v1_assets
+from .routes.v1 import docs as v1_docs
 
 # Setup sentry for alerting in case of exceptions
 if get_config().SENTRY_DSN:
@@ -31,7 +32,8 @@ Base.metadata.create_all(engine)
 
 # Load metadata from yaml file
 app = FastAPI(**get_config().FASTAPI_CONFIG)
-app.include_router(v1.router)
+app.include_router(v1_docs.router)
+app.include_router(v1_assets.router)
 
 # Set all CORS enabled origins
 app.add_middleware(

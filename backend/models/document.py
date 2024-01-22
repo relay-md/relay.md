@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import CHAR, ForeignKey, String
+from sqlalchemy import CHAR, BigInteger, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -25,6 +25,10 @@ class Document(Base):
     title: Mapped[str] = mapped_column(String(256), nullable=True)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"))
     filename: Mapped[str] = mapped_column(String(length=256))
+
+    filesize: Mapped[int] = mapped_column(BigInteger(), nullable=True)
+    checksum_sha256: Mapped[str] = mapped_column(String(length=64), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     last_updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     team_topics: Mapped[List[TeamTopic]] = relationship(
@@ -32,6 +36,8 @@ class Document(Base):
     )
     users: Mapped[List[User]] = relationship(secondary="document_user")
     user: Mapped["User"] = relationship(back_populates="owned_documents")  # noqa
+
+    embeds: Mapped[List["Asset"]] = relationship()  # noqa
 
     # if this is set, the document can be viewed online by anyone on the web
     # viewer, this will be automatically set when uploading a document. For

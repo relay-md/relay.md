@@ -46,6 +46,7 @@ class User(Base):
     owned_documents: Mapped[List["Document"]] = relationship(  # noqa
         back_populates="user"
     )
+    owned_assets: Mapped[List["Asset"]] = relationship(back_populates="user")  # noqa
     teams: Mapped[List["Team"]] = relationship(  # noqa
         secondary="user_team", back_populates="members"
     )
