@@ -1,8 +1,11 @@
 #howitworks.block.content
- .column.is-6.is-offset-3
-  .title.is-4 How it works
-  .subtitle.is-6 The power of Markdown, Frontmatter and Obsidian
+ .section.has-text-centered
+  .title How it works
+  .subtitle The power of Markdown, Frontmatter and Obsidian
+  video(controls='' width='100%' autoplay)
+    source(src='{{url_for("static", path="webm/20240122-demo.webm")}}' type='video/webm')
 
+ .column.is-6.is-offset-3
   .media
     figure.media-left.ml-2
       p.image.is-128x128

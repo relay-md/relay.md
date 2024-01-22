@@ -18,6 +18,7 @@
 script#access_token {{access_token}}
 script
 .
+  window.prerenderReady = false;
   get_document("{{id}}")
     .then((doc) => {
       const [html, metadata] = post_process_markdown(doc);
@@ -37,8 +38,10 @@ script
        `;
       }
       document.getElementById('frontmatter').innerHTML = metadata_html;
+      window.prerenderReady = true;
     })
     .catch((msg) => {
       document.getElementById('document').innerHTML = msg;
+      window.prerenderReady = true;
     });
 {% endblock %}

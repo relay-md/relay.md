@@ -89,6 +89,10 @@ def health():
 async def robotstxt():
     return """User-Agent: *
 # Disallow: /document/
+Disallow: /static/js/*.js
+Disallow: /static/css/*.css
+#
+Sitenmap: https://relay.md/sitemap.xml
 """
 
 

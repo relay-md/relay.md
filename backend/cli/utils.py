@@ -50,7 +50,7 @@ def new_item(
         try:
             values[key] = json.loads(value)
         except json.decoder.JSONDecodeError:
-            if key.endswith("_id"):
+            if key.endswith("_id") or key == "token":
                 try:
                     values[key] = uuid.UUID(value)
                 except Exception:
@@ -89,7 +89,7 @@ def edit_item(db, model, id: uuid.UUID, ignore_attributes=[], replace_column_nam
         try:
             new_values[key] = json.loads(value)
         except json.decoder.JSONDecodeError:
-            if key.endswith("_id"):
+            if key.endswith("_id") or key == "token":
                 try:
                     new_values[key] = uuid.UUID(value)
                 except Exception:

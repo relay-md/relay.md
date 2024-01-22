@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from unittest.mock import patch
 from uuid import UUID
 
@@ -97,10 +96,7 @@ relay-to:
 ---
 """
     assert req.text.startswith(expected)
-    assert req.headers.get("x-relay-filename") == "example.md"
-    assert req.headers.get("x-relay-title") == "Example text"
     assert req.headers.get("x-relay-document") == doc_id
-    assert json.loads(req.headers.get("x-relay-to")) == ["mytopic@myteam"]
 
 
 def test_document_perms(auth_header, api_client):

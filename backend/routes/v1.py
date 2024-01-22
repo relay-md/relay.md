@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
@@ -240,9 +239,6 @@ async def get_doc(
     elif content_type == "text/markdown":
         response = PlainTextResponse(body)
         response.headers["X-Relay-document"] = str(document.id)
-        response.headers["X-Relay-filename"] = document.filename
-        response.headers["X-Relay-to"] = json.dumps(document.shared_with)
-        response.headers["X-Relay-title"] = document.title
         return response
     else:
         raise exceptions.BadRequest(f"Unsupported content-type: {content_type}")
