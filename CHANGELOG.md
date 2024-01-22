@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.0 (2024-01-22)
+### Feature
+* **marketing:** Video demonstrating how it works ([`183a3f2`](https://github.com/knowledgemd/backend/commit/183a3f277a5f56d950f13c85b16f715550fd6dd1))
+
+### Fix
+* Unittests no longer can test x-relay-* attributes ([`9e511a6`](https://github.com/knowledgemd/backend/commit/9e511a656cb991465a566599e08663b519655f3f))
+* **billing:** An additional activation path fr the subscriptin ([`c991f5a`](https://github.com/knowledgemd/backend/commit/c991f5a48359db986eb40c771d1ede2b699e1e2b))
+
 ## v1.5.0 (2024-01-20)
 ### Feature
 * **rate-limits:** Implement rate limits ([`498e06d`](https://github.com/knowledgemd/backend/commit/498e06d09e26949e6f4458a8d382e44574a733a2))
