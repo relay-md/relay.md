@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.1 (2024-01-22)
+### Fix
+* Need to obtain email for github through additional request ([`88bbec4`](https://github.com/knowledgemd/backend/commit/88bbec407ba82a739a9e6206faa6cb481d5bec54))
+* Unittests ([`8e05a86`](https://github.com/knowledgemd/backend/commit/8e05a86fe45b63171e9f450c3c569420e57e2ae6))
+
 ## v1.6.0 (2024-01-22)
 ### Feature
 * **marketing:** Video demonstrating how it works ([`183a3f2`](https://github.com/knowledgemd/backend/commit/183a3f277a5f56d950f13c85b16f715550fd6dd1))
