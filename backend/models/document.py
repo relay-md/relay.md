@@ -33,6 +33,8 @@ class Document(Base):
     users: Mapped[List[User]] = relationship(secondary="document_user")
     user: Mapped["User"] = relationship(back_populates="owned_documents")  # noqa
 
+    embeds: Mapped[List["Asset"]] = relationship()  # noqa
+
     # if this is set, the document can be viewed online by anyone on the web
     # viewer, this will be automatically set when uploading a document. For
     # instance, when sending a doc to the `_` team.

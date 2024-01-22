@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from .access_token import AccessToken
+from .asset import Asset
 from .billing import Invoice, PersonalInformation, Subscription
 from .document import Document
 from .document_access import DocumentAccess
@@ -30,4 +31,5 @@ __all__ = [
     Invoice.__name__,
     StripeCustomer.__name__,
     StripeSubscription.__name__,
+    Asset.__name__,
 ]
