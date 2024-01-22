@@ -90,6 +90,8 @@ def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Share
         else:
             # WARNING: If any of the targets is non-private, the entire document
             # becomes public!
+            if "@" not in to:
+                continue
             topic, team = to.split("@")
             team_topic = team_topic_repo.from_string(to, user)
             if team_topic.team.public_permissions & Permissions.can_read:
