@@ -1,6 +1,9 @@
 doctype html
 html
  head
+  {% if request.state.is_prerender %}
+  script window.prerenderReady = false;
+  {% endif %}
   meta(charset='utf-8')
   meta(http-equiv="content-language" content="en")
   meta(http-equiv='X-UA-Compatible' content='IE=edge')
@@ -11,10 +14,6 @@ html
   meta(property='og:description' content='Simple collaboration with markdown. Obsidian plugin included')
   meta(property='og:image' content="{{ url_for('static', path='img/logo-navbar.svg') }}")
   meta(property='og:url' content='https://relay.md')
-
-  {% if request.state.is_prerender %}
-  script window.prerenderReady = false;
-  {% endif %}
 
   // TODO: as soon as we have a Twitter account
   // meta(name='twitter:title' content='Add title here')
