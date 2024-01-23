@@ -12,6 +12,10 @@ html
   meta(property='og:image' content="{{ url_for('static', path='img/logo-navbar.svg') }}")
   meta(property='og:url' content='https://relay.md')
 
+  {% if request.state.is_prerender %}
+  script window.prerenderReady = false;
+  {% endif %}
+
   // TODO: as soon as we have a Twitter account
   // meta(name='twitter:title' content='Add title here')
   // meta(name='twitter:description' content='Add description here')
