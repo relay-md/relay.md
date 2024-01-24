@@ -99,25 +99,45 @@ class StripePayments(AbstractPaymentGateway):
         # https://stripe.com/docs/api/checkout/sessions/object
         ################################################################
         if event["type"] == "checkout.session.completed":
-            session = event["data"]["object"]
+            # Repos
             invoice_repo = InvoiceRepo(db)
+            subscription_repo = SubscriptionRepo(db)
+            team_repo = TeamRepo(db)
+
+            # Get the full session with subscription
+            session = stripe.checkout.Session.retrieve(
+                event["data"]["object"]["id"], expand=["subscription", "invoice"]
+            )
+            stripe_invoice = session["invoice"]
+            stripe_subscription = session["subscription"]
             invoice_id = session["client_reference_id"]
-            invoice = invoice_repo.get_by_id(invoice_id)
-            if not invoice:
+            subscription_id = stripe_invoice["subscription_details"]["metadata"][
+                "subscription_id"
+            ]
+
+            local_invoice = invoice_repo.get_by_id(invoice_id)
+            if not local_invoice:
                 from ..exceptions import BadRequest
 
                 raise BadRequest("Invalid invoice ID")
-            invoice_repo.succeed_invoice_payment(invoice)
+            invoice_repo.succeed_invoice_payment(local_invoice)
+
             # store subscription id
-            subscription_repo = SubscriptionRepo(db)
-            for subscription in invoice.subscriptions:
-                subscription_repo.store_subscription_id(
-                    subscription, session.get("subscription")
-                )
-                # Activate subscription
-                # we keep it here so we do not need to wait
-                # for payment to confirm.
-                subscription_repo.update(subscription, active=True)
+            stripe_subscription_id = stripe_invoice["subscription"]
+
+            local_subscription = subscription_repo.get_by_id(UUID(subscription_id))
+            subscription_repo.store_subscription_id(
+                local_subscription, stripe_subscription_id
+            )
+            subscription_repo.update(
+                local_subscription, active=stripe_subscription["status"] == "active"
+            )
+
+            # Update team paid until attribute
+            end_date = datetime.utcfromtimestamp(
+                session["subscription"]["current_period_end"]
+            )
+            team_repo.update(local_subscription.team, paid_until=end_date)
 
         # Invoice specific webhooks ####################################
         # https://stripe.com/docs/api/invoices/object

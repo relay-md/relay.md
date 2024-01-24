@@ -14,97 +14,78 @@ def get_webhook_payload():
         return {
             "id": "evt_1OPMoVB5jLfQ2TsFkv9zLcGZ",
             "object": "event",
-            "api_version": "2023-10-16",
-            "created": 1703067343,
             "data": {
                 "object": {
                     "id": "cs_test_a1ardhex9OzbE4h9DcBZzXxwiZhRAhsukrxN6Os3PHOYcsKquX58VpzHgO",
                     "object": "checkout.session",
-                    "after_expiration": None,
-                    "allow_promotion_codes": None,
-                    "amount_subtotal": 3000,
-                    "amount_total": 3000,
-                    "automatic_tax": {"enabled": False, "status": None},
-                    "billing_address_collection": None,
-                    "cancel_url": "http://localhost:5000/payment/failed",
                     "client_reference_id": str(reference_id),
-                    "client_secret": None,
-                    "consent": None,
-                    "consent_collection": None,
-                    "created": 1703067305,
-                    "currency": "eur",
-                    "currency_conversion": None,
-                    "custom_fields": [],
-                    "custom_text": {
-                        "after_submit": None,
-                        "shipping_address": None,
-                        "submit": None,
-                        "terms_of_service_acceptance": None,
-                    },
                     "customer": "cus_PDoRlPaff7CDZO",
-                    "customer_creation": "always",
-                    "customer_details": {
-                        "address": {
-                            "city": None,
-                            "country": "DE",
-                            "line1": None,
-                            "line2": None,
-                            "postal_code": None,
-                            "state": None,
-                        },
-                        "email": "fabian@chainsquad.com",
-                        "name": "Fabian Schuh",
-                        "phone": None,
-                        "tax_exempt": "none",
-                        "tax_ids": [],
-                    },
-                    "customer_email": "fabian@chainsquad.com",
-                    "expires_at": 1703153705,
                     "invoice": "in_1OPMoSB5jLfQ2TsFGqEyEFbO",
-                    "invoice_creation": None,
-                    "livemode": False,
-                    "locale": None,
-                    "metadata": {},
                     "mode": "subscription",
-                    "payment_intent": None,
-                    "payment_link": None,
-                    "payment_method_collection": "always",
-                    "payment_method_configuration_details": None,
-                    "payment_method_options": None,
-                    "payment_method_types": ["card"],
                     "payment_status": "paid",
-                    "phone_number_collection": {"enabled": False},
-                    "recovered_from": None,
-                    "setup_intent": None,
-                    "shipping_address_collection": None,
-                    "shipping_cost": None,
-                    "shipping_details": None,
-                    "shipping_options": [],
                     "status": "complete",
-                    "submit_type": None,
                     "subscription": "sub_1OPMoSB5jLfQ2TsF5Yk9NCeY",
-                    "success_url": "http://localhost:5000/payment/success",
-                    "total_details": {
-                        "amount_discount": 0,
-                        "amount_shipping": 0,
-                        "amount_tax": 0,
-                    },
-                    "ui_mode": "hosted",
-                    "url": None,
                 }
             },
-            "livemode": False,
-            "pending_webhooks": 1,
-            "request": {"id": None, "idempotency_key": None},
             "type": "checkout.session.completed",
         }
 
     return func
 
 
-def test_create_invoice(
-    dbsession, account, get_webhook_payload, web_client, create_team
-):
+@pytest.fixture
+def get_get_full_session():
+    def func(invoice_id: UUID, subscription_id: UUID):
+        return {
+            "id": "cs_test_a1ardhex9OzbE4h9DcBZzXxwiZhRAhsukrxN6Os3PHOYcsKquX58VpzHgO",
+            "object": "checkout.session",
+            "client_reference_id": str(invoice_id),
+            "customer": "cus_PDoRlPaff7CDZO",
+            "invoice": {
+                "id": "in_1OPMoSB5jLfQ2TsFGqEyEFbO",
+                "object": "invoice",
+                "lines": {
+                    "object": "list",
+                    "data": [
+                        {
+                            "id": "il_1OPMoSB5jLfQ2TsFogAM2kw2",
+                            "object": "line_item",
+                            "price": {
+                                "id": "price_1OP91GB5jLfQ2TsFDJ2N2etY",
+                                "object": "price",
+                                "active": True,
+                                "lookup_key": "team-yearly",
+                            },
+                            "subscription": "sub_1OPMoSB5jLfQ2TsF5Yk9NCeY",
+                        }
+                    ],
+                },
+                "paid": True,
+                "status": "paid",
+                "subscription": "sub_1OPMoSB5jLfQ2TsF5Yk9NCeY",
+                "subscription_details": {
+                    "metadata": {
+                        "invoice_id": str(invoice_id),
+                        "subscription_id": str(subscription_id),
+                    }
+                },
+            },
+            "mode": "subscription",
+            "status": "complete",
+            "subscription": {
+                "id": "sub_1OPMoSB5jLfQ2TsF5Yk9NCeY",
+                "object": "subscription",
+                "current_period_end": 1734689740,
+                "current_period_start": 1703067340,
+                "status": "active",
+            },
+        }
+
+    return func
+
+
+@pytest.fixture()
+def setup_team(dbsession, account, create_team):
     team = create_team("private_team")
     billing_repo = repos.InvoiceRepo(dbsession)
     subscriptions = [
@@ -136,24 +117,40 @@ def test_create_invoice(
             subscriptions=subscriptions,
         )
     )
+    return invoice, team, subscriptions[0]
 
+
+@pytest.fixture()
+def send_webhook(web_client):
+    def func(payload, full_session):
+        with patch("stripe.checkout.Session.retrieve", return_value=full_session):
+            with patch("stripe.Webhook.construct_event", return_value=payload):
+                req = web_client.post(
+                    "/payment/stripe/webhook",
+                    json=payload,
+                    auth=("foo", "bar"),
+                    headers={"stripe-signature": "foobar"},
+                )
+        print(req.json())
+        req.raise_for_status()
+        assert "error" not in req.json()
+        return req.json()
+
+    return func
+
+
+def test_initial_payment(
+    dbsession, get_webhook_payload, setup_team, send_webhook, get_get_full_session
+):
+    invoice, team, subscription = setup_team
+    full_session = get_get_full_session(invoice.id, subscription.id)
     webhook_payload = get_webhook_payload(invoice.id)
-
-    with patch("stripe.Webhook.construct_event", return_value=webhook_payload):
-        req = web_client.post(
-            "/payment/stripe/webhook",
-            json=webhook_payload,
-            auth=("foo", "bar"),
-            headers={"stripe-signature": "foobar"},
-        )
-
-    req.raise_for_status()
-    assert "error" not in req.json()
-
+    send_webhook(webhook_payload, full_session)
     dbsession.commit()
     dbsession.refresh(invoice)
     assert invoice.payment_status == InvoiceStatus.COMPLETED
     dbsession.refresh(team)
-
-    # TODO: need to complete the unittests with all the webhooks we get
-    # assert team.paid_until == (datetime.utcnow() + timedelta(days=365)).date()
+    assert team.subscriptions
+    subscription = team.subscriptions[0]
+    assert subscription.active
+    assert team.paid_until
