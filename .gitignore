@@ -73,3 +73,5 @@ docs/default.db
 
 backend/static/js/*
 backend/static/css/*
+
+node_modules/
