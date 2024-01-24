@@ -13,7 +13,7 @@ from backend.repos.document import DocumentRepo
 router = APIRouter(prefix="")
 site_map_routes = [
     "contact",
-    "news",
+    "blog",
     "welcome",
     "obsidian_plugin",
     "relay_basics",
@@ -24,7 +24,7 @@ site_map_routes = [
 
 def generate_sitemap(request: Request, db: Session = Depends(get_session)):
     document_repo = DocumentRepo(db)
-    news_documents = document_repo.latest_news(size=50)
+    blog_posts = document_repo.latest_news(size=50)
 
     # Retrieve the list of URLs to include in the sitemap
     lastmod = datetime.utcnow()
@@ -37,7 +37,7 @@ def generate_sitemap(request: Request, db: Session = Depends(get_session)):
         }
         for site in site_map_routes
     ]
-    for document in news_documents:
+    for document in blog_posts:
         urls.append(
             {
                 "loc": request.url_for("get_document_from_id", id=str(document.id)),
