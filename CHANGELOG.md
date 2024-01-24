@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.2 (2024-01-24)
+### Fix
+* Typo ([`9b2e3fc`](https://github.com/knowledgemd/backend/commit/9b2e3fcf12d76b0e7fa958002eeae4cd5661c676))
+* Sitemap for googlebot ([`a3a83a0`](https://github.com/knowledgemd/backend/commit/a3a83a05b44ab472576bd5be1ceb78611a1b00e4))
+* Recurrring payments typo ([`3839c7d`](https://github.com/knowledgemd/backend/commit/3839c7d2bd48c5bee89d0d34d2d015755a2b2339))
+
 ## v1.6.1 (2024-01-22)
 ### Fix
 * Need to obtain email for github through additional request ([`88bbec4`](https://github.com/knowledgemd/backend/commit/88bbec407ba82a739a9e6206faa6cb481d5bec54))
