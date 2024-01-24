@@ -101,12 +101,15 @@ Sitenmap: https://relay.md/sitemap.xml
 async def prerender(request: Request, call_next):
     user_agent = request.headers.get("user-agent", "").lower()
     request.state.is_prerender = False
-    if "prerender" in user_agent:
-        request.state.is_prerender = True
-    else:
-        if any([x in user_agent for x in get_config().PRERENDER_USER_AGENTS]):
-            return RedirectResponse(
-                f"{get_config().PRERENDER_REDIRECT}{str(request.url)}"
-            )
+    print(request.url)
+
+    if ".xml" not in request.url.path:
+        if "prerender" in user_agent:
+            request.state.is_prerender = True
+        else:
+            if any([x in user_agent for x in get_config().PRERENDER_USER_AGENTS]):
+                return RedirectResponse(
+                    f"{get_config().PRERENDER_REDIRECT}{str(request.url)}"
+                )
     response = await call_next(request)
     return response
