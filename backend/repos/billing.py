@@ -156,6 +156,7 @@ class StripePayments(AbstractPaymentGateway):
         ################################################################
         elif event["type"] == "customer.subscription.updated":
             stripe_subscription = event["data"]["object"]
+            team_repo = TeamRepo(db)
             subscription_repo = SubscriptionRepo(db)
             stripe_subscription["metadata"]["team_id"]
             invoice_id = stripe_subscription["metadata"]["invoice_id"]
@@ -176,11 +177,10 @@ class StripePayments(AbstractPaymentGateway):
                 subscription = subscription_repo.update(
                     subscription, price=price, quantity=quantity, active=True
                 )
-            end_date = datetime.utcfromtimestamp(
-                stripe_subscription["current_period_end"]
-            )
-            team_repo = TeamRepo(db)
-            team_repo.update(subscription.team, paid_until=end_date)
+                end_date = datetime.utcfromtimestamp(
+                    stripe_subscription["current_period_end"]
+                )
+                team_repo.update(subscription.team, paid_until=end_date)
 
         elif event["type"] == "customer.subscription.created":
             stripe_subscription = event["data"]["object"]

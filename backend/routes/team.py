@@ -31,7 +31,6 @@ router = APIRouter(prefix="/team")
 async def show_team(
     team_name: str,
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -47,7 +46,6 @@ async def show_team(
 async def join(
     team_name: str,
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -63,7 +61,6 @@ async def join(
 async def leave(
     team_name: str,
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -79,7 +76,6 @@ async def invite_user(
     team_name: str,
     user_id: UUID,
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -107,7 +103,6 @@ async def remove_user(
     team_name: str,
     membership_id: UUID,
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -130,7 +125,6 @@ async def remove_user(
 @router.get("/{team_name}/toggle/perm")
 async def toggle_team_perms(
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -167,7 +161,6 @@ async def toggle_team_perms(
 @router.get("/{team_name}/toggle/perm/member")
 async def toggle_member_perms(
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -196,7 +189,6 @@ async def toggle_member_perms(
 @router.get("/{team_name}/settings")
 async def settings(
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -230,14 +222,14 @@ async def settings_user_search(
             raise exceptions.BadRequest("There is no subscription for this team!")
         subscription = team.subscriptions[0]
         if subscription.is_yearly:
-            price = get_config().PRICING_TEAM_YEARLY
+            price = config.PRICING_TEAM_YEARLY
             price_interval = "year"
             price_period = round(
                 (1 - percentage_of_period_year(date.today(), team.paid_until)) * price,
                 2,
             )
         else:
-            price = get_config().PRICING_TEAM_MONTHLY
+            price = config.PRICING_TEAM_MONTHLY
             price_interval = "month"
             price_period = round(
                 (1 - percentage_of_period_month(date.today(), team.paid_until)) * price,
@@ -283,7 +275,6 @@ async def settings_user_search(
 async def team_create_validate_team_name(
     request: Request,
     team_name: str = Form(default=""),
-    config: Settings = Depends(get_config),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
@@ -301,7 +292,6 @@ async def update_team_headline(
     request: Request,
     headline: str = Form(default=""),
     team: Team = Depends(get_team),
-    config: Settings = Depends(get_config),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
@@ -323,7 +313,6 @@ async def update_team_hide(
     request: Request,
     hide: bool = Form(default=False),
     team: Team = Depends(get_team),
-    config: Settings = Depends(get_config),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
@@ -339,7 +328,6 @@ async def update_team_seats(
     request: Request,
     seats: int = Form(default=0),
     team: Team = Depends(get_team),
-    config: Settings = Depends(get_config),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
@@ -363,7 +351,6 @@ async def create_topic_htx(
     request: Request,
     topic: str = Form(default=False),
     team: Team = Depends(get_team),
-    config: Settings = Depends(get_config),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
@@ -385,7 +372,6 @@ async def api_list_topics_in_team_post(
     request: Request,
     search: str = Form(""),
     team: Team = Depends(get_team),
-    config: Settings = Depends(get_config),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
@@ -418,7 +404,6 @@ async def api_list_topics_in_team_post(
 async def api_list_topics_in_team(
     request: Request,
     team: Team = Depends(get_team),
-    config: Settings = Depends(get_config),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
@@ -449,7 +434,6 @@ async def api_list_topics_in_team(
 @router.get("/{team_name}/billing")
 async def team_billing(
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -460,7 +444,6 @@ async def team_billing(
 @router.get("/{team_name}/billing/subscription/cancel")
 async def cancel_subscription(
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),

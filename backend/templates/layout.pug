@@ -1,6 +1,9 @@
 doctype html
 html
  head
+  {% if request.state.is_prerender %}
+  script window.prerenderReady = false;
+  {% endif %}
   meta(charset='utf-8')
   meta(http-equiv="content-language" content="en")
   meta(http-equiv='X-UA-Compatible' content='IE=edge')
@@ -29,16 +32,18 @@ html
   {% include "footer.pug" %}
 
  script(src="{{ url_for('static', path='js/main.js') }}")
+ {% if config.MATOMO_URI and config.MATOMO_SITE_ID %}
  script.
   var _paq = window._paq = window._paq || [];
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
-    var u="//matomo.infra.chainsquad.com/";
+    var u={{config.MATOMO_URI}};
     _paq.push(['setTrackerUrl', u+'matomo.php']);
-    _paq.push(['setSiteId', '1']);
+    _paq.push(['setSiteId', '{{config.MATOMO_SITE_ID}}']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
   })();
+ {% endif %}
 {% block javascript %}
 {% endblock %}

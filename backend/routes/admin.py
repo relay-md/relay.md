@@ -3,7 +3,6 @@
 from fastapi import APIRouter, Depends, Request
 from starlette.responses import RedirectResponse
 
-from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..repos.team import TeamRepo
 from ..utils.team import Team, get_team
@@ -15,7 +14,6 @@ router = APIRouter(prefix="/admin")
 @router.get("team/toggle_favorit/{team_name}")
 async def toggle_team_favorit(
     request: Request,
-    config: Settings = Depends(get_config),
     team: Team = Depends(get_team),
     db: Session = Depends(get_session),
     user: User = Depends(require_admin),

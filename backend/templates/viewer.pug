@@ -18,7 +18,6 @@
 script#access_token {{access_token}}
 script
 .
-  window.prerenderReady = false;
   get_document("{{id}}")
     .then((doc) => {
       const [html, metadata] = post_process_markdown(doc);

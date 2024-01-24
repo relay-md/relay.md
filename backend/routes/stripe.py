@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import RedirectResponse
 from starlette.responses import HTMLResponse
 
-from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..exceptions import BadRequest, WebhookException
 from ..repos.billing import InvoiceRepo
@@ -25,7 +24,6 @@ router = APIRouter(prefix="/payment")
 )
 async def payment_success(
     request: Request,
-    config: Settings = Depends(get_config),
     user: User = Depends(get_optional_user),
 ):
     return templates.TemplateResponse("payment-success.pug", context=dict(**locals()))
@@ -38,7 +36,6 @@ async def payment_success(
 )
 async def payment_failed(
     request: Request,
-    config: Settings = Depends(get_config),
     user: User = Depends(get_optional_user),
 ):
     return templates.TemplateResponse("payment-failed.pug", context=dict(**locals()))
@@ -51,7 +48,6 @@ async def payment_failed(
 )
 async def payment_error(
     request: Request,
-    config: Settings = Depends(get_config),
     user: User = Depends(get_optional_user),
 ):
     return templates.TemplateResponse("payment-error.pug", context=dict(**locals()))
@@ -65,7 +61,6 @@ async def payment_error(
 async def payment_invoice(
     invoice_id: UUID,
     request: Request,
-    config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
     user: User = Depends(get_optional_user),
 ):
@@ -87,7 +82,6 @@ async def payment_invoice(
 async def stripe_session_for_invoice(
     invoice_id: UUID,
     request: Request,
-    config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
 ):
     invoice_repo = InvoiceRepo(db)
@@ -106,7 +100,6 @@ async def stripe_session_for_invoice(
 async def stripe_webhook(
     request: Request,
     response: Response,
-    config: Settings = Depends(get_config),
     db: Session = Depends(get_session),
     username: str = Depends(required_basic_auth),
 ):

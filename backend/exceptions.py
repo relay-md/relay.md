@@ -11,7 +11,6 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.responses import RedirectResponse
 
-from .config import Settings, get_config
 from .repos.user import User
 from .templates import templates
 from .utils.user import get_optional_user
@@ -115,7 +114,6 @@ async def web_handle_exception(
     request: Request,
     exc: Exception,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     # required for top
     user = None
@@ -126,7 +124,6 @@ async def web_unhandled_exception(
     request: Request,
     exc: Exception,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     # required for top
     return templates.TemplateResponse("exception.pug", context=dict(**locals()))
@@ -136,7 +133,6 @@ async def web_handle_webhookexception(
     request: Request,
     exc: Exception,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     from .schema import Response
 
@@ -149,7 +145,6 @@ async def redirect_to_login(
     request: Request,
     exc: Exception,
     user: User = Depends(get_optional_user),
-    config: Settings = Depends(get_config),
 ):
     url = str(request.url_for("login"))
     if exc.next_url:

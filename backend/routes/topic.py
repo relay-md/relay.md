@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Request
 from starlette.responses import RedirectResponse
 
 from .. import exceptions
-from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..models.permissions import Permissions
 from ..repos.team import Team
@@ -21,7 +20,6 @@ router = APIRouter(prefix="/topic")
 async def subscribe(
     team_topic_name: str,
     request: Request,
-    config: Settings = Depends(get_config),
     team_topic: Team = Depends(get_team_topic),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
@@ -42,7 +40,6 @@ async def subscribe(
 async def unsubscribe(
     team_topic_name: str,
     request: Request,
-    config: Settings = Depends(get_config),
     team_topic: Team = Depends(get_team_topic),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
