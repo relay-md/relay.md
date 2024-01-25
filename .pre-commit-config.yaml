@@ -57,7 +57,7 @@ repos:
     rev: v0.902
     hooks:
       - id: mypy
-        files: ^gateway/
+        files: ^backend/
         exclude: tests
         additional_dependencies: [types-python-dateutil, types-requests, types-pyyaml, types-click]
         args: [--ignore-missing-imports]  # TODO add --strict!
