@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.3 (2024-01-25)
+### Fix
+* Missing quotes ([`b79a5c4`](https://github.com/knowledgemd/backend/commit/b79a5c4bec766281feed083b4d0272dc52c08cd6))
+* Improve stripe billing and add unittests ([`cb403d9`](https://github.com/knowledgemd/backend/commit/cb403d939898f58bc3740e22626999223820c834))
+
 ## v1.6.2 (2024-01-24)
 ### Fix
 * Typo ([`9b2e3fc`](https://github.com/knowledgemd/backend/commit/9b2e3fcf12d76b0e7fa958002eeae4cd5661c676))
