@@ -13,35 +13,12 @@ relay-to:
 Example text"""
 
 
-@pytest.fixture
-def patch_document_body_create():
-    with patch("backend.repos.document_body.DocumentBodyRepo.create") as mock:
-        yield mock
-
-
-@pytest.fixture
-def patch_document_body_get():
-    with patch(
-        "backend.repos.document_body.DocumentBodyRepo.get_by_id",
-        return_value=mocked_up_text.encode("utf-8"),
-    ):
-        yield
-
-
-@pytest.fixture
-def patch_document_body_update():
-    with patch(
-        "backend.repos.document_body.DocumentBodyRepo.update",
-    ) as mock:
-        yield mock
-
-
-@pytest.fixture
-def s3(patch_document_body_create, patch_document_body_get):
-    yield
-
-
-def test_document_upload(auth_header, api_client, s3):
+@patch(
+    "backend.repos.document_body.DocumentBodyRepo.get_by_id",
+    return_value=mocked_up_text.encode("utf-8"),
+    autospec=True,
+)
+def test_document_upload(mock, auth_header, api_client, patch_document_body_create):
     req = api_client.post("/v1/doc", headers=auth_header, content=mocked_up_text)
     req.raise_for_status()
 

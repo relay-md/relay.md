@@ -121,4 +121,4 @@ def test_cannot_subscribe_private_team(
     )
     create_team_topic("unit@test")
 
-    # No we subscribe and try again
+    # Now we subscribe and try again

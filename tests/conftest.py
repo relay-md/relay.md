@@ -2,6 +2,7 @@
 """Configuration for pytest"""
 import tempfile
 from typing import List, Optional
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -304,3 +305,30 @@ relay-to:
         return res["result"]
 
     return func
+
+
+@pytest.fixture
+def patch_document_body_create():
+    with patch("backend.repos.document_body.DocumentBodyRepo.create") as mock:
+        yield mock
+
+
+@pytest.fixture
+def patch_document_body_get():
+    def func(text):
+        print("foobar")
+        with patch(
+            "backend.repos.document_body.DocumentBodyRepo.get_by_id",
+            return_value=text.encode("utf-8"),
+        ):
+            yield
+
+    return func
+
+
+@pytest.fixture
+def patch_document_body_update():
+    with patch(
+        "backend.repos.document_body.DocumentBodyRepo.update",
+    ) as mock:
+        yield mock
