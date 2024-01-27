@@ -1,0 +1,134 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.hero.is-small.is-link
+  .hero-body
+    .title Library
+
+.section
+ .columns
+  .column.is-3
+   aside.menu
+     p.menu-label
+      a() Assets / Embeds
+     p.menu-label Documents / Topics
+     p
+     .control.has-icons-left
+      input.input.is-small(type="text" placeholder="search for filename")
+      span.icon.is-left
+       i.fas.fa-search
+     ul.menu-list
+       li
+         a Dashboard
+       li
+         a Customers
+
+  .column.is-9
+
+   .columns.is-multiline
+    .column
+     .card
+      .card-image
+        figure.image.is-4by3
+          img(src='https://bulma.io/images/placeholders/1280x960.png', alt='Placeholder image')
+      .card-content
+        .media
+          .media-content
+            p.title.is-4 John Smith
+            p.subtitle.is-6 @johnsmith
+        .content
+          | Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          | Phasellus nec iaculis mauris. 
+          a @bulmaio
+          | .
+          a(href='#') #css
+          a(href='#') #responsive
+          br
+          time(datetime='2016-1-1') 11:09 PM - 1 Jan 2016
+
+    .column
+     .card
+      .card-image
+        figure.image.is-4by3
+          img(src='https://bulma.io/images/placeholders/1280x960.png', alt='Placeholder image')
+      .card-content
+        .media
+          .media-content
+            p.title.is-4 John Smith
+            p.subtitle.is-6 @johnsmith
+        .content
+          | Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          | Phasellus nec iaculis mauris. 
+          a @bulmaio
+          | .
+          a(href='#') #css
+          a(href='#') #responsive
+          br
+          time(datetime='2016-1-1') 11:09 PM - 1 Jan 2016
+
+   .columns.is-multiline
+    .column
+     .card
+      .card-content
+        .media
+          .media-content
+            p.title.is-4 John Smith
+            p.subtitle.is-6 @johnsmith
+        .content
+          | Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          | Phasellus nec iaculis mauris. 
+          a @bulmaio
+          | .
+          a(href='#') #css
+          a(href='#') #responsive
+          br
+          time(datetime='2016-1-1') 11:09 PM - 1 Jan 2016
+      footer.card-footer
+        a.card-footer-item(href='#') Edit
+        a.card-footer-item(href='#') Delete
+
+    .column
+     .card
+      .card-content
+        .media
+          .media-content
+            p.title.is-4 John Smith
+            p.subtitle.is-6 @johnsmith
+        .content
+          | Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          | Phasellus nec iaculis mauris. 
+          a @bulmaio
+          | .
+          a(href='#') #css
+          a(href='#') #responsive
+          br
+          time(datetime='2016-1-1') 11:09 PM - 1 Jan 2016
+      footer.card-footer
+        a.card-footer-item(href='#') Edit
+        a.card-footer-item(href='#') Delete
+
+
+
+
+   // Pagination
+   nav.pagination.is-rounded(role='navigation', aria-label='pagination')
+    a.pagination-previous Previous
+    a.pagination-next Next page
+    ul.pagination-list
+      li
+        a.pagination-link(aria-label='Goto page 1') 1
+      li
+        span.pagination-ellipsis &mldr;
+      li
+        a.pagination-link(aria-label='Goto page 45') 45
+      li
+        a.pagination-link.is-current(aria-label='Page 46', aria-current='page') 46
+      li
+        a.pagination-link(aria-label='Goto page 47') 47
+      li
+        span.pagination-ellipsis &mldr;
+      li
+        a.pagination-link(aria-label='Goto page 86') 86
+
+
+
+{% endblock %}
