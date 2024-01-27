@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import enum
 from typing import Generic, List, Optional, TypeVar, Union
 from uuid import UUID
@@ -28,6 +29,10 @@ class Response(BaseModel, Generic[DataT]):
 
     result: Optional[DataT] = None
     error: Optional[Error] = None
+
+
+class SuccessResponse(BaseModel):
+    success: bool
 
 
 class TeamResponse(BaseModel):
@@ -91,3 +96,12 @@ class VersionResponse(BaseModel):
 
 class AssetReponse(BaseModel):
     id: UUID
+    user_id: UUID
+    document_id: UUID
+    created_at: datetime
+    last_updated_at: datetime
+    filename: str
+    filesize: int
+    checksum_sha256: str
+
+    model_config = ConfigDict(from_attributes=True)

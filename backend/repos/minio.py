@@ -72,3 +72,6 @@ class MinioAbstractRepo:
 
     def update(self, id: UUID, data: bytes) -> None:
         self.create(id, data)
+
+    def delete(self, id: UUID) -> None:
+        self._client.remove_object(self.BUCKET, self.get_file_name(id))
