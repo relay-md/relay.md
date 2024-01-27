@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import func, or_, select
 
@@ -31,7 +31,7 @@ class DocumentRepo(DatabaseAbstractRepository):
         access_token: AccessToken,
         page: int = 0,
         size: int = 10,
-        share_flags: DocumentShareType = None,
+        share_flags: Optional[DocumentShareType] = None,
     ):
         query = (
             select(Document)
