@@ -4,7 +4,35 @@
   .hero-body
     .title Library
 
-.section
+.section(hx-ext="client-side-templates")
+
+ template#list_documents
+  {% raw %}
+  {{#each result}}
+  .card
+   .card-content
+     .media
+       .media-content
+         p.title.is-4 {{this.title}}
+         p.subtitle.is-6 {{author.name}} (@{{author.username}})
+     .content
+       span {{this.relay-filename}}
+       br
+       time(datetime='2016-1-1') 11:09 PM - 1 Jan 2016
+  {{/each}}
+  {% endraw %}
+ template#list_topics
+  {% raw %}
+  {{#each result}}
+  li
+    a(hx-get="{% endraw %}{{config.API_URI}}{% raw %}/v1/docs/{{this.name}}"
+       hx-swap="innerHTML"
+       hx-target="#browser"
+       hx-headers='{{auth_header}}'
+       handlebars-array-template="list_documents"
+      ) {{this.name}}
+  {{/each}}
+  {% endraw %}
  .columns
   .column.is-3
    aside.menu
@@ -16,15 +44,16 @@
       input.input.is-small(type="text" placeholder="search for filename")
       span.icon.is-left
        i.fas.fa-search
-     ul.menu-list
-       li
-         a Dashboard
-       li
-         a Customers
+     ul.menu-list(hx-get="{{config.API_URI}}/v1/topics"
+       hx-trigger="load"
+       hx-swap="innerHTML"
+       hx-headers='{{auth_header}}'
+       handlebars-array-template="list_topics"
+     )
 
   .column.is-9
 
-   .columns.is-multiline
+   .columns.is-multiline#browser
     .column
      .card
       .card-image

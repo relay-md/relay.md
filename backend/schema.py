@@ -100,6 +100,19 @@ class DocumentIdentifierResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
+class UserSchema(BaseModel):
+    name: str
+    username: str
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+
+class DocumentLibraryResponse(DocumentIdentifierResponse):
+    author: UserSchema
+    last_updated_at: datetime
+    title: str
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+
 class VersionResponse(BaseModel):
     version: str
 

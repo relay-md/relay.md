@@ -192,3 +192,15 @@ class DocumentRepo(DatabaseAbstractRepository):
                 .limit(size)
             )
         )
+
+    def list_from_team_topic(
+        self, team_topic: TeamTopic, size, page: int
+    ) -> List[Document]:
+        return list(
+            self._db.scalars(
+                select(Document)
+                .filter(Document.team_topics.any(TeamTopic.id == team_topic.id))
+                .order_by(Document.last_updated_at.desc())
+                .limit(size)
+            )
+        )
