@@ -37,11 +37,21 @@ class SuccessResponse(BaseModel):
 
 class TeamResponse(BaseModel):
     id: UUID
+    name: str
+    headline: str
+    created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 
 class TopicResponse(BaseModel):
     id: UUID
+    name: str
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TeamTopicResponse(BaseModel):
+    id: UUID
+    name: str
     model_config = ConfigDict(from_attributes=True)
 
 

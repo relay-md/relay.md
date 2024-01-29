@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Request
 from starlette.responses import HTMLResponse
 
-from ..database import Session, get_session
-from ..repos.document import DocumentRepo
 from ..repos.user import User
 from ..templates import templates
-from ..utils.user import get_optional_user, require_user
+from ..utils.user import get_optional_user
 
 router = APIRouter(prefix="")
 
