@@ -74,6 +74,8 @@ class StripePayments(AbstractPaymentGateway):
             # relay.md side!
             allow_promotion_codes=True,
             # proration_behavior="always_invoice",
+            # We want stripe to deal with tax
+            automatic_tax=True,
         )
         return checkout_session
 
