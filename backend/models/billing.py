@@ -104,9 +104,6 @@ class Invoice(Base):
     payment_status: Mapped[InvoiceStatus] = mapped_column(
         Enum(InvoiceStatus), default=InvoiceStatus.PENDING
     )
-    payment_failure_reason: Mapped[str] = mapped_column(Text(), nullable=True)
-
-    payment_provider_reference: Mapped[str] = mapped_column(String(256), nullable=True)
 
     paid_at: Mapped[datetime] = mapped_column(nullable=True)
 
