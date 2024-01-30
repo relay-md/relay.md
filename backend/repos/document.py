@@ -3,7 +3,7 @@ from typing import List
 
 from sqlalchemy import func, or_, select
 
-from ..config import config
+from ..config import get_config
 from ..models.access_token import AccessToken
 from ..models.document import Document
 from ..models.document_team_topic import DocumentTeamTopic
@@ -178,14 +178,14 @@ class DocumentRepo(DatabaseAbstractRepository):
         )
 
     def latest_news(self, size=10) -> List[Document]:
-        if not config.RELAY_NEWS_TEAM_TOPIC_ID:
+        if not get_config().RELAY_NEWS_TEAM_TOPIC_ID:
             return []
         return list(
             self._db.scalars(
                 select(Document)
                 .filter(
                     Document.team_topics.any(
-                        TeamTopic.id == config.RELAY_NEWS_TEAM_TOPIC_ID
+                        TeamTopic.id == get_config().RELAY_NEWS_TEAM_TOPIC_ID
                     )
                 )
                 .order_by(Document.last_updated_at.desc())

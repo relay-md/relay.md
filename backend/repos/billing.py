@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 
 class AbstractPaymentGateway:
     @abc.abstractmethod
-    def get_payment_session(self, **kwargs):
+    def get_payment_session(self, invoice: Invoice):
         pass
 
     @abc.abstractmethod

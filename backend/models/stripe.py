@@ -15,7 +15,7 @@ class StripeCustomer(Base):
     __tablename__ = "stripe_customer"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
+        primary_key=True, default=uuid.uuid4, nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
@@ -29,7 +29,7 @@ class StripeSubscription(Base):
     __tablename__ = "stripe_subscription"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        primary_key=True, default=lambda x: uuid.uuid4(), nullable=False
+        primary_key=True, default=uuid.uuid4, nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 

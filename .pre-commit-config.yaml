@@ -60,5 +60,5 @@ repos:
       - id: mypy
         files: ^backend/
         exclude: tests
-        additional_dependencies: [types-python-dateutil, types-requests, types-pyyaml, types-click]
+        additional_dependencies: [types-python-dateutil, types-requests, types-pyyaml, types-click, types-markdown]
         args: [--ignore-missing-imports]  # TODO add --strict!

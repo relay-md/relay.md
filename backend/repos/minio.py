@@ -8,10 +8,9 @@ from minio import Minio
 from minio.commonconfig import CopySource
 
 from ..config import get_config
-from .base import AbstractRepository
 
 
-class MinioAbstractRepo(AbstractRepository):
+class MinioAbstractRepo:
     BUCKET = None
 
     def __init__(self, *args, **kwargs):
