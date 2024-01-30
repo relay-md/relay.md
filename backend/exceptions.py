@@ -125,7 +125,6 @@ async def web_unhandled_exception(
     exc: Exception,
     user: User = Depends(get_optional_user),
 ):
-    # required for top
     return templates.TemplateResponse("exception.pug", context=dict(**locals()))
 
 
