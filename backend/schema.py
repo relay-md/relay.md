@@ -24,11 +24,17 @@ class Error(BaseModel):
     message: str
 
 
+class PaginationLinks(BaseModel):
+    next: Optional[str] = None
+    prev: Optional[str] = None
+
+
 class Response(BaseModel, Generic[DataT]):
     """General Response for result and error"""
 
     result: Optional[DataT] = None
     error: Optional[Error] = None
+    links: Optional[PaginationLinks] = None
 
 
 class SuccessResponse(BaseModel):

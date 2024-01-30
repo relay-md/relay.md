@@ -285,6 +285,7 @@ async def get_docs(
     response_model_by_alias=True,
 )
 async def get_team_topic_docs(
+    request: Request,
     team_topic_name: str,
     type: str = "all",
     page: int = 0,
@@ -315,4 +316,20 @@ async def get_team_topic_docs(
                 last_updated_at=document.last_updated_at,
             )
         )
-    return dict(result=ret)
+    links = dict()
+    if len(ret) >= size:
+        links["next"] = str(
+            request.url_for(
+                "get_team_topic_docs", team_topic_name=team_topic_name
+            ).include_query_params(type=type, page=page + 1, size=size)
+        )
+    if page > 0:
+        links["prev"] = str(
+            request.url_for(
+                "get_team_topic_docs", team_topic_name=team_topic_name
+            ).include_query_params(type=type, page=page - 1, size=size)
+        )
+    return dict(
+        result=ret,
+        links=links,
+    )
