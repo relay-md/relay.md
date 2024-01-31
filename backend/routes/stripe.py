@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, Response
@@ -15,6 +16,7 @@ from ..utils.http import required_basic_auth
 from ..utils.user import get_optional_user
 
 router = APIRouter(prefix="/payment")
+log = logging.getLogger(__name__)
 
 
 @router.get(
@@ -107,5 +109,9 @@ async def stripe_webhook(
     try:
         await invoice_repo.process_webhook(request)
     except Exception as e:
+        import traceback
+
+        log.error(traceback.format_exc())
+
         raise WebhookException(str(e))
     return dict(success=True, message="accepted")

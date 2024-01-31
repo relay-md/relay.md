@@ -7,38 +7,18 @@ from backend.exceptions import NotAllowed
 from backend.models.team import DEFAULT_PUBLIC_PERMISSIONS, Permissions
 
 
-@pytest.fixture
-def patch_document_body_create():
-    with patch("backend.repos.document_body.DocumentBodyRepo.create") as mock:
-        yield mock
-
-
-@pytest.fixture
-def patch_document_body_get():
-    with patch(
-        "backend.repos.document_body.DocumentBodyRepo.get_by_id",
-    ):
-        yield
-
-
-@pytest.fixture
-def patch_document_body_update():
-    with patch(
-        "backend.repos.document_body.DocumentBodyRepo.update",
-    ) as mock:
-        yield mock
-
-
-@pytest.fixture(autouse=True)
-def s3(patch_document_body_create, patch_document_body_get, patch_document_body_update):
-    yield
-
-
+@patch(
+    "backend.repos.document_body.DocumentBodyRepo.get_by_id",
+    autospec=True,
+)
 def test_public_create_team_topic(
+    mock,
     dbsession,
     create_team,
     create_team_topic,
     eve,
+    patch_document_body_create,
+    patch_document_body_update,
 ):
     team = create_team(
         "public-test", public_permissions=DEFAULT_PUBLIC_PERMISSIONS.value
@@ -52,12 +32,19 @@ def test_public_create_team_topic(
         create_team_topic("testing-2@public-test", eve)
 
 
+@patch(
+    "backend.repos.document_body.DocumentBodyRepo.get_by_id",
+    autospec=True,
+)
 def test_public_post(
+    mock,
     dbsession,
     eve_auth_header,
     auth_header,
     create_team,
     upload_document,
+    patch_document_body_create,
+    patch_document_body_update,
 ):
     team = create_team(
         "public-test", public_permissions=DEFAULT_PUBLIC_PERMISSIONS.value
@@ -75,13 +62,20 @@ def test_public_post(
     assert exc.value.args[1].startswith("You are not allowed to post to")
 
 
+@patch(
+    "backend.repos.document_body.DocumentBodyRepo.get_by_id",
+    autospec=True,
+)
 def test_public_modify(
+    mock,
     dbsession,
     eve_auth_header,
     auth_header,
     create_team,
     upload_document,
     update_document,
+    patch_document_body_create,
+    patch_document_body_update,
 ):
     team = create_team(
         "public-test",

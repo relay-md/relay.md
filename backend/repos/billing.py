@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 
 class AbstractPaymentGateway:
     @abc.abstractmethod
-    def get_payment_session(self, **kwargs):
+    def get_payment_session(self, invoice: Invoice):
         pass
 
     @abc.abstractmethod
@@ -74,6 +74,8 @@ class StripePayments(AbstractPaymentGateway):
             # relay.md side!
             allow_promotion_codes=True,
             # proration_behavior="always_invoice",
+            # We want stripe to deal with tax
+            automatic_tax=dict(enabled=True),
         )
         return checkout_session
 
@@ -126,6 +128,9 @@ class StripePayments(AbstractPaymentGateway):
             stripe_subscription_id = stripe_invoice["subscription"]
 
             local_subscription = subscription_repo.get_by_id(UUID(subscription_id))
+            if not local_subscription:
+                raise ValueError("No corresponding subscription locally!?")
+
             subscription_repo.store_subscription_id(
                 local_subscription, stripe_subscription_id
             )
@@ -157,6 +162,8 @@ class StripePayments(AbstractPaymentGateway):
             ]
 
             subscription = subscription_repo.get_by_id(subscription_id)
+            if not subscription:
+                raise ValueError("No corresponding subscription locally!?")
             subscription_repo.store_subscription_id(
                 subscription, stripe_subscription_id
             )
@@ -184,6 +191,8 @@ class StripePayments(AbstractPaymentGateway):
             for item in stripe_subscription["items"]["data"]:
                 stripe_subscription_id = item["subscription"]
                 subscription = subscription_repo.get_by_id(subscription_id)
+                if not subscription:
+                    raise ValueError("No corresponding subscription locally!?")
                 subscription_repo.store_subscription_id(
                     subscription, stripe_subscription_id
                 )

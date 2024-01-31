@@ -8,10 +8,9 @@ from minio import Minio
 from minio.commonconfig import CopySource
 
 from ..config import get_config
-from .base import AbstractRepository
 
 
-class MinioAbstractRepo(AbstractRepository):
+class MinioAbstractRepo:
     BUCKET = None
 
     def __init__(self, *args, **kwargs):
@@ -73,3 +72,6 @@ class MinioAbstractRepo(AbstractRepository):
 
     def update(self, id: UUID, data: bytes) -> None:
         self.create(id, data)
+
+    def delete(self, id: UUID) -> None:
+        self._client.remove_object(self.BUCKET, self.get_file_name(id))

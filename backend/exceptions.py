@@ -116,7 +116,6 @@ async def web_handle_exception(
     user: User = Depends(get_optional_user),
 ):
     # required for top
-    user = None
     return templates.TemplateResponse("exception.pug", context=dict(**locals()))
 
 
@@ -125,7 +124,6 @@ async def web_unhandled_exception(
     exc: Exception,
     user: User = Depends(get_optional_user),
 ):
-    # required for top
     return templates.TemplateResponse("exception.pug", context=dict(**locals()))
 
 
@@ -143,7 +141,7 @@ async def web_handle_webhookexception(
 
 async def redirect_to_login(
     request: Request,
-    exc: Exception,
+    exc: LoginRequiredException,
     user: User = Depends(get_optional_user),
 ):
     url = str(request.url_for("login"))

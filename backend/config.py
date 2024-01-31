@@ -116,6 +116,7 @@ class Settings(BaseSettings):
         "W3C_Validator",
     ]
     PRERENDER_REDIRECT: str = "https://prerender.infra.chainsquad.com/"
+    PRERENDER_NO_PRERENDER_PATHS: List[str] = ["/sitemap.xml", "/robots.txt"]
 
     RATE_LIMITS_DEFAULT: str = "100/minute"
     RATE_LIMITS_REDIS: Optional[str] = None
@@ -126,7 +127,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
-config = None
+config: Optional[Settings] = None
 
 
 def get_config():

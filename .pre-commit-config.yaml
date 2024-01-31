@@ -47,6 +47,7 @@ repos:
           - "--remove-duplicate-keys"
           - "--remove-unused-variables"
           - "--remove-all-unused-imports"
+          - "--ignore-init-module-imports"
 
   - repo: https://github.com/PyCQA/flake8
     rev: 4.0.1
@@ -57,7 +58,7 @@ repos:
     rev: v0.902
     hooks:
       - id: mypy
-        files: ^gateway/
+        files: ^backend/
         exclude: tests
-        additional_dependencies: [types-python-dateutil, types-requests, types-pyyaml, types-click]
+        additional_dependencies: [types-python-dateutil, types-requests, types-pyyaml, types-click, types-markdown]
         args: [--ignore-missing-imports]  # TODO add --strict!
