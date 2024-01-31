@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.0 (2024-01-31)
+### Feature
+* **assets:** Allow to delete and update assets ([`beb18c7`](https://github.com/knowledgemd/backend/commit/beb18c70a8eba16b882c0b3d68cee8f54794d48d))
+
+### Fix
+* Typo ([`051ab2f`](https://github.com/knowledgemd/backend/commit/051ab2f3e08a264b1353bf79ea984f36075907f8))
+* Sitemap for googlebot ([`85f3ae5`](https://github.com/knowledgemd/backend/commit/85f3ae5eaf64ccce10f3c8df5a0d5501d5eb4efa))
+* Linting ([`70d5ba8`](https://github.com/knowledgemd/backend/commit/70d5ba8c8b70d9307c34fae797dbe06647fab4d6))
+* Issue with stripe integration ([`82f49d2`](https://github.com/knowledgemd/backend/commit/82f49d2446864edcd3f280b6e405d648402abf16))
+* More flexible way to skip prerender for paths ([`b155cea`](https://github.com/knowledgemd/backend/commit/b155ceaf025f289022ef92de82a3554d07085c6d))
+* Typo ([`79644fa`](https://github.com/knowledgemd/backend/commit/79644fac3506d622376da366bfa593bb9838e2e7))
+* Sitemap for googlebot ([`506b232`](https://github.com/knowledgemd/backend/commit/506b232b02dc0958f0d7b83e140d5dd11c2642a3))
+
 ## v1.6.3 (2024-01-25)
 ### Fix
 * Missing quotes ([`b79a5c4`](https://github.com/knowledgemd/backend/commit/b79a5c4bec766281feed083b4d0272dc52c08cd6))
