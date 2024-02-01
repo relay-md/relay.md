@@ -89,10 +89,6 @@ async def post_doc(
     if front.relay_filename:
         filename = front.relay_filename
 
-    # At this point we do not allow paths as filename
-    if "/" in filename or "\\" in filename:
-        raise exceptions.BadRequest("Filenames must not contain slash or backslash")
-
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
     check_document_post_permissions(db, user, shareables)
