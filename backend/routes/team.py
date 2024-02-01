@@ -408,10 +408,11 @@ async def api_list_topics_in_team(
     db: Session = Depends(get_session),
 ):
     user_repo = UserRepo(db)
-    # FIXME: this can be made more efficient with a join query
+    topics = user_repo.get_subscriptions(user=user, team=team)
     ret = list()
-    for topic in team.topics:
-        subscribed = bool(user_repo.is_subscribed(user, team, topic))
+    for topic_with_subscription in topics:
+        topic = topic_with_subscription[0]
+        subscribed = topic_with_subscription[1]
         if subscribed:
             toggle_link = request.url_for(
                 "unsubscribe", team_topic_name=topic.name + "@" + team.name

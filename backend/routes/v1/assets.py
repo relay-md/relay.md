@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import hashlib
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from fastapi import Depends, Request
@@ -13,6 +13,7 @@ from ...exceptions import BadRequest, NotAllowed, NotFound
 from ...models.document import Document
 from ...models.user import User
 from ...repos.asset import AssetContentRepo, AssetRepo
+from ...repos.user import UserRepo
 from ...schema import AssetReponse, Response, SuccessResponse
 from . import get_document, require_authenticated_user, router
 
@@ -126,8 +127,11 @@ async def get_asset(
     if not asset:
         raise NotFound()
     if asset.user_id != user.id:
-        # FIXME: need to figure out if the document (and thus asset) was shared
-        # by/to a team user is allowed to read
+        user_repo = UserRepo(db)
+        # TODO: find a more efficient way to query all team topics in document
+        for team_topic in asset.document.team_topics:
+            if user_repo.has_subscribed_to_topic_in_team(user, team_topic):
+                break
         raise NotAllowed("Not your asset")
     content_type = request.headers.get("content-type")
     if content_type == "application/json":
