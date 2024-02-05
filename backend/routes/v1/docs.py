@@ -6,6 +6,9 @@ from typing import List
 import frontmatter
 from fastapi import Depends, Request, Security
 from fastapi.responses import PlainTextResponse
+from backend.repos.team_topic import TeamTopicRepo
+
+from backend.repos.user_team_topic import UserTeamTopicRepo
 
 from ... import __version__, exceptions
 from ...database import Session, get_session
@@ -18,6 +21,7 @@ from ...repos.user import UserRepo
 from ...schema import (
     DocumentFrontMatter,
     DocumentIdentifierResponse,
+    DocumentLibraryResponse,
     DocumentResponse,
     DocumentShareType,
     Response,
@@ -84,10 +88,6 @@ async def post_doc(
         title = get_title_from_body(front_matter.content)
     if front.relay_filename:
         filename = front.relay_filename
-
-    # At this point we do not allow paths as filename
-    if "/" in filename or "\\" in filename:
-        raise exceptions.BadRequest("Filenames must not contain slash or backslash")
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
@@ -271,3 +271,61 @@ async def get_docs(
             )
         )
     return dict(result=ret)
+
+
+@router.get(
+    "/docs/{team_topic_name}",
+    tags=["v1"],
+    response_model=Response[List[DocumentLibraryResponse]],
+    response_model_exclude_unset=True,
+    response_model_by_alias=True,
+)
+async def get_team_topic_docs(
+    request: Request,
+    team_topic_name: str,
+    type: str = "all",
+    page: int = 0,
+    size: int = 50,
+    user: User = Depends(require_authenticated_user),
+    db: Session = Depends(get_session),
+):
+    team_topic = TeamTopicRepo(db).from_string(team_topic_name, user)
+    if not team_topic:
+        raise exceptions.NotFound("Invalid Topic")
+    user_team_topic = UserTeamTopicRepo(db).get_by_kwargs(
+        team_topic_id=team_topic.id, user_id=user.id
+    )
+    if not user_team_topic:
+        raise exceptions.NotFound("Not Subscribed to topic")
+    document_repo = DocumentRepo(db)
+    ret = list()
+    documents = document_repo.list_from_team_topic(team_topic, size, page)
+    for document in documents:
+        ret.append(
+            DocumentLibraryResponse(
+                relay_document=document.id,
+                relay_filename=document.filename,
+                relay_to=document.shared_with,
+                checksum_sha256=document.checksum_sha256,
+                author=document.user,
+                title=document.title,
+                last_updated_at=document.last_updated_at,
+            )
+        )
+    links = dict()
+    if len(ret) >= size:
+        links["next"] = str(
+            request.url_for(
+                "get_team_topic_docs", team_topic_name=team_topic_name
+            ).include_query_params(type=type, page=page + 1, size=size)
+        )
+    if page > 0:
+        links["prev"] = str(
+            request.url_for(
+                "get_team_topic_docs", team_topic_name=team_topic_name
+            ).include_query_params(type=type, page=page - 1, size=size)
+        )
+    return dict(
+        result=ret,
+        links=links,
+    )

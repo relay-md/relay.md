@@ -16,13 +16,23 @@ USERS = [
         username="fabian",
         email="fabian@die-schuhs.de",
         name="Fabian Schuh",
-    )
+    ),
+    dict(
+        id=UUID("b5ccf463-925a-4da1-9b6b-02338d576bca"),
+        username="xeroc",
+        email="fabian@chainsquad.com",
+        name="Fabian Schuh",
+    ),
 ]
 ACCESS_TOKEN = [
     dict(
         token=UUID("00000000-0000-0000-0000-000000000000"),
         user_id=UUID("85ed84e6-0617-49dc-b4fa-09c3e7ad9c87"),
-    )
+    ),
+    dict(
+        token=UUID("9d97599d-b905-42ba-9c07-9e84ca080abf"),
+        user_id=UUID("b5ccf463-925a-4da1-9b6b-02338d576bca"),
+    ),
 ]
 TOPICS = [
     dict(id=UUID("49ae6982-0e36-49ef-bf88-c4bc93f84218"), name="template"),
@@ -31,18 +41,19 @@ TOPICS = [
 TEAMS = [
     dict(
         id=UUID("fce2f6e4-18f3-47d5-abc0-2e0e483b3b62"),
-        user_id=UUID("85ed84e6-0617-49dc-b4fa-09c3e7ad9c87"),
+        user_id=UUID("b5ccf463-925a-4da1-9b6b-02338d576bca"),
         name="_",
     ),
     dict(
         id=UUID("528f4008-15cb-4415-87c3-2ead7096fcb1"),
-        user_id=UUID("85ed84e6-0617-49dc-b4fa-09c3e7ad9c87"),
+        user_id=UUID("b5ccf463-925a-4da1-9b6b-02338d576bca"),
         name="obsidian",
     ),
     dict(
         id=UUID("161fbd8f-ed53-41a8-8436-c8f3182a9527"),
-        user_id=UUID("85ed84e6-0617-49dc-b4fa-09c3e7ad9c87"),
+        user_id=UUID("b5ccf463-925a-4da1-9b6b-02338d576bca"),
         name="relay.md",
+        favorit=True,
     ),
 ]
 
