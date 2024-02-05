@@ -2,6 +2,21 @@
 
 <!--next-version-placeholder-->
 
+## v1.8.0 (2024-02-05)
+### Feature
+* Support for folders in filename ([`7fb014a`](https://github.com/knowledgemd/backend/commit/7fb014a8655542a4ba315ebdc946bbee949df077))
+* **library:** List documents from team_topic ([`90cdd86`](https://github.com/knowledgemd/backend/commit/90cdd860fbd17e3692598f279314353e88baaec3))
+* **v1:** Additional v1 routes for teams and topics ([`e339a38`](https://github.com/knowledgemd/backend/commit/e339a3870673dcf0bc5464a149faf3a77c7e2d6a))
+* **library:** Initial boilerplate for library ([`adb5224`](https://github.com/knowledgemd/backend/commit/adb5224a142d97a9271cb983b10519f863d6736f))
+* **plugin:** More details and hand out the api url via configuration link ([`5d9f711`](https://github.com/knowledgemd/backend/commit/5d9f7110f0656d1582a012c1c2eeb1e261b9d067))
+
+### Fix
+* Lint ([`aae5a7e`](https://github.com/knowledgemd/backend/commit/aae5a7ec084eb124e4b6146890e118b1136c9ab5))
+* Use table for document library ([`df8e4b8`](https://github.com/knowledgemd/backend/commit/df8e4b892f9174d27b6c3ba56e8be4ac4276d0e5))
+* Consistency w.r.t. spacings ([`5802a67`](https://github.com/knowledgemd/backend/commit/5802a67e2e449cb1d334e7ece3aad008fc564349))
+* Typo when merging ([`80fbc94`](https://github.com/knowledgemd/backend/commit/80fbc94d5f0770dca1a028f2f3f7152e7936c40f))
+* Typos ([`593cd63`](https://github.com/knowledgemd/backend/commit/593cd636da301eafc7537a40da3c038531fd87f9))
+
 ## v1.7.0 (2024-01-31)
 ### Feature
 * **assets:** Allow to delete and update assets ([`beb18c7`](https://github.com/knowledgemd/backend/commit/beb18c70a8eba16b882c0b3d68cee8f54794d48d))
