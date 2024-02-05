@@ -58,3 +58,13 @@ class TeamRepo(DatabaseAbstractRepository):
             .order_by(member_count.desc())
             .limit(limit)
         )
+
+    def joined(self, user: User, size: int, page: int):
+        return self._db.scalars(
+            select(Team)
+            .join(UserTeam)
+            .filter(and_(Team.hide.is_(False), UserTeam.user_id == user.id))
+            .order_by(Team.name)
+            .offset(page * size)
+            .limit(size)
+        )

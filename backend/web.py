@@ -24,6 +24,7 @@ from .routes import (
     team,
     teams,
     topic,
+    library,
 )
 from .routes.login import github, google
 
@@ -68,6 +69,7 @@ app.include_router(stripe.router)
 app.include_router(contact.router)
 app.include_router(admin.router)
 app.include_router(sitemap.router)
+app.include_router(library.router)
 
 # TODO:
 # exception handling:

@@ -1,21 +1,22 @@
 {% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
-.mt-5.mb-5
+.section
  .columns
   .column.is-8.is-offset-2
-   .title.is-1 {{team.name}}
-   .subtitle.is-5.text-icon
-     {% if team.is_paid %}
-     span.icon-text
-      span.icon
-        👑
-      span Pro Team
-     {% else %}
-     span.icon-text
-      span.icon
-        i.fas.fa-globe
-      span Team
-     {% endif %}
+   .block
+    .title.is-1 {{team.name}}
+    .subtitle.is-5.text-icon
+      {% if team.is_paid %}
+      span.icon-text
+        span.icon
+          👑
+        span Pro Team
+      {% else %}
+      span.icon-text
+        span.icon
+          i.fas.fa-globe
+        span Team
+      {% endif %}
 
    .block
     {% if user_repo.is_member(user, team) %}

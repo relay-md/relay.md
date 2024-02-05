@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-from typing import Generic, Optional, TypeVar, Union
+from typing import Generic, Optional, TypeVar, Union, List
 from uuid import UUID
 
 from sqlalchemy import ScalarResult, func, select
@@ -63,6 +63,11 @@ class DatabaseAbstractRepository(Generic[T]):
 
     def list(self, **kwargs) -> ScalarResult[T]:
         return self._db.scalars(select(self.ORM_Model).filter_by(**kwargs))
+
+    def paginate(self, size=10, page=0, **kwargs) -> List[T]:
+        return self._db.scalars(
+            select(self.ORM_Model).filter_by(**kwargs).offset(page * size).limit(size)
+        )
 
     def filter(self, *args) -> ScalarResult[T]:
         return self._db.scalars(select(self.ORM_Model).filter(*args))

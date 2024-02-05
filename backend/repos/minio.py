@@ -23,7 +23,11 @@ class MinioAbstractRepo:
         )
 
     def create(
-        self, id: UUID, data: Union[bytes, str], filename: Optional[str] = None
+        self,
+        id: UUID,
+        data: Union[bytes, str],
+        filename: Optional[str] = None,
+        content_type: Optional[str] = "text/markdown",
     ) -> None:
         if not self._client.bucket_exists(self.BUCKET):
             self._client.make_bucket(self.BUCKET)
@@ -33,17 +37,16 @@ class MinioAbstractRepo:
             file_postfix = filename.split(".")[-1]
         else:
             file_postfix = ""
-        # FIXME: we need to deal with mime type here!
         self._client.put_object(
             self.BUCKET,
             self.get_file_name(id, file_postfix),
             io.BytesIO(data),
             len(data),
-            content_type="text/markdown",
+            content_type=content_type,
         )
 
     @abc.abstractmethod
-    def get_file_name(self, id, postfix=None):
+    def get_file_name(self, id, postfix: Optional[str] = None):
         raise NotImplementedError()
 
     def get_by_id(self, id: UUID) -> bytes:

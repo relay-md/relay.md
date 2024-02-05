@@ -11,6 +11,7 @@ from ...models.document import Document
 from ...models.user import User
 from ...repos.access_token import AccessToken, AccessTokenRepo
 from ...repos.document import DocumentRepo
+from ...repos.user import UserRepo
 
 router = APIRouter(prefix="/v1")
 
@@ -78,10 +79,13 @@ async def get_user_shared_document(
     user: User = Depends(optional_authenticated_user),
     document: Document = Depends(get_document),
 ) -> Document:
-    # FIXME: here we need to check that the user is subscribed with the team
-    # that the document was shared with
     if document.is_public:
         return document
+    user_repo = UserRepo(db)
+    for team_topic in document.team_topics:
+        # TODO: invetigate if we can avoid the loop by a more powerful query
+        if user_repo.has_subscribed_to_topic_in_team(user, team_topic):
+            return document
     if not user or document.user_id != user.id:
         raise exceptions.NotAllowed(
             "Updating someone else document is not allowed currently!"

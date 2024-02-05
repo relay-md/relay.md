@@ -25,6 +25,7 @@ class Asset(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     last_updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     user: Mapped["User"] = relationship(back_populates="owned_assets")  # noqa
+    document: Mapped["Document"] = relationship(back_populates="embeds")  # noqa
 
     filename: Mapped[str] = mapped_column(String(256))
     filesize: Mapped[int] = mapped_column(BigInteger())

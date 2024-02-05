@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import select
+from sqlalchemy import and_, exists, select
 
 from ..config import get_config
+from ..models.team_topic import TeamTopic
 from ..models.user import User
 from .base import DatabaseAbstractRepository
 from .team import Team
 from .topic import Topic
 from .user_team import UserTeamRepo
-from .user_team_topic import UserTeamTopicRepo
+from .user_team_topic import UserTeamTopic, UserTeamTopicRepo
 
 
 class UserRepo(DatabaseAbstractRepository):
@@ -63,3 +64,28 @@ class UserRepo(DatabaseAbstractRepository):
                 # or creation of topic is not allowed
                 pass
         return user
+
+    def get_subscriptions(self, user: User, team: Team):
+        return self._db.execute(
+            select(
+                TeamTopic,
+                exists().where(
+                    and_(
+                        UserTeamTopic.team_topic_id == TeamTopic.id,
+                        UserTeamTopic.user_id == user.id,
+                    )
+                ),
+            ).filter(TeamTopic.team_id == team.id)
+        )
+
+    def has_subscribed_to_topic_in_team(self, user: User, team_topic: TeamTopic):
+        return self._db.scalar(
+            select(
+                exists().where(
+                    and_(
+                        UserTeamTopic.id == team_topic.id,
+                        UserTeamTopic.user_id == user.id,
+                    )
+                )
+            )
+        )

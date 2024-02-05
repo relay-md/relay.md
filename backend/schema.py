@@ -24,11 +24,17 @@ class Error(BaseModel):
     message: str
 
 
+class PaginationLinks(BaseModel):
+    next: Optional[str] = None
+    prev: Optional[str] = None
+
+
 class Response(BaseModel, Generic[DataT]):
     """General Response for result and error"""
 
     result: Optional[DataT] = None
     error: Optional[Error] = None
+    links: Optional[PaginationLinks] = None
 
 
 class SuccessResponse(BaseModel):
@@ -37,11 +43,21 @@ class SuccessResponse(BaseModel):
 
 class TeamResponse(BaseModel):
     id: UUID
+    name: str
+    headline: str
+    created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 
 class TopicResponse(BaseModel):
     id: UUID
+    name: str
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TeamTopicResponse(BaseModel):
+    id: UUID
+    name: str
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -87,6 +103,19 @@ class DocumentIdentifierResponse(BaseModel):
     relay_filename: Optional[str] = Field(None, alias="relay-filename")
 
     checksum_sha256: Optional[str]
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+
+class UserSchema(BaseModel):
+    name: str
+    username: str
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+
+class DocumentLibraryResponse(DocumentIdentifierResponse):
+    author: UserSchema
+    last_updated_at: datetime
+    title: str
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 

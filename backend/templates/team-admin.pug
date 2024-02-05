@@ -60,18 +60,17 @@ td.has-text-light
 
 {% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
-.mt-5.mb-5
+.section
  .columns
   .column.is-8.is-offset-2
-   .section
+   .block
     .title.is-1 {{team.name}}
     {% if team.is_paid %}
     .subtitle paid until {{team.paid_until}}
     {% endif %}
 
-   .section
+   .block
     .title.is-3 Team Settings
-
     .field.is-horizontal
       .field-label.is-normal Description/Headline
       .field-body
@@ -93,7 +92,7 @@ td.has-text-light
     //    label(for="hide_team")
     //    span(id="updated_team_hide")
 
-   .section
+   .block
     .title.is-3 Permissions
     .subtitle.is-5 Customize Team Permissions
     p.block Click the check marks/crosses to flip the corresponding permission.
@@ -132,7 +131,7 @@ td.has-text-light
       td
        {{permissions("public", team.public_permissions)}}
 
-   .section
+   .block
     .title.is-3 Members
     .subtitle.is-5 List of users subscribed to your team
     p.block
@@ -184,7 +183,7 @@ td.has-text-light
     {% endif %}
 
    {% if team.is_paid %}
-   .section
+   .block
     .title.is-3 Invite Users
     .subtitle.is-5.mb-0 Add others to your team
     .subtitle.is-7 You have&nbsp;
@@ -197,7 +196,7 @@ td.has-text-light
     div(id="users")
    {% endif %}
 
-   .section.box
+   .block.box
     .title.is-3 Subscription
     .subtitle.is-7 *Adding seats to your team will result in additional costs!
     {% if team.is_paid %}

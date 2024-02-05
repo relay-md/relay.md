@@ -61,10 +61,14 @@ async def login(
 
 
 @router.get("/configure/obsidian")
-async def configure_obsidian(request: Request, user: User = Depends(require_user)):
+async def configure_obsidian(
+    request: Request,
+    user: User = Depends(require_user),
+    config: Settings = Depends(get_config),
+):
     access_token = request.session["access_token"]
     return RedirectResponse(
-        url=f"obsidian://relay.md:access-token?token={access_token}"
+        url=f"obsidian://relay.md:access-token?token={access_token}&username={user.username}&api_url={config.API_URI}"
     )
 
 

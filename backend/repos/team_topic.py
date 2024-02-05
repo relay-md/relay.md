@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import List
+from typing import Optional
 
 from sqlalchemy import and_, select
 
@@ -8,15 +8,19 @@ from ..models.team import Team
 from ..models.team_topic import TeamTopic
 from ..models.topic import Topic
 from ..models.user import User
+from ..models.user_team_topic import UserTeamTopic
 from ..repos.team import TeamRepo
 from ..repos.topic import TopicRepo
 from .base import DatabaseAbstractRepository
+from sqlalchemy import ScalarResult
 
 
 class TeamTopicRepo(DatabaseAbstractRepository):
     ORM_Model = TeamTopic
 
-    def from_string(self, team_topic_str: str, user: User = None) -> TeamTopic:
+    def from_string(
+        self, team_topic_str: str, user: Optional[User] = None
+    ) -> TeamTopic:
         # import here due to cicular dependencies
         from ..exceptions import BadRequest, NotAllowed
 
@@ -55,9 +59,18 @@ class TeamTopicRepo(DatabaseAbstractRepository):
         self._db.refresh(new_team_topic)
         return new_team_topic
 
-    def search_names(self, team: Team, name: str) -> List[Topic]:
+    def search_names(self, team: Team, name: str) -> ScalarResult[Topic]:
         return self._db.scalars(
             select(Topic)
             .join(TeamTopic)
             .filter(and_(Topic.name.like(f"%{name}%"), TeamTopic.team_id == team.id))
+        )
+
+    def subscribed(self, user: User, size: int, page: int) -> ScalarResult[TeamTopic]:
+        return self._db.scalars(
+            select(TeamTopic)
+            .join(UserTeamTopic)
+            .filter(UserTeamTopic.user_id == user.id)
+            .offset(page * size)
+            .limit(size)
         )

@@ -124,6 +124,8 @@ class Settings(BaseSettings):
     MATOMO_URI: Optional[str] = None
     MATOMO_SITE_ID: Optional[int] = 1
 
+    API_URI: str = "https://api.relay.md"
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

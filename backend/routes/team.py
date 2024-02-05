@@ -365,41 +365,6 @@ async def create_topic_htx(
     return """<p id="validate-team-name" class="help is-success">Topic Created!</p>"""
 
 
-# TODO: this is duplicate code with the .get, except for the extra filtering of
-# topics
-@router.post("/{team_name}/api/topic/list")
-async def api_list_topics_in_team_post(
-    request: Request,
-    search: str = Form(""),
-    team: Team = Depends(get_team),
-    user: User = Depends(require_user),
-    db: Session = Depends(get_session),
-):
-    user_repo = UserRepo(db)
-    team_topic_repo = TeamTopicRepo(db)
-    topics = team_topic_repo.search_names(team, search.lower())
-    ret = list()
-    for topic in topics:
-        subscribed = bool(user_repo.is_subscribed(user, team, topic))
-        if subscribed:
-            toggle_link = request.url_for(
-                "unsubscribe", team_topic_name=topic.name + "@" + team.name
-            )
-        else:
-            toggle_link = request.url_for(
-                "subscribe", team_topic_name=topic.name + "@" + team.name
-            )
-        ret.append(
-            dict(
-                name=topic.name,
-                id=topic.id,
-                subscribed=subscribed,
-                toggle_url=str(toggle_link),
-            )
-        )
-    return ret
-
-
 @router.get("/{team_name}/api/topic/list")
 async def api_list_topics_in_team(
     request: Request,
@@ -408,18 +373,15 @@ async def api_list_topics_in_team(
     db: Session = Depends(get_session),
 ):
     user_repo = UserRepo(db)
-    # FIXME: this can be made more efficient with a join query
+    topics = user_repo.get_subscriptions(user=user, team=team)
     ret = list()
-    for topic in team.topics:
-        subscribed = bool(user_repo.is_subscribed(user, team, topic))
+    for topic_with_subscription in topics:
+        topic = topic_with_subscription[0]
+        subscribed = topic_with_subscription[1]
         if subscribed:
-            toggle_link = request.url_for(
-                "unsubscribe", team_topic_name=topic.name + "@" + team.name
-            )
+            toggle_link = request.url_for("unsubscribe", team_topic_name=topic.name)
         else:
-            toggle_link = request.url_for(
-                "subscribe", team_topic_name=topic.name + "@" + team.name
-            )
+            toggle_link = request.url_for("subscribe", team_topic_name=topic.name)
         ret.append(
             dict(
                 name=topic.name,

@@ -1,0 +1,72 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.hero.is-small.is-link
+  .hero-body
+    .title Library
+
+.section(hx-ext="client-side-templates"
+  hx-headers='{{auth_header}}'
+  )
+
+ template#list_documents
+  {% raw %}
+  {{#each result}}
+  tr
+   td
+    // FIXME: add link here
+    a(href="")
+         p.title.is-4 {{this.title}}
+         p.subtitle.is-6 {{author.name}} (@{{author.username}})
+   td
+     span {{this.relay-filename}}
+   td
+     time(datetime='{{this.last_updated_at}}') {{this.last_updated_at}}
+     {{#if @last}}
+     {{#if ../links.next}}
+     span(hx-trigger="revealed"
+       hx-get="{{../links.next}}"
+       hx-swap="beforeend"
+       hx-target="#browser"
+       handlebars-array-template="list_documents"
+     )
+     {{/if}}
+     {{/if}}
+
+  {{/each}}
+  {% endraw %}
+ template#list_topics
+  {% raw %}
+  {{#each result}}
+  li
+    // The initial size comes with the first batch loaded from the API. After that,
+    // the API provides "next" links that contain the same size for subsequent pages
+    a(hx-get="{% endraw %}{{config.API_URI}}{% raw %}/v1/docs/{{this.name}}?size=10"
+       hx-swap="innerHTML"
+       hx-target="#browser"
+       handlebars-array-template="list_documents"
+      ) {{this.name}}
+  {{/each}}
+  {% endraw %}
+ .columns
+  .column.is-3
+   aside.menu
+     //p.menu-label
+     // a() Assets / Embeds
+     p.menu-label Documents / Topics
+     p
+     .control.has-icons-left
+      input.input.is-small(type="text" placeholder="search for filename")
+      span.icon.is-left
+       i.fas.fa-search
+     ul.menu-list(hx-get="{{config.API_URI}}/v1/topics"
+       hx-trigger="load"
+       hx-swap="innerHTML"
+       hx-headers='{{auth_header}}'
+       handlebars-array-template="list_topics"
+     )
+
+  .column.is-9
+
+    table.table.is-fullwidth
+      tbody#browser
+{% endblock %}
