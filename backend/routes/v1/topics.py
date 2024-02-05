@@ -6,7 +6,7 @@ from fastapi import Depends
 from ...database import Session, get_session
 from ...models.user import User
 from ...repos.team_topic import TeamTopicRepo
-from ...schema import Response, TeamTopicResponse, TeamTopicResponse
+from ...schema import Response, TeamTopicResponse
 from . import (
     require_authenticated_user,
     router,
