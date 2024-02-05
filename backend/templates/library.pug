@@ -11,29 +11,27 @@
  template#list_documents
   {% raw %}
   {{#each result}}
-  .card.m-1
-   .card-content
+  tr
+   td
     // FIXME: add link here
     a(href="")
-     .media
-       .media-content
          p.title.is-4 {{this.title}}
          p.subtitle.is-6 {{author.name}} (@{{author.username}})
-     .content
-       span {{this.relay-filename}}
-       br
-       // FIXME: fix time
-       time(datetime='{{this.last_updated_at}}') {{this.last_updated_at}}
-       {{#if @last}}
-       {{#if ../links.next}}
-       span(hx-trigger="revealed"
-          hx-get="{{../links.next}}"
-          hx-swap="beforeend"
-          hx-target="#browser"
-          handlebars-array-template="list_documents"
-        )
-       {{/if}}
-       {{/if}}
+   td
+     span {{this.relay-filename}}
+   td
+     time(datetime='{{this.last_updated_at}}') {{this.last_updated_at}}
+     {{#if @last}}
+     {{#if ../links.next}}
+     span(hx-trigger="revealed"
+       hx-get="{{../links.next}}"
+       hx-swap="beforeend"
+       hx-target="#browser"
+       handlebars-array-template="list_documents"
+     )
+     {{/if}}
+     {{/if}}
+
   {{/each}}
   {% endraw %}
  template#list_topics
@@ -52,8 +50,8 @@
  .columns
   .column.is-3
    aside.menu
-     p.menu-label
-      a() Assets / Embeds
+     //p.menu-label
+     // a() Assets / Embeds
      p.menu-label Documents / Topics
      p
      .control.has-icons-left
@@ -69,5 +67,6 @@
 
   .column.is-9
 
-   .columns.is-multiline#browser
+    table.table.is-fullwidth
+      tbody#browser
 {% endblock %}
