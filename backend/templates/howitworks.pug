@@ -2,7 +2,7 @@
  .section.has-text-centered
   .title How it works
   .subtitle The power of Markdown, Frontmatter and Obsidian
-  video(controls='' width='100%' autoplay)
+  video(controls='' width='100%' autoplay='' loop='')
     source(src='{{url_for("static", path="webm/20240123-demo.webm")}}' type='video/webm' loop="true")
 
  .column.is-6.is-offset-3
@@ -14,7 +14,7 @@
       .content
         .title.is-5.mb-1
           strong Configure the Plugin
-        p After installing the plugin, a single click in the plugin's settings is enough to link your Relay.md account in Obsidian. No more configuration is required. It couldn't be more easy to set up.
+        p After installing the plugin, a single click in the plugin's settings is all it takes to link your Relay.md account in Obsidian. No further configuration is required. It couldn't be easier to set up.
 
   .media
     figure.media-left.ml-2
@@ -27,9 +27,9 @@
         p Use the frontmatter key&nbsp;
           span.tag.is-dark
             tt relay-to
-          | &nbsp;to list recipients individually or
-          | entire teams including a topic. &nbsp;
-          a(href="{{url_for('relay_basics')}}") Find out more.
+          | &nbsp;to list individual recipients or
+          | entire teams with a subject. &nbsp;
+          a(href="{{url_for('relay_basics')}}") Learn more.
 
   .media
     figure.media-left.ml-2
@@ -39,7 +39,7 @@
       .content
         .title.is-5.mb-1
           strong Receive your documents
-        p You will receive documents shared with you automatically into your vault, sorted into corresponding teams and topics. Each document will contain a unique identifier that allows the plugin to locate the document anywhere in your vault for updates. We recommend you move received documents into your usual hierarchy.
+        p You will automatically receive shared documents, sorted into corresponding teams and subjects. Each document contains a unique identifier that allows the plugin to locate the document anywhere in your vault for updates. We recommend that you move the documents you receive into your usual hierarchy.
 
   .media
     figure.media-left.ml-2
@@ -49,7 +49,7 @@
       .content
         .title.is-5.mb-1
           strong Access documents online
-        p Public documents can be access through the website by means of the unique document id. Simply share the document-id and people can read the document through the search online.
+        p Public documents can be accessed through the website using the unique document ID. Simply share the ID and people can read the document by searching online.
 
   .media
     figure.media-left.ml-2
@@ -59,8 +59,8 @@
       .content
         .title.is-5.mb-1
           strong Developer Access
-        p You can build your own apps using our API at&nbsp;
+        p You can build your own applications using our API at&nbsp;
           a(href='https://api.relay.md/docs') api.relay.md
-          | . Feel free to build your own note-taking app integration, or&nbsp;
-          a(href="{{url_for('contact')}}") contact using
+          | . Feel free to build your own note taking app integration, or&nbsp;
+          a(href="{{url_for('contact')}}") contact us using
           | &nbsp;for assistance.
