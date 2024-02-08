@@ -123,6 +123,7 @@ class Settings(BaseSettings):
 
     MATOMO_URI: Optional[str] = None
     MATOMO_SITE_ID: Optional[int] = 1
+    MAUTIC_URL: Optional[str] = None
 
     API_URI: str = "https://api.relay.md"
 
