@@ -18,9 +18,6 @@ clis = [
     "backend.cli.document",
     "backend.cli.document_body",
     "backend.cli.access_token",
-    "backend.cli.billing",
-    "backend.cli.invoice",
-    "backend.cli.subscription",
     "backend.cli.asset",
 ]
 

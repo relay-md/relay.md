@@ -13,18 +13,16 @@ from .config import get_config
 from .database import Base, engine
 from .routes import (
     admin,
-    billing,
     contact,
     document,
     home,
+    library,
     login,
     sitemap,
-    stripe,
     subscribe,
     team,
     teams,
     topic,
-    library,
 )
 from .routes.login import github, google
 
@@ -64,8 +62,6 @@ app.include_router(document.router)
 app.include_router(team.router)
 app.include_router(teams.router)
 app.include_router(topic.router)
-app.include_router(billing.router)
-app.include_router(stripe.router)
 app.include_router(contact.router)
 app.include_router(admin.router)
 app.include_router(sitemap.router)

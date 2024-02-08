@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 from .access_token import AccessTokenRepo
 from .asset import AssetRepo
-from .billing import (
-    InvoiceRepo,
-    PersonalInformationRepo,
-    SubscriptionRepo,
-)
 from .document import DocumentRepo
 from .document_access import DocumentAccessRepo
 from .document_body import DocumentBodyRepo
@@ -27,8 +22,5 @@ __all__ = [
     DocumentAccessRepo.__name__,
     UserTeamTopicRepo.__name__,
     UserTeamRepo.__name__,
-    InvoiceRepo.__name__,
-    PersonalInformationRepo.__name__,
-    SubscriptionRepo.__name__,
     AssetRepo.__name__,
 ]

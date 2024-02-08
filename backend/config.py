@@ -69,16 +69,6 @@ class Settings(BaseSettings):
 
     PAYMENT_BASIC_AUTH_WHITELIST: List[Tuple[str, str]] = [("foo", "bar")]
 
-    STRIPE_API_KEY: Optional[str] = ""
-    STRIPE_API_PRIVATE_KEY: Optional[str] = ""
-    STRIPE_WEBHOOK_SECRET: Optional[str] = ""
-    STRIPE_RETURN_URL_SUCCESS: str = "https://relay.md/payment/success"
-    STRIPE_RETURN_URL_CANCEL: str = "https://relay.md/payment/failed"
-    STRIPE_CUSTOMER_PORTAL_URL: Optional[str] = ""
-
-    PRICING_TEAM_YEARLY: float = 30.0
-    PRICING_TEAM_MONTHLY: float = 3.0
-
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
     RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID] = None
 

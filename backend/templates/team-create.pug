@@ -1,0 +1,22 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.section
+ .columns
+  .column.is-8.is-offset-2
+   .block
+    .title.is-1 Create a new team
+
+    form.box.p-5(method='POST' action="{{url_for('create_team_post')}}")
+      label.is-block.mb-4
+        span.is-block.mb-2 Team Name
+      .field
+       .control.has-icons-left
+        input.input#team_name(type="string" placeholder="Team Name" name="team_name" hx-post="{{url_for('team_create_validate_team_name')}}" hx-trigger="input changed delay:500ms, search" hx-target="#validate-team-name")
+        span.icon.is-left
+         i.fas.fa-globe
+       p(id="validate-team-name")
+      .mb-4
+        button.button.is-link.px-4(type='submit') Create
+
+
+{% endblock %}

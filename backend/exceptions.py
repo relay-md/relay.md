@@ -52,12 +52,6 @@ class Unauthorized(BaseAPIException):
     code = status.HTTP_401_UNAUTHORIZED
 
 
-class BillingException(BaseAPIException):
-    """400"""
-
-    code = status.HTTP_400_BAD_REQUEST
-
-
 class AlreadySubscribed(Exception):
     pass
 
@@ -164,6 +158,5 @@ def include_app_web(app):
     app.add_exception_handler(NotAllowed, web_handle_exception)
     app.add_exception_handler(NotFound, web_handle_exception)
     app.add_exception_handler(Unauthorized, web_handle_exception)
-    app.add_exception_handler(BillingException, web_handle_exception)
     app.add_exception_handler(WebhookException, web_handle_webhookexception)
     app.add_exception_handler(Exception, web_unhandled_exception)
