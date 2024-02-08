@@ -18,7 +18,6 @@ site_map_routes = [
     "obsidian_plugin",
     "relay_basics",
     "tos",
-    "pricing",
 ]
 
 
