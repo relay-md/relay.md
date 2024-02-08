@@ -49,6 +49,11 @@ class Subscription(Base):
         back_populates="subscription"
     )
 
+    period_starts_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow
+    )
+    period_ends_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
     @property
     def is_yearly(self):
         if self.price == int(get_config().PRICING_TEAM_YEARLY * 100):

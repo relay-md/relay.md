@@ -103,7 +103,7 @@ class StripePayments(AbstractPaymentGateway):
             # Repos
             invoice_repo = InvoiceRepo(db)
             subscription_repo = SubscriptionRepo(db)
-            team_repo = TeamRepo(db)
+            TeamRepo(db)
 
             # Get the full session with subscription
             session = stripe.checkout.Session.retrieve(
@@ -133,15 +133,20 @@ class StripePayments(AbstractPaymentGateway):
             subscription_repo.store_subscription_id(
                 local_subscription, stripe_subscription_id
             )
-            subscription_repo.update(
-                local_subscription, active=stripe_subscription["status"] == "active"
-            )
 
-            # Update team paid until attribute
+            # Update subscription
+            start_date = datetime.utcfromtimestamp(
+                session["subscription"]["current_period_start"]
+            )
             end_date = datetime.utcfromtimestamp(
                 session["subscription"]["current_period_end"]
             )
-            team_repo.update(local_subscription.team, paid_until=end_date)
+            subscription_repo.update(
+                local_subscription,
+                active=stripe_subscription["status"] == "active",
+                period_starts_at=start_date,
+                period_ends_at=end_date,
+            )
 
         # Invoice specific webhooks ####################################
         # https://stripe.com/docs/api/invoices/object
@@ -182,7 +187,7 @@ class StripePayments(AbstractPaymentGateway):
         ################################################################
         elif event["type"] == "customer.subscription.updated":
             stripe_subscription = event["data"]["object"]
-            team_repo = TeamRepo(db)
+            TeamRepo(db)
             subscription_repo = SubscriptionRepo(db)
             stripe_subscription["metadata"]["team_id"]
             invoice_id = stripe_subscription["metadata"]["invoice_id"]
@@ -202,19 +207,29 @@ class StripePayments(AbstractPaymentGateway):
                     price = get_config().PRICING_TEAM_YEARLY
                 else:
                     price = get_config().PRICING_TEAM_MONTHLY
-                subscription = subscription_repo.update(
-                    subscription, price=price, quantity=quantity, active=True
+                # Update subscription
+                start_date = datetime.utcfromtimestamp(
+                    stripe_subscription["current_period_start"]
                 )
                 end_date = datetime.utcfromtimestamp(
                     stripe_subscription["current_period_end"]
                 )
-                team_repo.update(subscription.team, paid_until=end_date)
+                subscription_repo.update(
+                    subscription,
+                    price=price,
+                    quantity=quantity,
+                    active=stripe_subscription["status"] == "active",
+                    period_starts_at=start_date,
+                    period_ends_at=end_date,
+                )
 
         elif event["type"] == "customer.subscription.created":
             stripe_subscription = event["data"]["object"]
             subscription_repo = SubscriptionRepo(db)
             subscription_id = stripe_subscription["metadata"]["subscription_id"]
             subscription = subscription_repo.get_by_id(subscription_id)
+            if not subscription:
+                raise ValueError("No corresponding subscription locally!?")
             subscription_repo.update(subscription, active=False)
             stripe_subscription_id = stripe_subscription["id"]
             subscription_repo.store_subscription_id(

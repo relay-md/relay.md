@@ -147,11 +147,6 @@ async def toggle_team_perms(
     elif type == "public":
         # Changing this flag requries upgrade
         new_perm = team.public_permissions ^ Permissions(perm)
-        if not team.is_paid:
-            return RedirectResponse(
-                url=request.url_for("team_billing", team_name=team.name)
-            )
-
         team_repo.update(team, public_permissions=(new_perm).value)
     else:
         raise exceptions.BadRequest(f"Invalid value for {type=}")
@@ -218,23 +213,38 @@ async def settings_user_search(
     users = list(user_repo.search_username(name, limit=5))
 
     def user_invite_link(user, team):
-        if not team.paid_until:
-            raise exceptions.BadRequest("There is no subscription for this team!")
-        subscription = team.subscriptions[0]
-        if subscription.is_yearly:
-            price = config.PRICING_TEAM_YEARLY
-            price_interval = "year"
-            price_period = round(
-                (1 - percentage_of_period_year(date.today(), team.paid_until)) * price,
-                2,
-            )
+        if team.active_subscription:
+            subscription = team.subscriptions[0]
+            if subscription.is_yearly:
+                price = config.PRICING_TEAM_YEARLY
+                price_interval = "year"
+                price_period = round(
+                    (
+                        1
+                        - percentage_of_period_year(
+                            date.today(), subscription.period_starts_end
+                        )
+                    )
+                    * price,
+                    2,
+                )
+            else:
+                price = config.PRICING_TEAM_MONTHLY
+                price_interval = "month"
+                price_period = round(
+                    (
+                        1
+                        - percentage_of_period_month(
+                            date.today(), subscription.period_starts_end
+                        )
+                    )
+                    * price,
+                    2,
+                )
         else:
-            price = config.PRICING_TEAM_MONTHLY
+            price = 0.0
             price_interval = "month"
-            price_period = round(
-                (1 - percentage_of_period_month(date.today(), team.paid_until)) * price,
-                2,
-            )
+            price_period = 0.0
         return f"""
             <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">
              <div class="list-item-image">

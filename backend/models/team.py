@@ -3,10 +3,10 @@
 """
 import re
 import uuid
-from datetime import date, datetime
+from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import Date, ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -76,36 +76,21 @@ class Team(Base):
         back_populates="team"
     )
 
-    paid_until: Mapped[date] = mapped_column(Date(), nullable=True)
     seats: Mapped[int] = mapped_column(Integer(), default=1)
 
     # Should this be shown in directory listing teams?
     hide: Mapped[bool] = mapped_column(default=False)
     favorit: Mapped[bool] = mapped_column(default=False)
 
-    @property
-    def is_public(self):
-        return self.public_permissions & (Permissions.can_read | Permissions.can_post)
-
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.name}>"
 
     @property
-    def can_upgrade(self):
-        """Is the team paid? Else, if becomes inactive, no posting, reading
-        etc.."""
-        return not (self.is_paid and any([x.active for x in self.subscriptions]))
-
-    @property
-    def is_paid(self):
-        """Is the team paid? Else, if becomes inactive, no posting, reading
-        etc.."""
-        if not self.paid_until:
-            return False
-        now = date.today()
-        if now < self.paid_until:
-            return True
-        return False
+    def active_subscription(self):
+        """Return the active subscription"""
+        for subscription in self.subscriptions:
+            if subscription.active:
+                return subscription
 
     def can(
         self, action: Permissions, user: User, membership: Optional[UserTeam] = None
