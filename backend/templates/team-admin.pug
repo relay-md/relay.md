@@ -19,20 +19,12 @@ table.table.is-striped.is-normal
  tr
   td {{perm.name | replace("_", "-")}}
   td
-   {% if not team.is_paid and type == "public" %}
-   {% if perm in Permissions(team_perms) %}
-   i.fa.fa-check
-   {% else %}
-   i.fa.fa-times
-   {% endif %}
-   {% else %}
    a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm.value, type=type) | safe}}")
     {% if perm in Permissions(team_perms) %}
     i.fa.fa-check
     {% else %}
     i.fa.fa-times
     {% endif %}
-   {% endif %}
  {% endfor %}
 {% endmacro %}
 
@@ -65,9 +57,6 @@ td.has-text-light
   .column.is-8.is-offset-2
    .block
     .title.is-1 {{team.name}}
-    {% if team.is_paid %}
-    .subtitle paid until {{team.paid_until}}
-    {% endif %}
 
    .block
     .title.is-3 Team Settings
@@ -109,20 +98,10 @@ td.has-text-light
          i.fa.fa-shield
         span Member
       th
-       .level
-        .level-item
-         .icon-text
-          .span.icon
-           i.fa.fa-globe
-          span Public
-        .level-item
-         {% if not team.is_paid %}
-         a.button.is-small.is-dark(href="{{ url_for('team_billing', team_name=team.name) }}")
-          span.text-icon
-           span.icon
-            👑
-           span upgrade
-         {% endif %}
+       .icon-text
+        .span.icon
+         i.fa.fa-globe
+        span Public
      tr
       td
        {{permissions("owner", team.owner_permissions)}}
@@ -182,24 +161,24 @@ td.has-text-light
     p No members have joined yet.
     {% endif %}
 
-   {% if team.is_paid %}
    .block
     .title.is-3 Invite Users
     .subtitle.is-5.mb-0 Add others to your team
+    {% if team.active_subscription %}
     .subtitle.is-7 You have&nbsp;
      strong {{team.seats}}
-     |&nbsp;in your subscription
+     |&nbsp;seats in your subscription
+    {% endif %}
     .control.has-icons-left
      input.input(type="tags" id="invite-users" name="name" hx-post="{{url_for('settings_user_search', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#users")
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
-   {% endif %}
 
+   {% if team.active_subscription %}
    .block.box
     .title.is-3 Subscription
     .subtitle.is-7 *Adding seats to your team will result in additional costs!
-    {% if team.is_paid %}
     form(hx-post="{{url_for('update_team_seats', team_name=team.name)}}" hx-target="#updated_team_seats")
      .field.has-addons
       .field-label.is-normal No. Seats
@@ -247,15 +226,15 @@ td.has-text-light
      span.icon.is-medium
       i.fas.fa-skull
      span Cancel Subscription
-    {% endif %}
+   {% endif %}
 
-    {% if team.can_upgrade %}
-    .subtitle.is-5 Upgrade to Private Member
-    a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
-     span.icon.is-medium
-      🎉
-     span Upgrade to Private Team
-    div(id="users")
-    {% endif %}
+   {% if not team.active_subscription %}
+   .subtitle.is-5 Upgrade to Private Member
+   a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
+    span.icon.is-medium
+     🎉
+    span Upgrade to Pro Team
+   div(id="users")
+   {% endif %}
 
 {% endblock %}

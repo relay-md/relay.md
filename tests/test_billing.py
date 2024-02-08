@@ -153,4 +153,5 @@ def test_initial_payment(
     assert team.subscriptions
     subscription = team.subscriptions[0]
     assert subscription.active
-    assert team.paid_until
+    assert subscription.period_starts_at
+    assert subscription.period_ends_at

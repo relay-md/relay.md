@@ -1,6 +1,6 @@
 {% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
-.section
+.mt-5.mb-5
  {% if user %}
  .columns
   .column.has-text-centered.is-10.is-offset-1
@@ -48,20 +48,25 @@
         input#input_team_name(type="hidden" name="team_name")
         .plan-header
          .title.is-5 Free
-         .subtitle.is-6 Open Source and public
+         .subtitle.is-6 Hosted on relay.md
         .plan-price
          span.plan-price-amount
            span.plan-price-currency $
            | 0
          span#priceunit /month/member
         .plan-items
-         .plan-item join and subscribe&nbsp;
-          strong public teams
-         .plan-item publish documents publicly
+         .plan-item public and
+            strong private teams
+         .plan-item
+           strong 10MiB
+           | &nbsp; of notes and embeds
          .plan-item obsidian&nbsp;
           strong integration&nbsp;
           | via plugin
-         .plan-item 1 access key
+         .plan-item fine grained&nbsp;
+          strong access control&nbsp;
+          |to teams
+         .plan-item 1 access key per user
         .plan-footer
          {% if user %}
          input.button.is-fullwidth#free_choose(type="submit")
@@ -76,20 +81,28 @@
         input#input_team_name(type="hidden" name="team_name")
         .plan-header
          .title.is-5 Team
-         .subtitle.is-6 Advanced and Private Collaboration
+         .subtitle.is-6 Startups and Freelancers
         .plan-price
          span.plan-price-amount
            span.plan-price-currency $
            span#team_price 3
          span#priceunit /month/member
         .plan-items
-         .plan-item 👈 all features from the left
-         .plan-item manage your own&nbsp;
-          strong private team
-         .plan-item publish documents privately
+         .plan-item public and
+            strong private teams
+         .plan-item
+           strong 5GiB
+           | &nbsp; of notes and embeds
+         .plan-item obsidian&nbsp;
+          strong integration&nbsp;
+          | via plugin
          .plan-item fine grained&nbsp;
           strong access control&nbsp;
           |to teams
+         .plan-item 5 access key per user
+         .plan-item fine grained&nbsp;
+          strong access control&nbsp;
+          |for teams
         .plan-footer
          {% if user %}
          input.button.is-fullwidth#team_choose(type="submit")
@@ -99,19 +112,33 @@
 
       .pricing-plan.is-danger
        .plan-header
-        .title.is-5 Enterprice
+        .title.is-5 Enterprise
         .subtitle.is-6 Premium Customizations
        .plan-price
         span.plan-price-amount
           span.plan-price-currency
         | Request Quote
        .plan-items
-        .plan-item 👈 all features from the left
-        .plan-item documents&nbsp;
+         .plan-item public and
+            strong private teams
+         .plan-item
+           strong >5GiB
+           | &nbsp; of notes and embeds
+         .plan-item obsidian&nbsp;
+          strong integration&nbsp;
+          | via plugin
+         .plan-item fine grained&nbsp;
+          strong access control&nbsp;
+          |to teams
+         .plan-item ∞ access key per user
+         .plan-item fine grained&nbsp;
+          strong access control&nbsp;
+          |for teams
+        .plan-item document and embed &nbsp;
          strong versioning
         .plan-item dedicated &nbsp;
          strong api endpoint
-        .plan-item direct communication line
+        .plan-item technical support
        .plan-footer
         a.button.is-fullwidth(href="{{url_for('contact')}}") Request Quote
 
@@ -119,7 +146,7 @@
   h2.title.section-subtitle.dark-text.text-bold.has-text-centered.is-2.pt-20.pb-20
     | You have some questions ?
   .columns.p-2
-    .column.is-4.is-offset-2
+    .column.is-5.is-offset-1
       .content
         p.title.is-5 Why a subscription?
         p Because lifetime pricing is not sustainable for long-running business that continuously offer their services. The sustainability is crucial especially for communications platforms that are used on a daily basis.
@@ -134,10 +161,10 @@
          | otherwise receive. Think of them as #tags, but you can subscribe to
          | them. If you are not subscribed to a team, you will not get documents
          | shared with that team automatically.
-    .column.is-4
+    .column.is-5
       .content
         p.title.is-5 The service is too expensive.
-        p We ony charge for private teams for professional use. We believe
+        p We only charge teams for professional use. We believe
          | it would improve your productivity worth more than the price. This
          | service reduces our own pain by more than it costs.
       .content
@@ -190,8 +217,8 @@ script
    free_choose.setAttribute("value", "Choose");
    // Set all team_name hidden tags
    {% else %}
-   team_choose.setAttribute("value", "Create Private Team");
-   free_choose.setAttribute("value", "Create Public Team");
+   team_choose.setAttribute("value", "Create Pro Team");
+   free_choose.setAttribute("value", "Create Team");
    {% endif %}
 
    units.forEach((unit) => {
