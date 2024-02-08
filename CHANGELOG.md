@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.9.0 (2024-02-08)
+### Feature
+* Upgrade pricing model to usage base ([`ed605fd`](https://github.com/knowledgemd/backend/commit/ed605fd1a9beab801315c35fb1b01f2e41dfdd70))
+* Remove billing ([`75eb1b0`](https://github.com/knowledgemd/backend/commit/75eb1b048eb7c581fdfe297d13f6feb3b478c437))
+
+### Fix
+* Add missing file ([`33e7886`](https://github.com/knowledgemd/backend/commit/33e788614b43b006194fd101a93fcc2ea85a18e0))
+
 ## v1.8.0 (2024-02-05)
 ### Feature
 * Support for folders in filename ([`7fb014a`](https://github.com/knowledgemd/backend/commit/7fb014a8655542a4ba315ebdc946bbee949df077))
