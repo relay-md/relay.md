@@ -112,3 +112,15 @@ async def tos(
     user: User = Depends(get_optional_user),
 ):
     return templates.TemplateResponse("tos.pug", context=dict(**locals()))
+
+
+@router.get(
+    "/pricing",
+    response_class=HTMLResponse,
+    tags=["web"],
+)
+async def pricing(
+    request: Request,
+    user: User = Depends(get_optional_user),
+):
+    return templates.TemplateResponse("pricing.pug", context=dict(**locals()))

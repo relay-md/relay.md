@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Query, Request
@@ -10,11 +11,16 @@ from .. import exceptions
 from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..models.permissions import Permissions
+from ..repos.billing import SubscriptionRepo
 from ..repos.team import Team, TeamRepo
 from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
 from ..templates import templates
+from ..utils.dates import (
+    percentage_of_period_month,
+    percentage_of_period_year,
+)
 from ..utils.team import get_team
 from ..utils.user import User, require_user
 
@@ -141,6 +147,11 @@ async def toggle_team_perms(
     elif type == "public":
         # Changing this flag requries upgrade
         new_perm = team.public_permissions ^ Permissions(perm)
+        if not team.is_paid:
+            return RedirectResponse(
+                url=request.url_for("team_billing", team_name=team.name)
+            )
+
         team_repo.update(team, public_permissions=(new_perm).value)
     else:
         raise exceptions.BadRequest(f"Invalid value for {type=}")
@@ -207,6 +218,23 @@ async def settings_user_search(
     users = list(user_repo.search_username(name, limit=5))
 
     def user_invite_link(user, team):
+        if not team.paid_until:
+            raise exceptions.BadRequest("There is no subscription for this team!")
+        subscription = team.subscriptions[0]
+        if subscription.is_yearly:
+            price = config.PRICING_TEAM_YEARLY
+            price_interval = "year"
+            price_period = round(
+                (1 - percentage_of_period_year(date.today(), team.paid_until)) * price,
+                2,
+            )
+        else:
+            price = config.PRICING_TEAM_MONTHLY
+            price_interval = "month"
+            price_period = round(
+                (1 - percentage_of_period_month(date.today(), team.paid_until)) * price,
+                2,
+            )
         return f"""
             <a href="{request.url_for("invite_user", team_name=team_name, user_id=user.id)}" class="list-item">
              <div class="list-item-image">
@@ -220,6 +248,16 @@ async def settings_user_search(
               </div>
               <div class="list-item-description">
                {user.name}
+              </div>
+             </div>
+             <div class="list-item-controls">
+             <div>
+               <div class="title is-5">
+                {price_period}€
+               </div>
+               <div class="subtitle is-7">
+                {price}€/{price_interval}
+               </div>
               </div>
              </div>
             </a>
@@ -285,6 +323,29 @@ async def update_team_hide(
     return """<p id="validate-team-name" class="help is-success">Team updated!</p>"""
 
 
+@router.post("/{team_name}/seats", response_class=PlainTextResponse)
+async def update_team_seats(
+    request: Request,
+    seats: int = Form(default=0),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+
+    # Get number of members in the team
+    user_team_repo = UserTeamRepo(db)
+    count_members = user_team_repo.count(team_id=team.id)
+    if count_members > seats:
+        return f"""<p id="validate-team-name" class="help is-danger">Your team has {count_members} seats in use right now!</p>"""
+    subscription_repo = SubscriptionRepo(db)
+    subscription = subscription_repo.get_latest_subscription_for_team_id(team.id)
+    if not subscription:
+        return """<p id="validate-team-name" class="help is-danger">No Subscription available, cannot set seats!</p>"""
+    team_repo.update_seats(team, subscription, seats)
+    return """<p id="validate-team-name" class="help is-success">Seats updated!</p>"""
+
+
 @router.post("/{team_name}/topic/create", response_class=PlainTextResponse)
 async def create_topic_htx(
     request: Request,
@@ -330,3 +391,26 @@ async def api_list_topics_in_team(
             )
         )
     return ret
+
+
+@router.get("/{team_name}/billing")
+async def team_billing(
+    request: Request,
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    return templates.TemplateResponse("pricing.pug", context=dict(**locals()))
+
+
+@router.get("/{team_name}/billing/subscription/cancel")
+async def cancel_subscription(
+    request: Request,
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    subscription_repo = SubscriptionRepo(db)
+    for subscription in team.subscriptions:
+        subscription_repo.cancel_subscription(subscription)
+    return RedirectResponse(url=request.url_for("settings", team_name=team.name))

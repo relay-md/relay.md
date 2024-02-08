@@ -1,0 +1,240 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.section
+ {% if user %}
+ .columns
+  .column.has-text-centered.is-10.is-offset-1
+   h1.title Team Name
+   {% if not team %}
+   h3.subtitle Choose your Team Name
+   .block.box
+    .field
+     .control.has-icons-left
+      input.input#team_name(type="string" placeholder="Team Name" name="team_name" hx-post="{{url_for('team_create_validate_team_name')}}" hx-trigger="input changed delay:500ms, search" hx-target="#validate-team-name")
+      span.icon.is-left
+       i.fas.fa-globe
+     p(id="validate-team-name")
+   {% else %}
+   h3.subtitle Your Team Name
+   .block.box.p-5
+    .title
+     tt {{team.name}}
+   {% endif %}
+ {% endif %}
+
+ .columns
+  .column.has-text-centered.is-10.is-offset-1
+   h1.title Pricing
+   h3.subtitle Chose your Plan and Payment Interval
+   .column.is-4.is-offset-4
+    .level
+     div
+      .title.is-4 Monthly
+      .subtitle.is-6 Flexible Payments
+     .field
+      input#invoice_yearly.switch.is-medium.is-rounded.is-success(checked="checked" type="checkbox" name="yearly" onclick="flipswitch()")
+      label(for='invoice_yearly')
+     div
+      .title.is-4 Yearly
+      .subtitle.is-6 Two months for free
+
+   #pricing.block.box
+    .pricing-table
+
+      .pricing-plan
+       form#billing_form(action="{{url_for('team_billing_post')}}" method="POST" onsubmit="return validateForm();")
+        input#input_yearly(type="hidden" name="yearly")
+        input#input_type(type="hidden" name="type" value="public")
+        input#input_team_name(type="hidden" name="team_name")
+        .plan-header
+         .title.is-5 Free
+         .subtitle.is-6 Open Source and public
+        .plan-price
+         span.plan-price-amount
+           span.plan-price-currency $
+           | 0
+         span#priceunit /month/member
+        .plan-items
+         .plan-item join and subscribe&nbsp;
+          strong public teams
+         .plan-item publish documents publicly
+         .plan-item obsidian&nbsp;
+          strong integration&nbsp;
+          | via plugin
+         .plan-item 1 access key
+        .plan-footer
+         {% if user %}
+         input.button.is-fullwidth#free_choose(type="submit")
+         {% else %}
+         a.button.is-fullwidth#free_choose(href="{{url_for('login')}}") Login to proceed
+         {% endif %}
+
+      .pricing-plan.is-warning
+       form#billing_form(action="{{url_for('team_billing_post')}}" method="POST" onsubmit="return validateForm();")
+        input#input_yearly(type="hidden" name="yearly")
+        input#input_type(type="hidden" name="type" value="private")
+        input#input_team_name(type="hidden" name="team_name")
+        .plan-header
+         .title.is-5 Team
+         .subtitle.is-6 Advanced and Private Collaboration
+        .plan-price
+         span.plan-price-amount
+           span.plan-price-currency $
+           span#team_price 3
+         span#priceunit /month/member
+        .plan-items
+         .plan-item 👈 all features from the left
+         .plan-item manage your own&nbsp;
+          strong private team
+         .plan-item publish documents privately
+         .plan-item fine grained&nbsp;
+          strong access control&nbsp;
+          |to teams
+        .plan-footer
+         {% if user %}
+         input.button.is-fullwidth#team_choose(type="submit")
+         {% else %}
+         a.button.is-fullwidth#team_choose(href="{{url_for('login')}}") Login to proceed
+         {% endif %}
+
+      .pricing-plan.is-danger
+       .plan-header
+        .title.is-5 Enterprice
+        .subtitle.is-6 Premium Customizations
+       .plan-price
+        span.plan-price-amount
+          span.plan-price-currency
+        | Request Quote
+       .plan-items
+        .plan-item 👈 all features from the left
+        .plan-item documents&nbsp;
+         strong versioning
+        .plan-item dedicated &nbsp;
+         strong api endpoint
+        .plan-item direct communication line
+       .plan-footer
+        a.button.is-fullwidth(href="{{url_for('contact')}}") Request Quote
+
+.container
+  h2.title.section-subtitle.dark-text.text-bold.has-text-centered.is-2.pt-20.pb-20
+    | You have some questions ?
+  .columns.p-2
+    .column.is-4.is-offset-2
+      .content
+        p.title.is-5 Why a subscription?
+        p Because lifetime pricing is not sustainable for long-running business that continuously offer their services. The sustainability is crucial especially for communications platforms that are used on a daily basis.
+      .content
+        p.title.is-5 How do i get started?
+        p Once you have an account on relay.md, you can create your own team.
+         | by default, new teams are public.
+      .content
+        p.title.is-5 What can I use topics for?
+        p
+         | Topics are meant to reduce the number of documents team members would
+         | otherwise receive. Think of them as #tags, but you can subscribe to
+         | them. If you are not subscribed to a team, you will not get documents
+         | shared with that team automatically.
+    .column.is-4
+      .content
+        p.title.is-5 The service is too expensive.
+        p We ony charge for private teams for professional use. We believe
+         | it would improve your productivity worth more than the price. This
+         | service reduces our own pain by more than it costs.
+      .content
+        p.title.is-5 What is the benefit of a private team?
+        p
+         | Private teams come with flexible permission system that can be
+         | controlled by the owner. As such, the team can be made private so that
+         | only invited members can subscribe to topics, or post, modify or read
+         | documents of that team.
+      .content.pb-40
+        p.title.is-5 What happens when i unsubscribe?
+        p No worries, your documents will still be treated confidentially,
+        | however, your team will become inactive. You will not be able to take
+        | any further action, post, or modify documents until the subscription
+        | is continued. You can make your team - and thus your documents -
+        | public at any time.
+
+{% endblock %}
+
+{% block javascript %}
+script
+.
+ {% if team %}
+ document.querySelectorAll('[id=input_team_name]').forEach((tag) => {
+  tag.setAttribute("value", "{{team.name}}")
+ })
+ {% else %}
+ function store_team_name(e) {
+   // Set all team_name hidden tags
+   document.querySelectorAll('[id=input_team_name]').forEach((tag) => {
+    tag.setAttribute("value", e.target.value)
+   })
+ }
+ team_name_input = document.getElementById("team_name")
+ if (team_name_input) {
+  team_name_input.addEventListener('input', store_team_name);
+  team_name_input.addEventListener('propertychange', store_team_name);
+ }
+ {% endif %}
+
+ function flipswitch() {
+   var box = document.getElementById('invoice_yearly');
+   var units = document.querySelectorAll('[id=priceunit]');
+   var team_price = document.getElementById('team_price');
+   var team_choose = document.getElementById('team_choose');
+   var free_choose = document.getElementById('free_choose');
+
+   {% if team and user %}
+   team_choose.setAttribute("value", "Choose");
+   free_choose.setAttribute("value", "Choose");
+   // Set all team_name hidden tags
+   {% else %}
+   team_choose.setAttribute("value", "Create Private Team");
+   free_choose.setAttribute("value", "Create Public Team");
+   {% endif %}
+
+   units.forEach((unit) => {
+    if (box.checked) {
+     unit.innerHTML = "/year/member"
+    } else {
+     unit.innerHTML = "/month/member"
+    }
+   });
+
+   document.querySelectorAll('[id=input_yearly]').forEach((tag) => {
+    tag.setAttribute("value", box.checked)
+   })
+
+   if (box.checked) {
+    // YEARLY //////////////////////////////
+    team_price.innerHTML = 3 * 10;
+   } else {
+    // MONTHLY /////////////////////////////
+    team_price.innerHTML = 3;
+   }
+ }
+ // Calling the method initially just so we are in sync with what HTML code says
+ flipswitch()
+
+script
+.
+ // Form validation
+ function validateForm(e) {
+  const team_name_input = document.getElementById("team_name");
+  const warning_field = document.getElementById("validate-team-name");
+  if (!team_name_input.value) {
+    team_name_input.classList.add("is-danger");
+    warning_field.classList.add("help", "is-danger");
+    warning_field.innerHTML = "A valid team name is required";
+    return false;
+  } else {
+    warning_field.classList.remove("help", "is-danger");
+    if (warning_field.innerHTML) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+ }
+{% endblock %}

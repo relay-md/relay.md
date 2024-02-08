@@ -3,6 +3,7 @@ from typing import Optional
 
 from sqlalchemy import and_, func, or_, select
 
+from ..models.billing import Subscription
 from ..models.team import Team
 from ..models.user import User
 from ..models.user_team import UserTeam
@@ -39,6 +40,13 @@ class TeamRepo(DatabaseAbstractRepository):
             .group_by(Team.id)
             .order_by(member_count.desc())
         )
+
+    def update_seats(self, team: Team, subscription: Subscription, new_seats: int):
+        from .billing import SubscriptionRepo
+
+        subscription_repo = SubscriptionRepo(self._db)
+        subscription_repo.update_quantity(subscription, new_seats)
+        self.update(team, seats=new_seats)
 
     def search_with_count(self, name, limit=10):
         member_count = func.count(UserTeam.team_id)

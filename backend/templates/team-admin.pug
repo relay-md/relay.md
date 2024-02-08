@@ -19,12 +19,20 @@ table.table.is-striped.is-normal
  tr
   td {{perm.name | replace("_", "-")}}
   td
+   {% if not team.is_paid and type == "public" %}
+   {% if perm in Permissions(team_perms) %}
+   i.fa.fa-check
+   {% else %}
+   i.fa.fa-times
+   {% endif %}
+   {% else %}
    a(href="{{url_for('toggle_team_perms', team_name=team.name).include_query_params(perm=perm.value, type=type) | safe}}")
     {% if perm in Permissions(team_perms) %}
     i.fa.fa-check
     {% else %}
     i.fa.fa-times
     {% endif %}
+   {% endif %}
  {% endfor %}
 {% endmacro %}
 
@@ -57,6 +65,9 @@ td.has-text-light
   .column.is-8.is-offset-2
    .block
     .title.is-1 {{team.name}}
+    {% if team.is_paid %}
+    .subtitle paid until {{team.paid_until}}
+    {% endif %}
 
    .block
     .title.is-3 Team Settings
@@ -105,6 +116,13 @@ td.has-text-light
            i.fa.fa-globe
           span Public
         .level-item
+         {% if not team.is_paid %}
+         a.button.is-small.is-dark(href="{{ url_for('team_billing', team_name=team.name) }}")
+          span.text-icon
+           span.icon
+            👑
+           span upgrade
+         {% endif %}
      tr
       td
        {{permissions("owner", team.owner_permissions)}}
@@ -164,6 +182,7 @@ td.has-text-light
     p No members have joined yet.
     {% endif %}
 
+   {% if team.is_paid %}
    .block
     .title.is-3 Invite Users
     .subtitle.is-5.mb-0 Add others to your team
@@ -175,5 +194,68 @@ td.has-text-light
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
+   {% endif %}
+
+   .block.box
+    .title.is-3 Subscription
+    .subtitle.is-7 *Adding seats to your team will result in additional costs!
+    {% if team.is_paid %}
+    form(hx-post="{{url_for('update_team_seats', team_name=team.name)}}" hx-target="#updated_team_seats")
+     .field.has-addons
+      .field-label.is-normal No. Seats
+      .field-body
+       .control
+        input.input(id="seats_team" value="{{team.seats | default(0)}}" type="number" name="seats")
+        label(for="seats_team")
+       .control
+        button.button.is-primary Ok
+       span(id="updated_team_seats")
+
+    .subtitle.is-5
+    table.table.mb-0
+     thead
+      tr
+       th Active
+       th Date
+       th Invoice
+       th Schedule
+       th Description
+       th Quantity
+       th Price
+     tbody
+      {% for sub in team.subscriptions %}
+      tr.is-success
+        {% if sub.active %}
+        td.has-text-success.icon-text
+         span.icon
+          i.fas.fa-check
+        {% else %}
+        td.has-text-dancer.icon-text
+         span.icon
+          i.fas.fa-times
+        {% endif %}
+        td {{sub.created_at.strftime("%Y-%m-%d") }}
+        td {{sub.name}}
+        td {{ "yearly" if sub.is_yearly else "monthly" }}
+        td {{sub.description}}
+        td {{sub.quantity }}
+        td {{sub.quantity * sub.price / 100}} €
+      {% endfor %}
+    p.help.block Find out more by logging into the&nbsp;
+     a(href=config.STRIPE_CUSTOMER_PORTAL_URL) Customer Portal.
+    a.block.button.is-medium.is-danger.is-outlined(href="{{ url_for('cancel_subscription', team_name=team.name) }}")
+     span.icon.is-medium
+      i.fas.fa-skull
+     span Cancel Subscription
+    {% endif %}
+
+    {% if team.can_upgrade %}
+    .subtitle.is-5 Upgrade to Private Member
+    a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
+     span.icon.is-medium
+      🎉
+     span Upgrade to Private Team
+    div(id="users")
+    {% endif %}
 
 {% endblock %}

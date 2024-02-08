@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+""" Subscriptions of a user into a team topic
 """
 import uuid
 
