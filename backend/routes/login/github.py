@@ -96,6 +96,8 @@ async def onboarding_github_post(
     user = user_repo.create_from_kwargs(
         username=username,
         email=email.lower(),
+        firstname=first_name,
+        lastname=last_name,
         name=f"{first_name} {last_name}",
         oauth_provider=OauthProvider.GITHUB,
         profile_picture_url=github_user["avatar_url"],
