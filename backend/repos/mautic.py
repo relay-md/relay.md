@@ -23,8 +23,8 @@ class MauticAPI(object):
         return bool(self.url)
 
     def _process_req(self, req) -> dict:
-        if str(req.status_code)[0] != 2:
-            # log.error(req.text)
+        if str(req.status_code)[0] != "2":
+            log.error(req.text)
             req.raise_for_status()
         return req.json()
 
@@ -69,19 +69,27 @@ class MauticRepo(MauticAPI):
         # add to segement
         mautic_segment = get_config().MAUTIC_USER_SEGMENT_ID
         if mautic_segment:
-            self.add_contact_to_segment(contact["contact"]["id"], mautic_segment)
+            self.add_contact_to_segment(contact["contact"], mautic_segment)
 
         return contact
 
     def find_contact(self, email) -> Optional[dict]:
-        params = dict(col="email", expr="eq", val=email)
+        params = {
+            "where[0][col]": ["email"],
+            "where[0][expr]": "eq",
+            "where[0][val]": email,
+        }
         contacts: dict = self.get("contacts", params=params)
         contact_ids = list(contacts.get("contacts", {}).keys())
         if contact_ids:
             return contacts["contacts"].get(contact_ids[0])
 
     def find_contact_from_user(self, user: User) -> Optional[dict]:
-        params = dict(col="user_id", expr="eq", val=str(user.id))
+        params = {
+            "where[0][col]": ["user_id"],
+            "where[0][expr]": "eq",
+            "where[0][val]": str(user.id),
+        }
         contacts: dict = self.get("contacts", params=params)
         contact_ids = list(contacts.get("contacts", {}).keys())
         if contact_ids:

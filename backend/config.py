@@ -129,8 +129,9 @@ class Settings(BaseSettings):
     MAUTIC_API_USERNAME: Optional[str] = None
     MAUTIC_API_PASSWORD: Optional[str] = None
     MAUTIC_URL: Optional[str] = None
-    MAUTIC_NEWSLETTER_FORM_ID: Optional[int] = 1
 
+    MAUTIC_NEWSLETTER_OPT_IN_SEGMENT_ID: Optional[int] = None
+    MAUTIC_NEWSLETTER_FORM_ID: Optional[int] = None
     MAUTIC_USER_SEGMENT_ID: Optional[int] = None
     MAUTIC_SUBSCRIPTION_SEGMENT_ID: Optional[int] = None
 
