@@ -402,6 +402,6 @@ class PersonalInformationRepo(DatabaseAbstractRepository):
             tax=dict(ip_address=ip),
         )
 
-        self.store_in_mautic(**kwargs)
+        self.store_in_mautic(item)
 
         return item
