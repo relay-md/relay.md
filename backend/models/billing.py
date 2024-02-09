@@ -64,6 +64,10 @@ class Subscription(Base):
     def is_monthly(self):
         return not self.is_yearly
 
+    @property
+    def user(self):
+        return self.invoice.user
+
     def __repr__(self):
         return f"{self.__class__.__name__}(name={self.name}, quantity={self.quantity}, price={self.price})"
 
@@ -87,8 +91,8 @@ class PersonalInformation(Base):
     zip: Mapped[str] = mapped_column(String(128))
     country_code: Mapped[str] = mapped_column(String(3))
     # Phone
-    phone_country_code: Mapped[str] = mapped_column(String(6))
-    phone_number: Mapped[str] = mapped_column(String(128))
+    phone_country_code: Mapped[str] = mapped_column(String(6), default="")
+    phone_number: Mapped[str] = mapped_column(String(128), default="")
 
     stripe: Mapped["StripeCustomer"] = relationship()  # noqa
 

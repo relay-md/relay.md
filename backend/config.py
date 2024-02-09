@@ -123,10 +123,23 @@ class Settings(BaseSettings):
 
     MATOMO_URI: Optional[str] = None
     MATOMO_SITE_ID: Optional[int] = 1
+    MAUTIC_URL: Optional[str] = None
+
+    MAUTIC_API_BASE_URL: Optional[str] = None
+    MAUTIC_API_USERNAME: Optional[str] = None
+    MAUTIC_API_PASSWORD: Optional[str] = None
+    MAUTIC_URL: Optional[str] = None
+
+    MAUTIC_NEWSLETTER_OPT_IN_SEGMENT_ID: Optional[int] = None
+    MAUTIC_NEWSLETTER_FORM_ID: Optional[int] = None
+    MAUTIC_USER_SEGMENT_ID: Optional[int] = None
+    MAUTIC_SUBSCRIPTION_SEGMENT_ID: Optional[int] = None
 
     API_URI: str = "https://api.relay.md"
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="allow"
+    )
 
 
 config: Optional[Settings] = None

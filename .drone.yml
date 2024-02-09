@@ -19,11 +19,11 @@ steps:
 #############################
 kind: pipeline
 type: docker
-name: Build and deploy for develop
+name: Build and deploy for test.relay.md
 
 trigger:
   branch:
-    - develop
+    - relay.md/develop
   status:
     # Only runs if the first pipeline was fully successful
     - success
@@ -83,7 +83,7 @@ name: semantic-version
 depends_on:
   - run_tests
 trigger:
-  branch: master
+  branch: relay.md/master
   event: push
   status:
     # Only runs if the first pipeline was fully successful
@@ -101,7 +101,7 @@ steps:
 #############################
 kind: pipeline
 type: docker
-name: Build and deploy for prod
+name: Build and deploy for relay.md
 
 trigger:
   event:

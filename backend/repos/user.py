@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from sqlalchemy import and_, exists, select
 
 from ..config import get_config
 from ..models.team_topic import TeamTopic
 from ..models.user import User
 from .base import DatabaseAbstractRepository
+from .mautic import MauticRepo
 from .team import Team
 from .topic import Topic
 from .user_team import UserTeamRepo
 from .user_team_topic import UserTeamTopic, UserTeamTopicRepo
+
+log = logging.getLogger(__name__)
 
 
 class UserRepo(DatabaseAbstractRepository):
@@ -44,11 +49,19 @@ class UserRepo(DatabaseAbstractRepository):
             select(User).filter(User.username.like(f"%{name}%")).limit(limit)
         )
 
+    def store_in_mautic(self, user: User):
+        mautic_repo = MauticRepo()
+        mautic_repo.process_user(user)
+
     def create_from_kwargs(self, **kwargs):
         from ..exceptions import BadRequest, NotAllowed
         from ..repos.team_topic import TeamTopicRepo
 
-        user = super().create_from_kwargs(**kwargs)
+        kwargs.pop("firstname", "")
+        kwargs.pop("lastname", "")
+
+        user: User = super().create_from_kwargs(**kwargs)
+        self.store_in_mautic(user)
 
         # Automatically subscribe to some team topics
         team_topic_repo = TeamTopicRepo(self._db)

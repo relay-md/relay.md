@@ -15,6 +15,7 @@ from ..models.billing import (
     Subscription,
 )
 from .base import DatabaseAbstractRepository
+from .mautic import MauticRepo
 from .stripe import (
     StripeCustomerRepo,
     StripeSubscription,
@@ -277,6 +278,17 @@ class SubscriptionRepo(DatabaseAbstractRepository):
         super().__init__(*args, **kwargs)
         self.payment = StripePayments()
 
+    def store_in_mautic(self, subscription: Subscription):
+        mautic_repo = MauticRepo()
+        mautic_repo.process_subscription(subscription)
+
+    def update(self, item: Subscription, **kwargs):
+        old_active = item.active
+        new_active = kwargs.get("active", item.active)
+        super().update(item, **kwargs)
+        if old_active != new_active:
+            self.store_in_mautic(item)
+
     def store_subscription_id(self, subscription: Subscription, id):
         stripe_subscription_repo = StripeSubscriptionRepo(self._db)
         stripe_subscription = stripe_subscription_repo.get_by_kwargs(
@@ -337,6 +349,8 @@ class PersonalInformationRepo(DatabaseAbstractRepository):
     def create_from_kwargs(self, **kwargs):
         ip = kwargs.pop("ip", None)
         personal_info = super().create_from_kwargs(**kwargs)
+
+        # Create Stripe customer
         stripe_customer = stripe.Customer.create(
             name=kwargs["name"],
             email=kwargs["email"],
@@ -355,11 +369,17 @@ class PersonalInformationRepo(DatabaseAbstractRepository):
             personal_information_id=personal_info.id,
             stripe_customer_id=stripe_customer["id"],
         )
+        self.store_in_mautic(personal_info)
         return personal_info
+
+    def store_in_mautic(self, personal_info: PersonalInformation):
+        mautic_repo = MauticRepo()
+        mautic_repo.process_person(personal_info)
 
     def update(self, item, **kwargs):
         ip = kwargs.pop("ip", None)
         super().update(item, **kwargs)
+
         customer_repo = StripeCustomerRepo(self._db)
         customer = customer_repo.get_by_kwargs(personal_information_id=item.id)
         if not customer:
@@ -381,4 +401,7 @@ class PersonalInformationRepo(DatabaseAbstractRepository):
             ),
             tax=dict(ip_address=ip),
         )
+
+        self.store_in_mautic(**kwargs)
+
         return item
