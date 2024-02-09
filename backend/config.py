@@ -132,6 +132,7 @@ class Settings(BaseSettings):
     MAUTIC_NEWSLETTER_FORM_ID: Optional[int] = 1
 
     MAUTIC_USER_SEGMENT_ID: Optional[int] = None
+    MAUTIC_SUBSCRIPTION_SEGMENT_ID: Optional[int] = None
 
     API_URI: str = "https://api.relay.md"
 

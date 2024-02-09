@@ -22,6 +22,7 @@ clis = [
     "backend.cli.invoice",
     "backend.cli.subscription",
     "backend.cli.asset",
+    "backend.cli.mautic",
 ]
 
 for cli in clis:

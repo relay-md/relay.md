@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
+import logging
+from typing import Optional
 
 from requests import Session
 
 from ..config import get_config
+from ..models.billing import PersonalInformation
+from ..models.user import User
+
+log = logging.getLogger(__name__)
 
 
 class MauticAPI(object):
@@ -17,7 +23,9 @@ class MauticAPI(object):
         return bool(self.url)
 
     def _process_req(self, req) -> dict:
-        req.raise_for_status()
+        if str(req.status_code)[0] != 2:
+            # log.error(req.text)
+            req.raise_for_status()
         return req.json()
 
     def post(self, api: str, payload: dict) -> dict:
@@ -61,17 +69,62 @@ class MauticRepo(MauticAPI):
         # add to segement
         mautic_segment = get_config().MAUTIC_USER_SEGMENT_ID
         if mautic_segment:
-            self.post(
-                f"segments/{mautic_segment}/contact/{contact['contact']['id']}/add", {}
-            )
+            self.add_contact_to_segment(contact["contact"]["id"], mautic_segment)
 
         return contact
 
-    def update_contact(self, email, **kwargs):
-        email = email.lower()
+    def find_contact(self, email) -> Optional[dict]:
         params = dict(col="email", expr="eq", val=email)
         contacts: dict = self.get("contacts", params=params)
-        contact = list(contacts.get("contacts", {}).keys())
+        contact_ids = list(contacts.get("contacts", {}).keys())
+        if contact_ids:
+            return contacts.get(contact_ids[0])
+
+    def update_contact(self, email, **kwargs):
+        email = email.lower()
+        contact = self.find_contact(email)
         if not contact:
             return self.add_contact(email, **kwargs)
-        return self.patch(f"contacts/{contact[0]}/edit", kwargs)
+        return self.patch(f"contacts/{contact['id']}/edit", kwargs)
+
+    def import_from_user(self, user: User):
+        firstname, *_, lastname = user.name.split(" ")
+        return self.update_contact(
+            user.email, firstname=firstname, lastname=lastname, user_id=str(user.id)
+        )
+
+    def import_from_person(self, person: PersonalInformation):
+        self.update_contact(
+            person.user.email,
+            city=person.city,
+            country_code=person.country_code,
+            address1=person.address_line1,
+            address2=person.address_line2,
+            zipcode=person.zip,
+            state_str=person.state,
+            phone=person.phone_country_code + person.phone_number,
+        )
+
+    def add_contact_to_segment(self, contact, segment_id):
+        self.post(f"segments/{segment_id}/contact/{contact['id']}/add", {})
+
+    def remove_contact_to_segment(self, contact: dict, segment_id):
+        self.post(f"segments/{segment_id}/contact/{contact['id']}/remove", {})
+
+    def enable_subscription(self, email):
+        if not get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID:
+            return
+        contact = self.find_contact(email)
+        if contact:
+            self.add_contact_to_segment(
+                contact, get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID
+            )
+
+    def disable_subscription(self, email):
+        if not get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID:
+            return
+        contact = self.find_contact(email)
+        if contact:
+            self.remove_contact_to_segment(
+                contact, get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID
+            )
