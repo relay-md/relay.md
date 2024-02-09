@@ -81,6 +81,7 @@ td.has-text-light
     //    label(for="hide_team")
     //    span(id="updated_team_hide")
 
+   {% if team.active_subscription %}
    .block
     .title.is-3 Permissions
     .subtitle.is-5 Customize Team Permissions
@@ -162,8 +163,8 @@ td.has-text-light
     {% endif %}
 
    .block
-    .title.is-3 Invite Users
-    .subtitle.is-5.mb-0 Add others to your team
+    .title.is-5 Invite Users
+    .subtitle.is-6.mb-3 Add others to your team
     {% if team.active_subscription %}
     .subtitle.is-7 You have&nbsp;
      strong {{team.seats}}
@@ -174,6 +175,8 @@ td.has-text-light
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
+
+   {% endif %}
 
    {% if team.active_subscription %}
    .block.box
@@ -229,7 +232,7 @@ td.has-text-light
    {% endif %}
 
    {% if not team.active_subscription %}
-   .subtitle.is-5 Upgrade to Private Member
+   .title.is-3 Subscription
    a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
     span.icon.is-medium
      🎉
