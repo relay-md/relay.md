@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.11.1 (2024-02-09)
+### Fix
+* Prices are in € ([`8eac5a7`](https://github.com/knowledgemd/backend/commit/8eac5a721c1163de21d73b8a9ceb3e676e1b7ee6))
+* Typo ([`35e86eb`](https://github.com/knowledgemd/backend/commit/35e86ebf5281c78e7cb08b61d2bf1089b217d7dc))
+* Typo ([`4a4c427`](https://github.com/knowledgemd/backend/commit/4a4c427b50cc8085839e1b63724ac7e944a311e9))
+
 ## v1.11.0 (2024-02-09)
 ### Feature
 * Distinguish member control to pro team ([`353b938`](https://github.com/knowledgemd/backend/commit/353b938b1a7ec832c4738f0e6df571f0dc3cbe39))
