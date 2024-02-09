@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v1.10.0 (2024-02-09)
+### Feature
+* **mautic:** Allow to track users with mautic for marketing ([`a50e556`](https://github.com/knowledgemd/backend/commit/a50e55652990afabfa2b0fbd46eb08fffb979608))
+* Initial work on Mautic API ([`d13b8c9`](https://github.com/knowledgemd/backend/commit/d13b8c994ae0b1d1c1ee00ab28cae80c7295757f))
+* Allow to use mautic for tracking ([`a2dd26d`](https://github.com/knowledgemd/backend/commit/a2dd26d78e581159af2630b1f03be5fdd35dad16))
+
+### Fix
+* Allow extra vars in .env ([`ae9ea71`](https://github.com/knowledgemd/backend/commit/ae9ea71dd5f0f0880511b451daabbbac2a0d1eb8))
+
 ## v1.9.0 (2024-02-08)
 ### Feature
 * Upgrade pricing model to usage base ([`ed605fd`](https://github.com/knowledgemd/backend/commit/ed605fd1a9beab801315c35fb1b01f2e41dfdd70))
