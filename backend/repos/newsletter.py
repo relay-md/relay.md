@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from typing import Optional
+
 import requests
 
 from backend.exceptions import AlreadySubscribed
@@ -7,7 +9,13 @@ from ..config import get_config
 
 
 class NewsletterRepo:
-    def subscribe(self, email, first_name, last_name, status="pending"):
+    def subscribe(
+        self,
+        email,
+        first_name: Optional[str] = "",
+        last_name: Optional[str] = "",
+        status="pending",
+    ):
         req = requests.post(
             f"https://{get_config().MAILCHIMP_API_SERVER}.api.mailchimp.com/3.0/lists/{get_config().MAILCHIMP_LIST_ID}/members",
             auth=("key", get_config().MAILCHIMP_API_KEY),
