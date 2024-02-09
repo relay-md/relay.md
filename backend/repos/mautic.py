@@ -5,7 +5,7 @@ from typing import Optional
 from requests import Session
 
 from ..config import get_config
-from ..models.billing import PersonalInformation
+from ..models.billing import PersonalInformation, Subscription
 from ..models.user import User
 
 log = logging.getLogger(__name__)
@@ -78,7 +78,14 @@ class MauticRepo(MauticAPI):
         contacts: dict = self.get("contacts", params=params)
         contact_ids = list(contacts.get("contacts", {}).keys())
         if contact_ids:
-            return contacts.get(contact_ids[0])
+            return contacts["contacts"].get(contact_ids[0])
+
+    def find_contact_from_user(self, user: User) -> Optional[dict]:
+        params = dict(col="user_id", expr="eq", val=str(user.id))
+        contacts: dict = self.get("contacts", params=params)
+        contact_ids = list(contacts.get("contacts", {}).keys())
+        if contact_ids:
+            return contacts["contacts"].get(contact_ids[0])
 
     def update_contact(self, email, **kwargs):
         email = email.lower()
@@ -87,13 +94,13 @@ class MauticRepo(MauticAPI):
             return self.add_contact(email, **kwargs)
         return self.patch(f"contacts/{contact['id']}/edit", kwargs)
 
-    def import_from_user(self, user: User):
+    def process_user(self, user: User):
         firstname, *_, lastname = user.name.split(" ")
         return self.update_contact(
             user.email, firstname=firstname, lastname=lastname, user_id=str(user.id)
         )
 
-    def import_from_person(self, person: PersonalInformation):
+    def process_person(self, person: PersonalInformation):
         self.update_contact(
             person.user.email,
             city=person.city,
@@ -105,26 +112,26 @@ class MauticRepo(MauticAPI):
             phone=person.phone_country_code + person.phone_number,
         )
 
+    def process_subscription(self, subscription: Subscription):
+        if not get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID:
+            return
+        contact = self.find_contact_from_user(subscription.user)
+        if not contact:
+            log.warning(
+                f"No contact found in mautic for user {subscription.user.username}"
+            )
+            return
+        if subscription.active:
+            self.add_contact_to_segment(
+                contact, get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID
+            )
+        else:
+            self.remove_contact_to_segment(
+                contact, get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID
+            )
+
     def add_contact_to_segment(self, contact, segment_id):
         self.post(f"segments/{segment_id}/contact/{contact['id']}/add", {})
 
     def remove_contact_to_segment(self, contact: dict, segment_id):
         self.post(f"segments/{segment_id}/contact/{contact['id']}/remove", {})
-
-    def enable_subscription(self, email):
-        if not get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID:
-            return
-        contact = self.find_contact(email)
-        if contact:
-            self.add_contact_to_segment(
-                contact, get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID
-            )
-
-    def disable_subscription(self, email):
-        if not get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID:
-            return
-        contact = self.find_contact(email)
-        if contact:
-            self.remove_contact_to_segment(
-                contact, get_config().MAUTIC_SUBSCRIPTION_SEGMENT_ID
-            )

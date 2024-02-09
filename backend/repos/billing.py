@@ -278,17 +278,16 @@ class SubscriptionRepo(DatabaseAbstractRepository):
         super().__init__(*args, **kwargs)
         self.payment = StripePayments()
 
+    def store_in_mautic(self, subscription: Subscription):
+        mautic_repo = MauticRepo()
+        mautic_repo.process_subscription(subscription)
+
     def update(self, item: Subscription, **kwargs):
         old_active = item.active
         new_active = kwargs.get("active", item.active)
-        if old_active != new_active:
-            mautic_repo = MauticRepo()
-            # we toggled subscription active status
-            if new_active:
-                mautic_repo.enable_subscription(item.user.email)
-            else:
-                mautic_repo.disable_subscription(item.user.email)
         super().update(item, **kwargs)
+        if old_active != new_active:
+            self.store_in_mautic(item)
 
     def store_subscription_id(self, subscription: Subscription, id):
         stripe_subscription_repo = StripeSubscriptionRepo(self._db)
@@ -375,7 +374,7 @@ class PersonalInformationRepo(DatabaseAbstractRepository):
 
     def store_in_mautic(self, personal_info: PersonalInformation):
         mautic_repo = MauticRepo()
-        mautic_repo.import_from_person(personal_info)
+        mautic_repo.process_person(personal_info)
 
     def update(self, item, **kwargs):
         ip = kwargs.pop("ip", None)

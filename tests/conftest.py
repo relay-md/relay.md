@@ -2,7 +2,7 @@
 """Configuration for pytest"""
 import tempfile
 from typing import List, Optional
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -332,3 +332,13 @@ def patch_document_body_update():
         "backend.repos.document_body.DocumentBodyRepo.update",
     ) as mock:
         yield mock
+
+
+@pytest.fixture(autouse=True)
+def disable_mautic_api():
+    with patch(
+        "backend.repos.mautic.MauticAPI.enabled",
+        new_callable=PropertyMock,
+        return_value=False,
+    ):
+        yield

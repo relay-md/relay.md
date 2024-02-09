@@ -49,28 +49,19 @@ class UserRepo(DatabaseAbstractRepository):
             select(User).filter(User.username.like(f"%{name}%")).limit(limit)
         )
 
+    def store_in_mautic(self, user: User):
+        mautic_repo = MauticRepo()
+        mautic_repo.process_user(user)
+
     def create_from_kwargs(self, **kwargs):
         from ..exceptions import BadRequest, NotAllowed
         from ..repos.team_topic import TeamTopicRepo
 
-        firstname = kwargs.pop("firstname", "")
-        lastname = kwargs.pop("lastname", "")
+        kwargs.pop("firstname", "")
+        kwargs.pop("lastname", "")
 
         user: User = super().create_from_kwargs(**kwargs)
-
-        try:
-            mautic_repo = MauticRepo()
-            if not firstname or not lastname:
-                firstname, *_, lastname = user.name.split(" ")
-            mautic_repo.update_contact(
-                user.email,
-                firstname=firstname,
-                lastname=lastname,
-                username=user.username,
-                user_id=str(user.id),
-            )
-        except Exception:
-            log.error("Extension error: {exc}")
+        self.store_in_mautic(user)
 
         # Automatically subscribe to some team topics
         team_topic_repo = TeamTopicRepo(self._db)
