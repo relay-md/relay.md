@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.11.0 (2024-02-09)
+### Feature
+* Distinguish member control to pro team ([`353b938`](https://github.com/knowledgemd/backend/commit/353b938b1a7ec832c4738f0e6df571f0dc3cbe39))
+
+### Fix
+* Problem with mautic integration ([`804bc10`](https://github.com/knowledgemd/backend/commit/804bc1051167b9599dd74a32f3a40353215b80bd))
+
 ## v1.10.0 (2024-02-09)
 ### Feature
 * **mautic:** Allow to track users with mautic for marketing ([`a50e556`](https://github.com/knowledgemd/backend/commit/a50e55652990afabfa2b0fbd46eb08fffb979608))
