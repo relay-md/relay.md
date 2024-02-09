@@ -1,39 +1,58 @@
 footer.footer
-  .container
-    .columns
-      .column.is-4
-        .block
-          a(href='/')
-           img(src="{{ url_for('static', path='img/logo-navbar.svg') }}" width='64' alt="navbar footer logo")
-          .title.is-5 Relay.md
-          .sub-title.is-3 Markdown workflows for teams
-        .block
-          span.icon
-            a(target='_blank' rel="noopener" href='https://github.com/relay-md/relay.md')
-              i.fab.fa-github
-          span.icon
-            a(target='_blank' rel="noopener" href='mailto:fabian@relay.md')
-              i.fas.fa-envelope
-          span.icon
-            a(target='_blank' rel="noopener" href='https://forum.obsidian.md/t/relay-md-sharing-documents-with-people-and-teams/72208')
-              i.fab.fa-discourse
-          span.icon
-            a(target='_blank' rel="noopener" href='https://www.reddit.com/r/ObsidianMD/comments/187rq1k/relaymd_sharing_markdown_documents_with_people/')
-              i.fab.fa-reddit
-        .block
-          small(style='color: var(--textLight)') &copy; ChainSquad GmbH
-      .column.is-4
-        .title.is-5 Product
-        a.navbar-item.p-0(href='/#features') Features
-        a.navbar-item.p-0(href="{{url_for('relay_basics')}}") Basics
-        a.navbar-item.p-0(href="{{url_for('obsidian_plugin')}}") Plugin
-        a.navbar-item.p-0(href="{{url_for('blog')}}") Blog
-        a.navbar-item.p-0(href="{{url_for('get_teams')}}") Teams
-        a.navbar-item.p-0(href="https://api.relay.md/docs") API
-      .column.is-4
-        .title.is-5 Commercial
-        a.navbar-item.p-0(href="{{url_for('tos')}}/#tos") Terms of Service
-        a.navbar-item.p-0(href="{{url_for('tos')}}/#privacy") Privacy Policy
-        a.navbar-item.p-0(href="{{url_for('tos')}}/#imprint") Imprint
-        a.navbar-item.p-0(href="{{url_for('contact')}}") Contact Us
-      .column.is-4
+ .columns
+   .column.is-1
+   .column.is-3
+
+     .block
+       a(href='/')
+        img(src="{{ url_for('static', path='img/logo-navbar.svg') }}" width='64' alt="navbar footer logo")
+       .title.is-5.m-0 Relay.md
+       .sub-title.is-3.m-0 Markdown workflows for teams
+
+     .block
+       .title.is-6.m-0 Socials
+       span.icon
+         a(target='_blank' rel="noopener" href='https://github.com/relay-md/relay.md')
+           i.fab.fa-github
+       span.icon
+         a(target='_blank' rel="noopener" href='mailto:fabian@relay.md')
+           i.fas.fa-envelope
+       span.icon
+         a(target='_blank' rel="noopener" href='https://forum.obsidian.md/t/relay-md-sharing-documents-with-people-and-teams/72208')
+           i.fab.fa-discourse
+       span.icon
+         a(target='_blank' rel="noopener" href='https://www.reddit.com/r/ObsidianMD/comments/187rq1k/relaymd_sharing_markdown_documents_with_people/')
+           i.fab.fa-reddit
+
+     .block
+       .title.is-6.m-0.pb-1 Let’s stay in touch
+       .subtitle.is-7.m-0.pb-1 Subscribe to our newsletter to receive the latest articles in your inbox occationally.
+       form(hx-post="{{url_for('submitmail')}}")
+         .field(hx-target='this' hx-swap='outerHTML').p-0.m-0
+           .control.has-icons-left.has-icons-right
+             input.input.is-normal(type='email' name='email' placeholder='bob@smith.com' hx-post="{{url_for('validatemail')}}" hx-target="#validation-result"  hx-trigger="input changed delay:500ms, search" hx-swap="innerHTML")
+             span.icon.is-small.is-left
+               i.fas.fa-envelope
+             p#validation-result
+         button.button.is-block.is-link.is-fullwidth.is-normal.m-0 Subscribe
+
+     .block
+       small(style='color: var(--textLight)') &copy; ChainSquad GmbH
+
+   .column.is-1
+   .column.is-3
+     .title.is-5 Product
+     a.navbar-item.p-0(href='/#features') Features
+     a.navbar-item.p-0(href="{{url_for('relay_basics')}}") Basics
+     a.navbar-item.p-0(href="{{url_for('obsidian_plugin')}}") Plugin
+     a.navbar-item.p-0(href="{{url_for('blog')}}") Blog
+     a.navbar-item.p-0(href="{{url_for('get_teams')}}") Teams
+     a.navbar-item.p-0(href="https://api.relay.md/docs") API
+
+   .column.is-1
+   .column.is-3
+     .title.is-5 Commercial
+     a.navbar-item.p-0(href="{{url_for('tos')}}/#tos") Terms of Service
+     a.navbar-item.p-0(href="{{url_for('tos')}}/#privacy") Privacy Policy
+     a.navbar-item.p-0(href="{{url_for('tos')}}/#imprint") Imprint
+     a.navbar-item.p-0(href="{{url_for('contact')}}") Contact Us
