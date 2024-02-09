@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from sqlalchemy import and_, exists, select
 
 from ..config import get_config
 from ..models.team_topic import TeamTopic
 from ..models.user import User
 from .base import DatabaseAbstractRepository
+from .mautic import MauticRepo
 from .team import Team
 from .topic import Topic
 from .user_team import UserTeamRepo
 from .user_team_topic import UserTeamTopic, UserTeamTopicRepo
+
+log = logging.getLogger(__name__)
 
 
 class UserRepo(DatabaseAbstractRepository):
@@ -48,7 +53,24 @@ class UserRepo(DatabaseAbstractRepository):
         from ..exceptions import BadRequest, NotAllowed
         from ..repos.team_topic import TeamTopicRepo
 
-        user = super().create_from_kwargs(**kwargs)
+        firstname = kwargs.pop("firstname", "")
+        lastname = kwargs.pop("lastname", "")
+
+        user: User = super().create_from_kwargs(**kwargs)
+
+        try:
+            mautic_repo = MauticRepo()
+            if not firstname or not lastname:
+                firstname, *_, lastname = user.name.split(" ")
+            mautic_repo.update_contact(
+                user.email,
+                firstname=firstname,
+                lastname=lastname,
+                username=user.username,
+                user_id=str(user.id),
+            )
+        except Exception:
+            log.error("Extension error: {exc}")
 
         # Automatically subscribe to some team topics
         team_topic_repo = TeamTopicRepo(self._db)
