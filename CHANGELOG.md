@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v1.12.1 (2024-02-10)
+### Fix
+* Re-enable permissions, limits seats, can only change numberby upgrading ([`efde17a`](https://github.com/knowledgemd/backend/commit/efde17a188603f98771dc501b933010faece19c2))
+* Limit # members in free team ([`f4b3849`](https://github.com/knowledgemd/backend/commit/f4b3849d93b510ff7a0fe4bf7b51e8bac4f8c17c))
+
 ## v1.12.0 (2024-02-10)
 ### Feature
 * **configure:** Explicit page to link obsidian ([`7109670`](https://github.com/knowledgemd/backend/commit/7109670db4e663b1ac4a5bc5c418142f3a24e271))
