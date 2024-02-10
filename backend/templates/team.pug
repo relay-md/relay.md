@@ -20,13 +20,13 @@
 
    .block
     {% if user_repo.is_member(user, team) %}
-    a(href="{{url_for('leave', team_name=team.name)}}").button
+    a(href="{{url_for('leave', team_name=team.name)}}").button.is-warning
       span.icon.is-small
         i.fas.fa-signature
       span Leave
     {% else %}
     {% if team.can(Permissions.can_join, user, membership) %}
-    a(href="{{url_for('join', team_name=team.name)}}").button
+    a(href="{{url_for('join', team_name=team.name)}}").button.is-primary
       span.icon.is-small
         i.fas.fa-signature
       span Join Team
@@ -36,7 +36,7 @@
     {% endif %}
 
     {% if user and team.user_id == user.id %}
-    a(href="{{url_for('settings', team_name=team.name)}}").button.is-warning
+    a(href="{{url_for('settings', team_name=team.name)}}").button.is-danger
      span.icon-text
       span.icon.is-small
        i.fas.fa-edit
@@ -52,66 +52,68 @@
      p.is-italic no description provided
      {% endif %}
 
+   {% if membership %}
    .block
     .title.is-3 Topics
 
-    p.block
-     span.tag.is-primary Subscribed
-     span.tag Unsubscribed
-    // TODO: might want to make this a different permission to be able to list topics!
-    {% if not team.can(Permissions.can_read, user, membership) %}
-    span.is-italic confidential
-    {% else %}
-
-    div(hx-ext="client-side-templates")
-      template#list_topics
-        {% raw %}
-        {{#each this}}
-        tr
-         td {{name}}
-         td
-          {{#if subscribed}}
-          a(href="{{toggle_url}}" data-tooltip="Subscribe to topic")
-            .button.is-primary
-              span.icon
-                i.fas.fa-sign-out
-          {{else}}
-          a(href="{{toggle_url}}" data-tooltip="Unsubscribe from topic")
-            .button
-              span.icon
-                i.fas.fa-sign-in
-          {{/if}}
-        {{/each}}
-        {% endraw %}
-      .field.is-horizontal
-        .field-body
-          .control.has-icons-left
-            input.input#team_name(hx-post="{{url_for('api_list_topics_in_team', team_name=team.name)}}"
+    .columns.is-8.is-variable
+      .column.is-half.has-text-left
+        .title.is-5 Existing Topics in the team
+        div(hx-ext="client-side-templates")
+          template#list_topics
+            {% raw %}
+            {{#each this}}
+            tr
+             td {{name}}
+             td
+              {{#if subscribed}}
+              input.switch.is-medium.is-rounded.is-success(type="checkbox" id="switch-{{id}}" 
+                  hx-post="{{toggle_url}}" 
+                  hx-swap="none"
+                  checked="checked")
+              {{else}}
+              input.switch.is-medium.is-rounded.is-success(type="checkbox" id="switch-{{id}}"
+                  hx-post="{{toggle_url}}"
+                  hx-swap="none"
+                  )
+              {{/if}}
+              label(for="switch-{{id}}")
+              p(id="updated_subscription-{{id}}")
+            {{/each}}
+            {% endraw %}
+          .field.is-horizontal
+            .field-body
+              .control.has-icons-left
+                input.input#team_name(hx-get="{{url_for('api_list_topics_in_team', team_name=team.name)}}"
+                  hx-swap="innerHTML"
+                  hx-target="#table_content"
+                  hx-trigger="input changed delay:500ms, search"
+                  handlebars-array-template="list_topics"
+                  placeholder="Search Topics"
+                  name="search")
+                span.icon.is-left
+                 i.fas.fa-search
+          table.table.is-narrow.is-striped(hx-get="{{url_for('api_list_topics_in_team', team_name=team.name)}}"
               hx-swap="innerHTML"
               hx-target="#table_content"
-              hx-trigger="input changed delay:500ms, search"
-              handlebars-array-template="list_topics"
-              placeholder="Search Topics"
-              name="search")
-            span.icon.is-left
-             i.fas.fa-search
-      table.table.is-narrow.is-striped(hx-get="{{url_for('api_list_topics_in_team', team_name=team.name)}}"
-          hx-swap="innerHTML"
-          hx-target="#table_content"
-          hx-trigger="load"
-          handlebars-array-template="list_topics")
-        thead
-          th Topic
-          th Un-/Subscribe
-        tbody#table_content
-      .field.is-horizontal
-        .field-body
-          .control.has-icons-left
-            input.input#team_name(type="string" placeholder="New Topic" name="topic" hx-post="{{url_for('create_topic_htx', team_name=team.name)}}" hx-target="#topic_created")
-            span.icon.is-left
-              i.fas.fa-plus
-          span(id="topic_created")
-    {% endif %}
+              hx-trigger="load, refresh-topics from:body"
+              handlebars-array-template="list_topics")
+            thead
+              th Topic
+              th Un-/Subscribe
+            tbody#table_content
+      .column.is-half.has-text-left
+        .title.is-5 Topics / Subjects
+        p.is-size-6.block Topics are subjects that you can use to narrow down a group of people in your team.
+        p.is-size-6.block Team members subscribe to topics to receive documents shared on those subjects
+        .subtitle.is-5.mb-1 Create a new topic
+        .control.has-icons-left
+          input.input#team_name(type="string" placeholder="New Topic" name="topic" hx-post="{{url_for('create_topic_htx', team_name=team.name)}}")
+          span.icon.is-left
+            i.fas.fa-plus
+
+
+   {% endif %}
 
    // .block
    //  .title.is-3 Public Permissions

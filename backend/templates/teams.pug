@@ -11,19 +11,10 @@
          i.fas.fa-plus
        span Create a new team
 
-   .title.is-4.mb-0 Selected Teams
-   p.block
-    .level
-     .level-left
-      span.text-icon
-       span.icon
-        i.fas.fa-globe
-       span Public&nbsp;
-      span.text-icon
-       span.icon
-        i.fas.fa-lock
-       span Private
-     .level-right
+   .level
+    .level-left
+      .title.is-4.mb-0 Teams
+    .level-right
       .field
        p.control.has-icons-left
          input.input(type="text" name="name" placeholder="Search" hx-post="{{url_for('search_team')}}" hx-trigger="input changed delay:500ms, search" hx-target="#team-search-results")
