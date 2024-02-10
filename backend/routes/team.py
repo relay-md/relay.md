@@ -350,7 +350,7 @@ async def update_team_seats(
     subscription_repo = SubscriptionRepo(db)
     subscription = subscription_repo.get_latest_subscription_for_team_id(team.id)
     if not subscription:
-        return """<p id="validate-team-name" class="help is-danger">No Subscription available, cannot set seats!</p>"""
+        return """<p id="validate-team-name" class="help is-danger">No Subscription available! Please upgrade your Team!</p>"""
     team_repo.update_seats(team, subscription, seats)
     return """<p id="validate-team-name" class="help is-success">Seats updated!</p>"""
 
