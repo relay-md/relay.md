@@ -123,7 +123,6 @@ class Settings(BaseSettings):
 
     MATOMO_URI: Optional[str] = None
     MATOMO_SITE_ID: Optional[int] = 1
-    MAUTIC_URL: Optional[str] = None
 
     MAUTIC_API_BASE_URL: Optional[str] = None
     MAUTIC_API_USERNAME: Optional[str] = None
