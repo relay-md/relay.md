@@ -76,7 +76,7 @@ class Team(Base):
         back_populates="team"
     )
 
-    seats: Mapped[int] = mapped_column(Integer(), default=1)
+    seats: Mapped[int] = mapped_column(Integer(), default=5)
 
     # Should this be shown in directory listing teams?
     hide: Mapped[bool] = mapped_column(default=False)

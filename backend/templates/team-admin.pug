@@ -81,7 +81,6 @@ td.has-text-light
     //    label(for="hide_team")
     //    span(id="updated_team_hide")
 
-   {% if team.active_subscription %}
    .block
     .title.is-3 Permissions
     .subtitle.is-5 Customize Team Permissions
@@ -165,18 +164,14 @@ td.has-text-light
    .block
     .title.is-5 Invite Users
     .subtitle.is-6.mb-3 Add others to your team
-    {% if team.active_subscription %}
-    .subtitle.is-7 You have&nbsp;
-     strong {{team.seats}}
-     |&nbsp;seats in your subscription
-    {% endif %}
+    .subtitle.is-7 You have a total of 
+     strong {{team.seats}} 
+     | seats available
     .control.has-icons-left
      input.input(type="tags" id="invite-users" name="name" hx-post="{{url_for('settings_user_search', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#users")
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
-
-   {% endif %}
 
    {% if team.active_subscription %}
    .block.box
