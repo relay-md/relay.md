@@ -55,15 +55,19 @@
            | 0
          span#priceunit /month/member
         .plan-items
-         .plan-item public and 
-            strong private teams
          .plan-item
            strong 10MiB
            |   of notes and embeds
+         .plan-item Up to 
+           strong 5 team members
+         .plan-item public and 
+            strong private teams
          .plan-item obsidian 
           strong integration 
           | via plugin
-         .plan-item 1 access key
+         .plan-item fine grained 
+          strong access control 
+          |to teams
         .plan-footer
          {% if user %}
          input.button.is-fullwidth#free_choose(type="submit")
@@ -85,18 +89,19 @@
            span#team_price 3
          span#priceunit /month/member
         .plan-items
-         .plan-item public and 
-            strong private teams
          .plan-item
            strong 5GiB
            |   of notes and embeds
+         .plan-item
+           strong >5 team members
+         .plan-item public and 
+            strong private teams
          .plan-item obsidian 
           strong integration 
           | via plugin
          .plan-item fine grained 
           strong access control 
           |to teams
-         .plan-item 5 access keys
         .plan-footer
          {% if user %}
          input.button.is-fullwidth#team_choose(type="submit")
@@ -113,18 +118,19 @@
           span.plan-price-currency
         | Request Quote
        .plan-items
-         .plan-item public and 
-            strong private teams
          .plan-item
            strong >5GiB
            |   of notes and embeds
+         .plan-item
+           strong >50 team members
+         .plan-item public and 
+            strong private teams
          .plan-item obsidian 
           strong integration 
           | via plugin
          .plan-item fine grained 
           strong access control 
           |to teams
-         .plan-item ∞ access keys
         .plan-item document and embed  
          strong versioning
         .plan-item dedicated  
