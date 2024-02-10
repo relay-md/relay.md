@@ -67,9 +67,8 @@ async def configure_obsidian(
     config: Settings = Depends(get_config),
 ):
     access_token = request.session["access_token"]
-    return RedirectResponse(
-        url=f"obsidian://relay.md:access-token?token={access_token}&username={user.username}&api_url={config.API_URI}"
-    )
+    redirect_url = f"obsidian://relay.md:access-token?token={access_token}&username={user.username}&api_url={config.API_URI}"
+    return templates.TemplateResponse("configure-obsidian.pug", context=locals())
 
 
 @router.post("/onboarding/check-username", response_class=PlainTextResponse)

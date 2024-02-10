@@ -83,6 +83,7 @@ class MauticRepo(MauticAPI):
         contact_ids = list(contacts.get("contacts", {}).keys())
         if contact_ids:
             return contacts["contacts"].get(contact_ids[0])
+        return None
 
     def find_contact_from_user(self, user: User) -> Optional[dict]:
         params = {
@@ -94,6 +95,7 @@ class MauticRepo(MauticAPI):
         contact_ids = list(contacts.get("contacts", {}).keys())
         if contact_ids:
             return contacts["contacts"].get(contact_ids[0])
+        return None
 
     def update_contact(self, email, **kwargs):
         email = email.lower()
