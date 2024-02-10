@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v1.12.0 (2024-02-10)
+### Feature
+* **configure:** Explicit page to link obsidian ([`7109670`](https://github.com/knowledgemd/backend/commit/7109670db4e663b1ac4a5bc5c418142f3a24e271))
+
+### Fix
+* Whitespacing ([`199353d`](https://github.com/knowledgemd/backend/commit/199353d77bf2df5a8de14b722f745eca4b885687))
+* Whitespacing ([`cd19cde`](https://github.com/knowledgemd/backend/commit/cd19cde4edc43f9e778fb238bf8688b58ab1061b))
+* Whitespacing ([`fc7bf70`](https://github.com/knowledgemd/backend/commit/fc7bf70e4bc6db9ae5215eed200abd89f7b80be7))
+
 ## v1.11.1 (2024-02-09)
 ### Fix
 * Prices are in € ([`8eac5a7`](https://github.com/knowledgemd/backend/commit/8eac5a721c1163de21d73b8a9ceb3e676e1b7ee6))
