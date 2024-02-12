@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.12.2 (2024-02-12)
+### Fix
+* Re-enable permissions, limits seats, can only change numberby upgrading ([`afc8d2f`](https://github.com/knowledgemd/backend/commit/afc8d2faab67e96213d769052be648b20ccbe852))
+* Limit # members in free team ([`c5491e9`](https://github.com/knowledgemd/backend/commit/c5491e9f2257d1143c779d12bba3a3105137ee07))
+* Ensure we only return a document once ([`7b74329`](https://github.com/knowledgemd/backend/commit/7b743299df4a9eeaed6ffaf393c7bab8aa38b986))
+
 ## v1.12.1 (2024-02-10)
 ### Fix
 * Re-enable permissions, limits seats, can only change numberby upgrading ([`efde17a`](https://github.com/knowledgemd/backend/commit/efde17a188603f98771dc501b933010faece19c2))
