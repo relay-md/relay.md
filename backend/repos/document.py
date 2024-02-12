@@ -39,6 +39,7 @@ class DocumentRepo(DatabaseAbstractRepository):
             .order_by(Document.last_updated_at.asc())
             .offset(page * size)
             .limit(size)
+            .distinct()
         )
 
         filters = list()
