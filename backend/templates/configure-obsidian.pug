@@ -1,0 +1,44 @@
+{% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
+{% block content %}
+.section
+  .container.has-text-centered
+  .columns.is-8.is-variable
+    .column.is-two-thirds.has-text-left
+      .block
+        h1.title.is-1 One-click Configuration for Obsidian
+        p.is-size-4.block To everyones advantage, Obsidian allows services like relay.md to send configurations from our website to your Vault. We have configured our plugin to handle this accordingly.
+        p.is-size-4.block.has-text-centered.mb-0
+          a.button.is-link.is-large(href="{{redirect_url}}")
+            span.icon
+              i.fas.fa-link
+            span Link your Vault
+        p.has-text-centered.help.m-0.p-0 The link opens automatically after 5 seconds.
+      .block
+        .title.is-3 Didn't work?
+        p.block If Obsidian does not open, paste the following markdown link into a note in Obsidian and open it:
+        p.block.ml-5.p-3.has-background-dark.has-text-light
+          tt [click-me](
+           a.has-text-light(href="{{redirect_url}}"){{redirect_url}}
+          |)
+    .column.is-one-third.has-text-left
+      .title How this works
+      .block.content
+        ol
+          li Relay.md provides a
+           strong 🔗 special link
+          li The link opens Obsidian with ⚙️ configuration details
+          li The Relay.md Plugin stores the details in your Vault
+          li You are ready to use relay.md 🎉
+      .block
+        strong Your Obsidian will present your with this message
+        .has-text-centered.mt-3
+          img(src="{{url_for('static', path='img/howto/configuration-stored.png')}}" width="320")
+
+{% endblock %}
+
+{% block javascript %}
+script
+.
+  setTimeout(() => {
+  }, 5000);
+{% endblock %}
