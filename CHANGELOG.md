@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v1.13.0 (2024-02-13)
+### Feature
+* Additional api to obtain user info of access-key ([`a973cba`](https://github.com/knowledgemd/backend/commit/a973cbac4b36093a41d44fb0119d80652303527a))
+* **configure:** Explicit page to link obsidian ([`ac7d455`](https://github.com/knowledgemd/backend/commit/ac7d4553acd43bea9ab9b78638b4239a3c1c5979))
+
+### Fix
+* Allow advanced config when linking obsidian ([`69fedca`](https://github.com/knowledgemd/backend/commit/69fedca7034977d024fa4efe79f5e645418a3076))
+* Contact form needs to use the email address in from field ([`d39d953`](https://github.com/knowledgemd/backend/commit/d39d953dc3efa7ddf3d8a54da7e319fbc5723e5c))
+
 ## v1.12.2 (2024-02-12)
 ### Fix
 * Re-enable permissions, limits seats, can only change numberby upgrading ([`afc8d2f`](https://github.com/knowledgemd/backend/commit/afc8d2faab67e96213d769052be648b20ccbe852))
