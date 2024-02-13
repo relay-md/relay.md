@@ -12,7 +12,7 @@ def get_optional_user(
 ) -> Optional[User]:
     user_id = request.session.get("user_id")
     if not user_id:
-        return
+        return None
     # Returns non in case the user-is invalid
     return UserRepo(db).get_by_id(user_id)
 

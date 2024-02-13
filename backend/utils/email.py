@@ -5,10 +5,12 @@ from email.mime.text import MIMEText
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from ..config import config
+from ..config import get_config
 
 
-def send_email(to, subject, template_file, **kwargs):
+def send_email(to, subject, template_file, sender=None, **kwargs):
+    config = get_config()
+
     if not all([config.MAIL_SERVER, config.MAIL_USERNAME, config.MAIL_PASSWORD]):
         return
 
@@ -19,7 +21,7 @@ def send_email(to, subject, template_file, **kwargs):
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = config.MAIL_FROM
+    msg["From"] = sender or config.MAIL_FROM
     msg["To"] = to
     template = env.get_template(template_file)
     msg.attach(MIMEText(template.render(**kwargs), "html"))

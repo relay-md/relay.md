@@ -46,7 +46,7 @@ async def get_optional_access_token(
         pass
     # We need this optional autentication to be able to share documents
     # without requiring a login
-    return
+    return None
 
 
 async def require_authenticated_user(

@@ -11,16 +11,16 @@ from fastapi import Request
 
 def get_next_url(req: Request) -> Optional[str]:
     if "next" not in req.session:
-        return
+        return None
     try:
         return req.session["next"].pop()
     except IndexError:
-        return
+        return None
 
 
 def add_next_url(req: Request, url: Optional[str]):
     if not url:
-        return
+        return None
     if "next" not in req.session:
         req.session["next"] = []
     # no duplicates in next-stack

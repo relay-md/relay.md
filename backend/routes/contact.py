@@ -43,6 +43,7 @@ async def contact_post(
         config.MAIL_ADMIN,
         f"[relay.md - contact form] {name}",
         "mail/contact.html",
+        sender=email,
         **locals(),
     )
     return """
