@@ -142,9 +142,10 @@ class StripePayments(AbstractPaymentGateway):
             end_date = datetime.utcfromtimestamp(
                 session["subscription"]["current_period_end"]
             )
+            active = stripe_subscription["status"] == "active"
             subscription_repo.update(
                 local_subscription,
-                active=stripe_subscription["status"] == "active",
+                active=active,
                 period_starts_at=start_date,
                 period_ends_at=end_date,
             )
@@ -188,41 +189,59 @@ class StripePayments(AbstractPaymentGateway):
         ################################################################
         elif event["type"] == "customer.subscription.updated":
             stripe_subscription = event["data"]["object"]
-            TeamRepo(db)
             subscription_repo = SubscriptionRepo(db)
-            stripe_subscription["metadata"]["team_id"]
-            invoice_id = stripe_subscription["metadata"]["invoice_id"]
             subscription_id = stripe_subscription["metadata"]["subscription_id"]
-            for item in stripe_subscription["items"]["data"]:
-                stripe_subscription_id = item["subscription"]
-                subscription = subscription_repo.get_by_id(subscription_id)
-                if not subscription:
-                    raise ValueError("No corresponding subscription locally!?")
-                subscription_repo.store_subscription_id(
-                    subscription, stripe_subscription_id
-                )
+            subscription = subscription_repo.get_by_id(subscription_id)
+            if not subscription:
+                raise ValueError("No corresponding subscription locally!?")
 
-                lookup_key = item["price"]["lookup_key"]
-                quantity = item["quantity"]
-                if lookup_key == "team_yearly":
-                    price = get_config().PRICING_TEAM_YEARLY
-                else:
-                    price = get_config().PRICING_TEAM_MONTHLY
-                # Update subscription
-                start_date = datetime.utcfromtimestamp(
-                    stripe_subscription["current_period_start"]
-                )
-                end_date = datetime.utcfromtimestamp(
-                    stripe_subscription["current_period_end"]
-                )
+            invoice_id = stripe_subscription["metadata"]["invoice_id"]
+            # we only process the first item because only have one!
+            item = stripe_subscription["items"]["data"][0]
+            stripe_subscription_id = item["subscription"]
+            subscription_repo.store_subscription_id(
+                subscription, stripe_subscription_id
+            )
+
+            lookup_key = item["price"]["lookup_key"]
+            quantity = item["quantity"]
+            if lookup_key == "team_yearly":
+                price = get_config().PRICING_TEAM_YEARLY
+            else:
+                price = get_config().PRICING_TEAM_MONTHLY
+            # Update subscription
+            start_date = datetime.utcfromtimestamp(
+                stripe_subscription["current_period_start"]
+            )
+            end_date = datetime.utcfromtimestamp(
+                stripe_subscription["current_period_end"]
+            )
+            subscription_repo.update(
+                subscription,
+                price=price,
+                quantity=quantity,
+                active=stripe_subscription["status"] == "active",
+                period_starts_at=start_date,
+                period_ends_at=end_date,
+            )
+
+            # TODO: we'll want to make a check on the front end to see if the
+            # subscription is past due and then prompt the user to update their
+            # payment method
+            if stripe_subscription.get("status") == "past_due":
                 subscription_repo.update(
                     subscription,
-                    price=price,
-                    quantity=quantity,
-                    active=stripe_subscription["status"] == "active",
-                    period_starts_at=start_date,
-                    period_ends_at=end_date,
+                    active=False,
+                    period_ends_at=datetime.utcnow(),
                 )
+
+            # TODO: Stripe will send a subscription.updated event when a subscription is canceled
+            # but the subscription is still active until the end of the period.
+            # So we check if cancel_at_period_end is true and send an email to the customer.
+            # https://stripe.com/docs/billing/subscriptions/cancel#events
+            if stripe_subscription.get("cancel_at_period_end"):
+                # mail: subject: 'We hate to see you go :(',
+                pass
 
         elif event["type"] == "customer.subscription.created":
             stripe_subscription = event["data"]["object"]
@@ -231,10 +250,9 @@ class StripePayments(AbstractPaymentGateway):
             subscription = subscription_repo.get_by_id(subscription_id)
             if not subscription:
                 raise ValueError("No corresponding subscription locally!?")
-            subscription_repo.update(subscription, active=False)
-            stripe_subscription_id = stripe_subscription["id"]
+
             subscription_repo.store_subscription_id(
-                subscription, stripe_subscription_id
+                subscription, stripe_subscription["id"]
             )
 
         elif event["type"] == "customer.subscription.deleted":
@@ -242,6 +260,9 @@ class StripePayments(AbstractPaymentGateway):
             subscription_repo = SubscriptionRepo(db)
             subscription_id = stripe_subscription["metadata"]["subscription_id"]
             subscription = subscription_repo.get_by_id(subscription_id)
+            if not subscription:
+                raise ValueError("No corresponding subscription locally!?")
+
             subscription_repo.update(subscription, active=False)
 
         # Fallback

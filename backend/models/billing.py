@@ -33,6 +33,7 @@ class Subscription(Base):
     name: Mapped[str] = mapped_column(String(64))
     # E.g. Name
     description: Mapped[str] = mapped_column(String(64))
+
     # e.g. number of team members!
     quantity: Mapped[int] = mapped_column()
     price: Mapped[int] = mapped_column()

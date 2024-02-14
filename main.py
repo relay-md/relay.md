@@ -23,12 +23,16 @@ clis = [
     "backend.cli.subscription",
     "backend.cli.asset",
     "backend.cli.mautic",
+    "backend.cli.stripe_",
 ]
 
 for cli in clis:
     parts = cli.split(".")
     mod = __import__(".".join(parts), fromlist=[parts[-1]])
-    main.add_command(getattr(mod, parts[-1]))
+    module = parts[-1]
+    if parts[-1].endswith("_"):
+        module = parts[-1].replace("_", "")
+    main.add_command(getattr(mod, module))
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@
 from fastapi import APIRouter, Depends, Form, Request, status
 from starlette.responses import RedirectResponse
 
+from ..config import get_config
 from ..database import Session, get_session
 from ..exceptions import BadRequest, NotAllowed
 from ..models.billing import Subscription
@@ -63,6 +64,7 @@ async def team_billing_post(
 
     if SubscriptionRepo(db).get_by_kwargs(team_id=team.id, active=True):
         raise BadRequest(f"Team {team.name} already has an active subscription!")
+    seats = get_config().PRICING_MEMBERS_INCLUDED_IN_FREE
     price_total = get_price(yearly=yearly, private=True)
     if yearly:
         price_interval = "yearly"
@@ -119,7 +121,7 @@ async def team_billing_payment(
         phone_number=phone,
     )
     person = customer_repo.get_by_kwargs(user_id=user.id)
-    subscription_repo = SubscriptionRepo(db)
+    SubscriptionRepo(db)
     invoice_repo = InvoiceRepo(db)
 
     if person:
@@ -129,26 +131,21 @@ async def team_billing_payment(
             **personal_data, ip=request.client.host
         )
 
-    subscription = subscription_repo.get_by_kwargs(team_id=team.id, active=False)
-    if not subscription:
-        subscriptions = [
-            Subscription(
-                name="Team Subscription",
-                quantity=1,  # 1 member
-                price=int(price_total * 100),
-                description=f"Team: {team_name}",
-                team_id=team.id,
-                stripe=StripeSubscription(stripe_key=stripe_key),
-            )
-        ]
-        invoice = invoice_repo.create_from_kwargs(
-            user_id=user.id,
-            customer_id=person.id,
-            subscriptions=subscriptions,
+    subscriptions = [
+        Subscription(
+            name="Team Subscription",
+            price=int(price_total * 100),
+            quantity=get_config().PRICING_MEMBERS_INCLUDED_IN_FREE,
+            description=f"Team: {team_name}",
+            team_id=team.id,
+            stripe=StripeSubscription(stripe_key=stripe_key),
         )
-    else:
-        subscriptions = [subscription]
-        invoice = invoice_repo.get_by_id(subscriptions[0].invoice_id)
+    ]
+    invoice = invoice_repo.create_from_kwargs(
+        user_id=user.id,
+        customer_id=person.id,
+        subscriptions=subscriptions,
+    )
 
     return RedirectResponse(
         url=request.url_for("payment_invoice", invoice_id=invoice.id),

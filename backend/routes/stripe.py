@@ -70,11 +70,9 @@ async def payment_invoice(
     invoice = invoice_repo.get_by_id(invoice_id)
     if not invoice:
         raise BadRequest("Invalid invoice ID")
-    if invoice.paid_at is None:
-        return RedirectResponse(
-            url=request.url_for("stripe_session_for_invoice", invoice_id=invoice_id)
-        )
-    return "paid"
+    return RedirectResponse(
+        url=request.url_for("stripe_session_for_invoice", invoice_id=invoice_id)
+    )
 
 
 @router.get(

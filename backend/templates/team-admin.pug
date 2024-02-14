@@ -194,29 +194,26 @@ td.has-text-light
       tr
        th Active
        th Date
-       th Invoice
        th Schedule
-       th Description
        th Quantity
        th Price
+       th Ends by
      tbody
       {% for sub in team.subscriptions %}
       tr.is-success
+       td
         {% if sub.active %}
-        td.has-text-success.icon-text
-         span.icon
+        span.icon.has-text-success
           i.fas.fa-check
         {% else %}
-        td.has-text-dancer.icon-text
-         span.icon
+        span.icon.has-text-danger
           i.fas.fa-times
         {% endif %}
         td {{sub.created_at.strftime("%Y-%m-%d") }}
-        td {{sub.name}}
         td {{ "yearly" if sub.is_yearly else "monthly" }}
-        td {{sub.description}}
         td {{sub.quantity }}
         td {{sub.quantity * sub.price / 100}} €
+        td {{sub.period_ends_at.strftime("%Y-%m-%d")}}
       {% endfor %}
     p.help.block Find out more by logging into the&nbsp;
      a(href=config.STRIPE_CUSTOMER_PORTAL_URL) Customer Portal.

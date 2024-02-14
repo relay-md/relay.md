@@ -508,19 +508,16 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
    .column.is-9.is-offset-1.box
     .block
      .level
-      .title.is-5 Team Subscription
-      .title.is-5 {{price_total}} € / {{price_interval}}
+      div
+        .title.is-5 Team Subscription
+        .subtitle.is-6.has-text-weight-semibold {{seats}} Seats
+      .title.is-5 {{price_total}} € / seat / {{price_interval}}
 
      .field.is-grouped.is-grouped-multiline
        .control
         .tags.has-addons
          .tag.is-medium.is-dark Name
          .tag.is-medium.is-link {{team.name}}
-
-       .control
-        .tags.has-addons
-         .tag.is-medium.is-dark Type
-         .tag.is-medium.is-info private
 
        .control
         .tags.has-addons
