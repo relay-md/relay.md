@@ -31,12 +31,7 @@ DEFAULT_MEMBER_PERMISSIONS = (
     | Permissions.can_invite
 )
 
-DEFAULT_PUBLIC_PERMISSIONS = (
-    Permissions.can_read
-    | Permissions.can_post
-    | Permissions.can_create_topics
-    | Permissions.can_join
-)
+DEFAULT_PUBLIC_PERMISSIONS = Permissions.can_join
 
 
 class Team(Base):
