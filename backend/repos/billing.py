@@ -21,7 +21,6 @@ from .stripe import (
     StripeSubscription,
     StripeSubscriptionRepo,
 )
-from .team import TeamRepo
 
 log = logging.getLogger(__name__)
 
@@ -41,6 +40,7 @@ class StripePayments(AbstractPaymentGateway):
         stripe.api_key = get_config().STRIPE_API_PRIVATE_KEY
 
     def get_payment_session(self, invoice: Invoice):
+        customer = invoice.customer
         line_items = list()
         for item in invoice.subscriptions:
             prices = stripe.Price.list(
@@ -53,11 +53,10 @@ class StripePayments(AbstractPaymentGateway):
                 },
             )
 
-        # https://stripe.com/docs/api/checkout/sessions/create
-        checkout_session = stripe.checkout.Session.create(
+        session_create_params = dict(
             client_reference_id=str(invoice.id),
             currency="EUR",
-            customer=invoice.customer.stripe.stripe_customer_id,
+            customer=customer.stripe.stripe_customer_id,
             line_items=line_items,
             mode="subscription",
             success_url=f"{get_config().STRIPE_RETURN_URL_SUCCESS}",  # ?session_id={CHECKOUT_SESSION_ID}",
@@ -77,6 +76,16 @@ class StripePayments(AbstractPaymentGateway):
             # We want stripe to deal with tax
             automatic_tax=dict(enabled=True),
         )
+        if customer.is_business:
+            session_create_params.update(
+                dict(
+                    tax_id_collection=dict(enabled=True),
+                    customer_update=dict(name="auto"),
+                )
+            )
+
+        # https://stripe.com/docs/api/checkout/sessions/create
+        checkout_session = stripe.checkout.Session.create(**session_create_params)
         return checkout_session
 
     async def process_webhook(self, db, request):
@@ -104,11 +113,12 @@ class StripePayments(AbstractPaymentGateway):
             # Repos
             invoice_repo = InvoiceRepo(db)
             subscription_repo = SubscriptionRepo(db)
-            TeamRepo(db)
+            person_repo = PersonalInformationRepo(db)
 
             # Get the full session with subscription
             session = stripe.checkout.Session.retrieve(
-                event["data"]["object"]["id"], expand=["subscription", "invoice"]
+                event["data"]["object"]["id"],
+                expand=["subscription", "invoice", "customer"],
             )
             stripe_invoice = session["invoice"]
             stripe_subscription = session["subscription"]
@@ -149,6 +159,18 @@ class StripePayments(AbstractPaymentGateway):
                 period_starts_at=start_date,
                 period_ends_at=end_date,
             )
+
+            from rich import print
+
+            print(session)
+
+            # Update the customer / vat id
+            customer_details = session.get("customer_details", {})
+            tax_ids = customer_details.get("tax_ids")
+            if tax_ids:
+                # use just the first one
+                tax_id = tax_ids[0]["value"]
+                person_repo.update(local_invoice.customer, vat_id=tax_id)
 
         # Invoice specific webhooks ####################################
         # https://stripe.com/docs/api/invoices/object
@@ -367,24 +389,30 @@ class PersonalInformationRepo(DatabaseAbstractRepository):
         super().__init__(*args, **kwargs)
         self.payment = StripePayments()
 
-    def create_from_kwargs(self, **kwargs):
-        ip = kwargs.pop("ip", None)
-        personal_info = super().create_from_kwargs(**kwargs)
-
-        # Create Stripe customer
-        stripe_customer = stripe.Customer.create(
-            name=kwargs["name"],
-            email=kwargs["email"],
+    def get_stripe_customer_payload(self, personal_info: PersonalInformation, ip: str):
+        customer_create_payload = dict(
+            name=personal_info.name,
+            email=personal_info.user.email,
             address=dict(
-                city=kwargs["city"],
-                country=kwargs["country_code"],
-                line1=kwargs["address_line1"],
-                line2=kwargs["address_line2"],
-                postal_code=kwargs["zip"],
-                state=kwargs["state"],
+                city=personal_info.city,
+                country=personal_info.country_code,
+                line1=personal_info.address_line1,
+                line2=personal_info.address_line2,
+                postal_code=personal_info.zip,
+                state=personal_info.state,
             ),
             tax=dict(ip_address=ip),
         )
+        return customer_create_payload
+
+    def create_from_kwargs(self, **kwargs):
+        ip = kwargs.pop("ip", None)
+        personal_info: PersonalInformation = super().create_from_kwargs(**kwargs)
+
+        # Create Stripe customer
+        # https://docs.stripe.com/api/customers/create
+        customer_create_payload = self.get_stripe_customer_payload(personal_info, ip)
+        stripe_customer = stripe.Customer.create(**customer_create_payload)
         stripe_customer_repo = StripeCustomerRepo(self._db)
         stripe_customer_repo.create_from_kwargs(
             personal_information_id=personal_info.id,
@@ -397,32 +425,23 @@ class PersonalInformationRepo(DatabaseAbstractRepository):
         mautic_repo = MauticRepo()
         mautic_repo.process_person(personal_info)
 
-    def update(self, item, **kwargs):
+    def update(self, personal_info, **kwargs):
         ip = kwargs.pop("ip", None)
-        super().update(item, **kwargs)
+        super().update(personal_info, **kwargs)
 
         customer_repo = StripeCustomerRepo(self._db)
-        customer = customer_repo.get_by_kwargs(personal_information_id=item.id)
+        customer = customer_repo.get_by_kwargs(personal_information_id=personal_info.id)
         if not customer:
             log.error(
-                "No stripe customer id known for PersonalInformation {item.id}. Skipping updating Stripe..."
+                "No stripe customer id known for PersonalInformation {personal_info.id}. Skipping updating Stripe..."
             )
-            return item
+            return personal_info
+
+        customer_create_payload = self.get_stripe_customer_payload(personal_info, ip)
+        # https://docs.stripe.com/api/customers/update
         stripe.Customer.modify(
             customer.stripe_customer_id,
-            name=kwargs["name"],
-            email=kwargs["email"],
-            address=dict(
-                city=kwargs["city"],
-                country=kwargs["country_code"],
-                line1=kwargs["address_line1"],
-                line2=kwargs["address_line2"],
-                postal_code=kwargs["zip"],
-                state=kwargs["state"],
-            ),
-            tax=dict(ip_address=ip),
+            **customer_create_payload,
         )
-
-        self.store_in_mautic(item)
-
-        return item
+        self.store_in_mautic(personal_info)
+        return personal_info

@@ -79,6 +79,21 @@ def get_get_full_session():
                 "current_period_start": 1703067340,
                 "status": "active",
             },
+            "customer_details": {
+                "address": {
+                    "city": "asf",
+                    "country": "AT",
+                    "line1": "asfasf",
+                    "line2": "asfasf",
+                    "postal_code": "asfasf",
+                    "state": "asfasf",
+                },
+                "email": "fabian@chainsquad.com",
+                "name": "ChainSquad GmbH",
+                "phone": None,
+                "tax_exempt": "reverse",
+                "tax_ids": [{"type": "eu_vat", "value": "DExxXxXxxxx"}],
+            },
         }
 
     return func
@@ -155,3 +170,6 @@ def test_initial_payment(
     assert subscription.active
     assert subscription.period_starts_at
     assert subscription.period_ends_at
+
+    dbsession.refresh(invoice)
+    assert invoice.customer.vat_id == "DExxXxXxxxx"

@@ -95,6 +95,9 @@ class PersonalInformation(Base):
     phone_country_code: Mapped[str] = mapped_column(String(6), default="")
     phone_number: Mapped[str] = mapped_column(String(128), default="")
 
+    vat_id: Mapped[str] = mapped_column(String(128), nullable=True)
+    is_business: Mapped[bool] = mapped_column(default=False)
+
     stripe: Mapped["StripeCustomer"] = relationship()  # noqa
 
     def __repr__(self):

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, Form, Request, status
 from starlette.responses import RedirectResponse
 
@@ -65,13 +67,14 @@ async def team_billing_post(
     if SubscriptionRepo(db).get_by_kwargs(team_id=team.id, active=True):
         raise BadRequest(f"Team {team.name} already has an active subscription!")
     seats = get_config().PRICING_MEMBERS_INCLUDED_IN_FREE
-    price_total = get_price(yearly=yearly, private=True)
+    unit_price = get_price(yearly=yearly, private=True)
     if yearly:
         price_interval = "yearly"
     else:
         price_interval = "monthly"
     customer_repo = PersonalInformationRepo(db)
     customer = customer_repo.get_by_kwargs(user_id=user.id)
+    price_total = seats * unit_price
     return templates.TemplateResponse("billing.pug", context=dict(**locals()))
 
 
@@ -92,6 +95,9 @@ async def team_billing_payment(
     country_code: str = Form(default=""),
     phone_country_code: str = Form(default=""),
     phone: str = Form(default=""),
+    name: str = Form(default=""),
+    is_business: bool = Form(default=False),
+    vatid: Optional[str] = Form(default=""),
 ):
     team_repo = TeamRepo(db)
 
@@ -109,7 +115,7 @@ async def team_billing_payment(
     customer_repo = PersonalInformationRepo(db)
     personal_data = dict(
         user_id=user.id,
-        name=user.name,
+        name=name,
         email=user.email,
         address_line1=address_line1,
         address_line2=address_line2,
@@ -119,9 +125,10 @@ async def team_billing_payment(
         country_code=country_code,
         phone_country_code=phone_country_code,
         phone_number=phone,
+        vat_id=vatid,
+        is_business=is_business,
     )
     person = customer_repo.get_by_kwargs(user_id=user.id)
-    SubscriptionRepo(db)
     invoice_repo = InvoiceRepo(db)
 
     if person:
@@ -148,6 +155,6 @@ async def team_billing_payment(
     )
 
     return RedirectResponse(
-        url=request.url_for("payment_invoice", invoice_id=invoice.id),
+        url=request.url_for("stripe_session_for_invoice", invoice_id=invoice.id),
         status_code=status.HTTP_302_FOUND,
     )
