@@ -257,9 +257,7 @@ async def get_docs(
             access_token,
             page,
             size,
-            DocumentShareType.PUBLIC
-            | DocumentShareType.SHARED_WITH_USER
-            | DocumentShareType.SUBSCRIBED_TEAM,
+            DocumentShareType.SHARED_WITH_USER | DocumentShareType.SUBSCRIBED_TEAM,
         )
     ret = list()
     for document in documents:
