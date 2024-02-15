@@ -20,7 +20,7 @@ api_key_header = APIKeyHeader(name="X-API-Key")
 
 async def get_access_token(
     api_key_header: str = Security(api_key_header), db: Session = Depends(get_session)
-) -> str:
+) -> AccessToken:
     try:
         api_key_uuid = UUID(api_key_header)
         access_token_repo = AccessTokenRepo(db)

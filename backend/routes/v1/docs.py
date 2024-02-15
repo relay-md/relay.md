@@ -14,6 +14,7 @@ from ... import __version__, exceptions
 from ...database import Session, get_session
 from ...models.document import Document
 from ...models.user import User
+from ...models.access_token import AccessToken
 from ...repos.document import DocumentRepo
 from ...repos.document_access import DocumentAccessRepo
 from ...repos.document_body import DocumentBodyRepo
@@ -246,7 +247,7 @@ async def get_docs(
     size: int = 50,
     user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
-    access_token: str = Security(get_access_token),
+    access_token: AccessToken = Security(get_access_token),
 ):
     document_repo = DocumentRepo(db)
     if type == "mine":
