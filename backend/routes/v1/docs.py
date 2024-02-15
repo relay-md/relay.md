@@ -6,15 +6,15 @@ from typing import List
 import frontmatter
 from fastapi import Depends, Request, Security
 from fastapi.responses import PlainTextResponse
-from backend.repos.team_topic import TeamTopicRepo
 
+from backend.repos.team_topic import TeamTopicRepo
 from backend.repos.user_team_topic import UserTeamTopicRepo
 
 from ... import __version__, exceptions
 from ...database import Session, get_session
+from ...models.access_token import AccessToken
 from ...models.document import Document
 from ...models.user import User
-from ...models.access_token import AccessToken
 from ...repos.document import DocumentRepo
 from ...repos.document_access import DocumentAccessRepo
 from ...repos.document_body import DocumentBodyRepo
