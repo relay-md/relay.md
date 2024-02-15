@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Query, Request
 from starlette.responses import HTMLResponse
 
 from ..database import Session, get_session
+from ..exceptions import LoginRequiredException
 from ..repos.document import DocumentRepo
 from ..repos.user import User
 from ..templates import templates
@@ -122,5 +123,8 @@ async def tos(
 async def pricing(
     request: Request,
     user: User = Depends(get_optional_user),
+    team_name: str = Query(""),
 ):
+    if team_name and not user:
+        raise LoginRequiredException(next_url=request.url)
     return templates.TemplateResponse("pricing.pug", context=dict(**locals()))

@@ -5,7 +5,7 @@
  .columns
   .column.has-text-centered.is-10.is-offset-1
    h1.title Team Name
-   {% if not team %}
+   {% if not team_name %}
    h3.subtitle Choose your Team Name
    .block.box
     .field
@@ -18,15 +18,15 @@
    h3.subtitle Your Team Name
    .block.box.p-5
     .title
-     tt {{team.name}}
+     tt {{team_name}}
    {% endif %}
  {% endif %}
 
  .columns
   .column.has-text-centered.is-10.is-offset-1
-   h1.title Pricing
-   h3.subtitle Chose your Plan and Payment Interval
-   .column.is-4.is-offset-4
+   .title.has-text-primary.has-text-weight-bold Plans
+   .subtitle.has-text-grey Chose your Plan and Payment Interval
+   .column.is-6.is-offset-3
     .level
      div
       .title.is-4 Monthly
@@ -109,7 +109,7 @@
          a.button.is-fullwidth#team_choose(href="{{url_for('login')}}") Login to proceed
          {% endif %}
 
-      .pricing-plan.is-danger
+      .pricing-plan
        .plan-header
         .title.is-5 Enterprise
         .subtitle.is-6 Premium Customizations
@@ -137,7 +137,7 @@
          strong api endpoint
         .plan-item technical support
        .plan-footer
-        a.button.is-fullwidth(href="{{url_for('contact')}}") Request Quote
+        a.button.is-secondary.is-fullwidth(href="{{url_for('contact')}}") Request Quote
 
 .container
   h2.title.section-subtitle.dark-text.text-bold.has-text-centered.is-2.pt-20.pb-20
@@ -145,35 +145,35 @@
   .columns.p-2
     .column.is-5.is-offset-1
       .content
-        p.title.is-5 Why a subscription?
-        p Because lifetime pricing is not sustainable for long-running business that continuously offer their services. The sustainability is crucial especially for communications platforms that are used on a daily basis.
+        p.title.is-5.has-text-primary Why a subscription?
+        p.has-text-grey.has-text-weight-bold Because lifetime pricing is not sustainable for long-running business that continuously offer their services. The sustainability is crucial especially for communications platforms that are used on a daily basis.
       .content
-        p.title.is-5 How do i get started?
-        p Once you have an account on relay.md, you can create your own team.
+        p.title.is-5.has-text-primary How do i get started?
+        p.has-text-grey.has-text-weight-bold Once you have an account on relay.md, you can create your own team.
          | by default, new teams are public.
       .content
-        p.title.is-5 What can I use topics for?
-        p
+        p.title.is-5.has-text-primary What can I use topics for?
+        p.has-text-grey.has-text-weight-bold
          | Topics are meant to reduce the number of documents team members would
          | otherwise receive. Think of them as #tags, but you can subscribe to
          | them. If you are not subscribed to a team, you will not get documents
          | shared with that team automatically.
     .column.is-5
       .content
-        p.title.is-5 The service is too expensive.
-        p We only charge teams for professional use. We believe
+        p.title.is-5.has-text-primary The service is too expensive.
+        p.has-text-grey.has-text-weight-bold We only charge teams for professional use. We believe
          | it would improve your productivity worth more than the price. This
          | service reduces our own pain by more than it costs.
       .content
-        p.title.is-5 What is the benefit of a private team?
-        p
+        p.title.is-5.has-text-primary What is the benefit of a private team?
+        p.has-text-grey.has-text-weight-bold
          | Private teams come with flexible permission system that can be
          | controlled by the owner. As such, the team can be made private so that
          | only invited members can subscribe to topics, or post, modify or read
          | documents of that team.
       .content.pb-40
-        p.title.is-5 What happens when i unsubscribe?
-        p No worries, your documents will still be treated confidentially,
+        p.title.is-5.has-text-primary What happens when i unsubscribe?
+        p.has-text-grey.has-text-weight-bold No worries, your documents will still be treated confidentially,
         | however, your team will become inactive. You will not be able to take
         | any further action, post, or modify documents until the subscription
         | is continued. You can make your team - and thus your documents -
@@ -184,9 +184,9 @@
 {% block javascript %}
 script
 .
- {% if team %}
+ {% if team_name %}
  document.querySelectorAll('[id=input_team_name]').forEach((tag) => {
-  tag.setAttribute("value", "{{team.name}}")
+  tag.setAttribute("value", "{{team_name}}")
  })
  {% else %}
  function store_team_name(e) {
@@ -209,7 +209,7 @@ script
    var team_choose = document.getElementById('team_choose');
    var free_choose = document.getElementById('free_choose');
 
-   {% if team and user %}
+   {% if team_name and user %}
    team_choose.setAttribute("value", "Choose");
    free_choose.setAttribute("value", "Choose");
    // Set all team_name hidden tags

@@ -1,24 +1,93 @@
 section.hero.is-light.is-large
   .hero-body
     h1.title.has-text-dark.has-text-weight-bold
-      img.brand-logo(src="{{ url_for('static', path='img/logo-navbar.svg')}}" width='128rm')
+      img.brand-logo.mr-1(src="{{ url_for('static', path='img/logo-navbar.svg')}}" width='128rm')
       | Relay.md
-    h1.subtitle.mt-4(style='line-height: 1.8;')
-      | A&nbsp;
-      span.tag.is-dark.is-medium collaborative platform
-      | &nbsp;for managing large&nbsp;
-      span.tag.is-dark.is-medium markdown documents
-      | . Integrated with Obsidian, it becomes the&nbsp;
-      span.tag.is-dark.is-medium ultimate tool
-      | &nbsp;for team-wide&nbsp;
-      span.tag.is-dark.is-medium knowledge management
-      | ,&nbsp;
-      span.tag.is-dark.is-medium task organization
-      | , and&nbsp;
-      span.tag.is-dark.is-medium project coordination
-      | . Seamlessly link information, navigate documents, and manage projects within Obsidian,&nbsp;
-      span.tag.is-dark.is-medium enabling teams
-      | &nbsp;to collaborate efficiently while&nbsp;
-      span.tag.is-dark.is-medium leveraging
-      | &nbsp;the&nbsp;
-      span.tag.is-dark.is-medium simplicity of markdown
+    h2.subtitle.is-5.has-text-primary.has-text-weight-bold.mb-0 Markdown Workflows for Teams
+    h2.subtitle.is-5.has-text-grey Send your notes to other vaults quickly and easily.
+
+    .block
+      {% if not user %}
+      .title.is-6.mb-2 Let’s stay in touch
+      form(hx-post="{{url_for('submitmail')}}")
+        .field.has-addons(hx-target='this' hx-swap='outerHTML')
+            .control.has-icons-left.has-icons-right
+              input.input.is-normal(type='email' name='email' placeholder='bob@smith.com' hx-post="{{url_for('validatemail')}}" hx-target="#validation-result"  hx-trigger="input changed delay:500ms, search" hx-swap="innerHTML")
+              span.icon.is-small.is-left
+                i.fas.fa-envelope
+              p#validation-result
+            .control
+              button.button.is-block.is-primary.is-fullwidth.is-normal.m-0
+                span.icon
+                  i.fas.fa-heart
+                span Subscribe
+        p.is-size-7 We care about the protection of your data and only use this to notify you when changelog is released. 
+      {% endif %}
+
+    .columns.mt-6
+      .column.is-5
+        .media.block
+          .media-left
+            span.icon.is-large.has-background-primary.has-text-light
+              i.fas.fa-2x.fa-heart.is-large
+          .media-content
+            .content
+              .title.is-5.mb-1 Tight integration with Obsidian
+              p.has-text-weight-bold.has-text-grey Obsidian seamlessly connects with Relay.md, making it simple and straightforward for you to share your notes quickly.
+        .media.block
+          .media-left
+            span.icon.is-large.has-background-primary.has-text-light
+              i.fas.fa-2x.fa-cog.is-large
+          .media-content
+            .content
+              .title.is-5.mb-1 One-click Configuration
+              p.has-text-weight-bold.has-text-grey Easly configure your Vault with a one-click solution. No hazzle!
+        .media.block
+          .media-left
+            span.icon.is-large.has-background-primary.has-text-light
+              i.fas.fa-2x.fa-bolt.is-large
+          .media-content
+            .content
+              .title.is-5.mb-1 Powerful Collaboration
+              p.has-text-weight-bold.has-text-grey Leverage the power of Obsidian with relay.md for collaboration to get the most out of your second brain.
+      .column.is-1
+      .column.is-5
+        .media
+          .media-left
+            span.icon.is-large.has-background-primary.has-text-light
+              i.fas.fa-2x.fa-user-friends.is-large
+          .media-content
+            .content
+              .title.is-5.mb-1 Build your own Community
+              p.has-text-weight-bold.has-text-grey Share notes with hundres of people quickly. Keep copies of your notes updated through relay.md and Obsidian.
+        .media
+          .media-left
+            span.icon.is-large.has-background-primary.has-text-light
+              i.fas.fa-2x.fa-tachometer-alt.is-large
+          .media-content
+            .content
+              .title.is-5.mb-1 Improve efficiency
+              p.has-text-weight-bold.has-text-grey Keep your audience in Obsidian. Avoid copy &amp; paste from Obsidian into a non-markdown tool.
+        .media
+          .media-left
+            span.icon.is-large.has-background-primary.has-text-light
+              i.fas.fa-2x.fa-crown.is-large
+          .media-content
+            .content
+              .title.is-5.mb-1 One Vault to rule them all
+              p.has-text-weight-bold.has-text-grey Keep your knowledge in your vault. Only share what's required with those that need it.
+
+    .block.has-text-centered.mt-6
+      .column.is-7.is-offset-2
+        h2.subtitle.is-4.has-text-primary.has-text-weight-bold.mb-0 Claim your Team now
+        h2.subtitle.is-5.has-text-grey Team names are uniqe. Get yours now!
+        form(method="GET" action="{{url_for('pricing')}}")
+          .field.has-addons
+              .control.has-icons-left.has-icons-right
+                input.input.is-normal#team_name(type='text' name='team_name' placeholder='your-team'  hx-post="{{url_for('team_create_validate_team_name')}}" hx-trigger="input changed delay:500ms, search" hx-target="#validate-team-name")
+                span.icon.is-small.is-left
+                  i.fas.fa-user-friends
+                p#validate-team-name
+              .control
+                button.button.is-block.is-primary.is-fullwidth.is-normal.m-0
+                  span 🎉 Claim Team

@@ -21,7 +21,7 @@ from ..utils.dates import (
     percentage_of_period_year,
 )
 from ..utils.team import get_team
-from ..utils.user import User, require_user
+from ..utils.user import User, get_optional_user, require_user
 
 router = APIRouter(prefix="/team")
 
@@ -284,7 +284,7 @@ async def settings_user_search(
 async def team_create_validate_team_name(
     request: Request,
     team_name: str = Form(default=""),
-    user: User = Depends(require_user),
+    user: User = Depends(get_optional_user),
     db: Session = Depends(get_session),
 ):
     team_repo = TeamRepo(db)
@@ -358,6 +358,7 @@ async def update_team_seats(
 @router.get("/{team_name}/billing")
 async def team_billing(
     request: Request,
+    team_name: str,
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),

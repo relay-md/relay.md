@@ -2,20 +2,33 @@
 {% block content %}
 .section
  .columns.is-centered
-  .column.is-6.is-centered
-   h1.title.is-1 Select Auth Provider
+  .column.is-8.is-centered
+   .title.is-2.has-text-primary Login
+   .subtitle.is-4.has-text-grey Please Select Auth Provider
 
    .block
-    a.button.is-large(href="{{url_for('login_github')}}")
+    a.button.is-large(href="{{url_for('login_github')}}").is-github
      span.icon.is-large
       i.fab.fa-github
-     span Sign-in with GitHub
+     span GitHub
 
-   // .block
-   //  a.button.is-large(href="{{url_for('login_google')}}")
-   //   span.icon.is-large
-   //    i.fab.fa-google
-   //   span Sign-in with Google
+   .block
+    button.disabled.button.is-large(href="{{url_for('login_google')}}" disabled="disabled").is-google
+     span.icon.is-large
+      i.fab.fa-google
+     span Google
+
+   .block
+    button.disabled.button.is-large(href="{{url_for('login_google')}}" disabled="disabled").is-facebook
+     span.icon.is-large
+      i.fab.fa-facebook
+     span Facebook
+
+   .block
+    button.disabled.button.is-large(href="{{url_for('login_google')}}" disabled="disabled").is-twitter
+     span.icon.is-large
+      i.fab.fa-twitter
+     span Twitter
 
    .block
 {% endblock %}

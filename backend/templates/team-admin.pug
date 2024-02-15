@@ -56,10 +56,10 @@ td.has-text-light
  .columns
   .column.is-8.is-offset-2
    .block
-    .title.is-1 {{team.name}}
+    .title.is-1.has-text-primary.has-text-weight-bold {{team.name}}
 
    .block
-    .title.is-3 Team Settings
+    .title.is-3.has-text-primary.has-text-weight-bold Team Settings
     .field.is-horizontal
       .field-label.is-normal Description/Headline
       .field-body
@@ -82,8 +82,8 @@ td.has-text-light
     //    span(id="updated_team_hide")
 
    .block
-    .title.is-3 Permissions
-    .subtitle.is-5 Customize Team Permissions
+    .title.is-3.has-text-primary.has-text-weight-bold Permissions
+    .subtitle.is-5.has-text-grey Customize Team Permissions
     p.block Click the check marks/crosses to flip the corresponding permission.
     table.table.block
      tr
@@ -111,8 +111,8 @@ td.has-text-light
        {{permissions("public", team.public_permissions)}}
 
    .block
-    .title.is-3 Members
-    .subtitle.is-5 List of users subscribed to your team
+    .title.is-3.has-text-primary.has-text-weight-bold Members
+    .subtitle.is-5.has-text-grey List of users subscribed to your team
     p.block
      |Customize your members permissions. By default,&nbsp;
      span.is-underlined Member/Group permissions apply!
@@ -162,9 +162,9 @@ td.has-text-light
     {% endif %}
 
    .block
-    .title.is-5 Invite Users
-    .subtitle.is-6.mb-3 Add others to your team
-    .subtitle.is-7 You have a total of 
+    .title.is-5.has-text-primary.has-text-weight-bold Invite Users
+    .subtitle.is-6.mb-3.has-text-grey Add others to your team
+    p.block You have a total of 
      strong {{team.seats}} 
      | seats available
     .control.has-icons-left
@@ -175,8 +175,8 @@ td.has-text-light
 
    {% if team.active_subscription %}
    .block.box
-    .title.is-3 Subscription
-    .subtitle.is-7 *Adding seats to your team will result in additional costs!
+    .title.is-3.has-text-primary.has-text-weight-bold Subscription
+    .subtitle.is-7.has-text-grey *Adding seats to your team will result in additional costs!
     form(hx-post="{{url_for('update_team_seats', team_name=team.name)}}" hx-target="#updated_team_seats")
      .field.has-addons
       .field-label.is-normal No. Seats
@@ -188,7 +188,7 @@ td.has-text-light
         button.button.is-primary Ok
        span(id="updated_team_seats")
 
-    .subtitle.is-5
+    .subtitle.is-5.has-text-grey
     table.table.mb-0
      thead
       tr
@@ -224,8 +224,9 @@ td.has-text-light
    {% endif %}
 
    {% if not team.active_subscription %}
-   .title.is-3 Subscription
-   a.button.is-medium.is-danger.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
+   .title.is-3.has-text-primary.has-text-weight-bold Subscription
+   .subtitle.is-5.has-text-grey Get all the benefits of a Pro Team by subscribting
+   a.button.is-medium.is-primary.is-outlined(href="{{ url_for('team_billing', team_name=team.name) }}")
     span.icon.is-medium
      🎉
     span Upgrade to Pro Team

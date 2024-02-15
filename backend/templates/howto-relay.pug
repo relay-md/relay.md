@@ -3,8 +3,8 @@
 .section
  .columns
   .column.is-8.is-offset-2
-   h1.title.is-1 How to use Relay.md
-   p.subtitle This site explains some of the basic functionalities of relay.md
+   .title.has-text-primary.has-text-weight-bold How to use Relay.md
+   .subtitle.has-text-grey This site explains some of the basic functionalities of relay.md
 
    .card.block
     .card-header
@@ -20,7 +20,7 @@
       tt.tag.is-dark.is-small topic@team
       | &nbsp; identifier.
      p.has-text-centered.block
-      a.button.is-info.is-medium.is-rounded(href="{{url_for('get_teams')}}") Teams Overview
+      a.button.is-primary.is-medium.is-rounded(href="{{url_for('get_teams')}}") Teams Overview
      p.block Labels on the other hand can be created at will for most teams. The owner of a team has a choice to disable creation of labels by anyone other than the owner.
 
    .card.block

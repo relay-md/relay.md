@@ -1,6 +1,6 @@
 {% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
-section.hero.is-link
+section.hero.is-primary
  .hero-body
   .title
    figure.image.is-128x128
@@ -9,8 +9,8 @@ section.hero.is-link
 
 .column
  section.section
-  .title Account
-  .subtitle Personal Information of your account
+  .title.has-text-primary.has-text-weight-bold Account
+  .subtitle.has-text-grey Personal Information of your account
   table.table
    tr
     td
@@ -19,8 +19,8 @@ section.hero.is-link
     td {{user.email}}
 
  section.section
-  .title API
-  .subtitle Access Token
+  .title.has-text-primary.has-text-weight-bold API
+  .subtitle.has-text-grey Access Token
   {% for access_token in user.access_tokens %}
   div.icon-text
    span.icon
