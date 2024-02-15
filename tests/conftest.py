@@ -19,10 +19,11 @@ Settings.model_config = SettingsConfigDict(  # noqa
 # noqa
 from backend import database, models, repos  # noqa
 from backend.api import app as api_app
+from backend.models.permissions import Permissions
 from backend.repos.document import DocumentRepo
-from backend.repos.team import TeamRepo
+from backend.repos.team import Team, TeamRepo
 from backend.repos.team_topic import TeamTopicRepo
-from backend.repos.user import UserRepo
+from backend.repos.user import User, UserRepo
 from backend.repos.user_team_topic import UserTeamTopicRepo
 from backend.web import app as web_app
 
@@ -159,26 +160,24 @@ def eve_auth_header(eve_access_token):
 
 
 @pytest.fixture(autouse=True)
-def default_team_topics(dbsession, account):
-    team_repo = repos.TeamRepo(dbsession)
-    topic_repo = repos.TopicRepo(dbsession)
-    team_topic_repo = repos.TeamTopicRepo(dbsession)
-    user_team_repo = repos.UserTeamRepo(dbsession)
-
-    team_repo.create_from_kwargs(
+def default_team_topics(dbsession, account, create_team, create_team_topic, join_team):
+    create_team(
         name="_",
         user_id=account.id,
+        public_permissions=Permissions.can_post
+        + Permissions.can_read
+        + Permissions.can_join
+        + Permissions.can_modify
+        + Permissions.can_create_topics,
     )
 
-    team = team_repo.create_from_kwargs(
+    team = create_team(
         name="myteam",
         user_id=account.id,
         public_permissions=0,
     )
-    topic = topic_repo.create_from_kwargs(name="mytopic")
-    team_topic_repo.create_from_kwargs(team_id=team.id, topic_id=topic.id)
-    # Join account into default team
-    user_team_repo.create_from_kwargs(team_id=team.id, user_id=account.id)
+    create_team_topic("mytopic@myteam")
+    join_team(team, account)
 
 
 @pytest.fixture()
@@ -204,6 +203,11 @@ def team_topic_repo(dbsession):
 @pytest.fixture
 def user_team_topic_repo(dbsession):
     return UserTeamTopicRepo(dbsession)
+
+
+@pytest.fixture
+def user_team_repo(dbsession):
+    return repos.UserTeamRepo(dbsession)
 
 
 @pytest.fixture
@@ -246,7 +250,9 @@ def subscribe_to_team_topic(account, team_topic_repo, user_team_topic_repo):
 @pytest.fixture
 def create_team(team_repo, account):
     def func(name: str, **kwargs):
-        return team_repo.create_from_kwargs(name=name, user_id=account.id, **kwargs)
+        if "user_id" not in kwargs:
+            kwargs["user_id"] = account.id
+        return team_repo.create_from_kwargs(name=name, **kwargs)
 
     return func
 
@@ -255,6 +261,14 @@ def create_team(team_repo, account):
 def create_team_topic(team_topic_repo, account):
     def func(name: str, from_account=account):
         return team_topic_repo.from_string(name, from_account)
+
+    return func
+
+
+@pytest.fixture
+def join_team(dbsession, user_team_repo):
+    def func(team: Team, user: User):
+        user_team_repo.create_from_kwargs(team_id=team.id, user_id=user.id)
 
     return func
 
