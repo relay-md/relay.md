@@ -1,33 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-
-<svg class="logo" width="140" height="100" viewBox="21 10 140 120" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-   <style>
-   path {
-      stroke: black;
-      stroke-width: 20;
-      stroke-linecap: butt;
-      fill: none;
-   }
-   </style>
-   <defs>
-      <g id="arrow">
-            <path
-               d=" M   0,   0
-                   L -50,  70
-                   L   0, 140"
-            />
-      </g>
-   </defs>
-   <use href="#arrow" x="70" y="0" />
-   <use href="#arrow" x="120" y="0" />
-   <path
-      d=" M 110, 20
-          L 120, 20
-          C 170, 21
-            170, 79
-            125, 80
-          L 125, 80
-          L 170, 140
-      "
-   />
+<svg class="absolute top-0 left-full transform" width="404" height="784" fill="none" viewbox="0 0 404 784" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <defs>
+ <pattern id="squares" x="0" y="0" width="20" height="20" patternunits="userSpaceOnUse">
+   <rect class="has-text-grey-lighter" x="0" y="0" width="4" height="4" fill="currentColor">
+   </rect>
+  </pattern>
+</defs>
+<rect width="404" height="784" fill="url(#squares)"></rect>
 </svg>

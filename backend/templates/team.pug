@@ -4,7 +4,7 @@
  .columns
   .column.is-8.is-offset-2
    .block
-    .title.is-1 {{team.name}}
+    .title.is-1.has-text-primary.has-text-weight-bold {{team.name}}
     .subtitle.is-5.text-icon
       {% if team.active_subscription %}
       span.icon-text
@@ -44,7 +44,7 @@
     {% endif %}
 
    .block
-    .title.is-3 Description
+    .title.is-3.has-text-primary.has-text-weight-bold Description
     .box
      {% if team.headline %}
      p {{team.headline}}
@@ -54,11 +54,11 @@
 
    {% if membership %}
    .block
-    .title.is-3 Topics
+    .title.is-3.has-text-primary.has-text-weight-bold Topics
 
     .columns.is-8.is-variable
       .column.is-half.has-text-left
-        .title.is-5 Existing Topics in the team
+        .title.is-5.has-text-grey Existing Topics in the team
         div(hx-ext="client-side-templates")
           template#list_topics
             {% raw %}
@@ -103,10 +103,11 @@
               th Un-/Subscribe
             tbody#table_content
       .column.is-half.has-text-left
-        .title.is-5 Topics / Subjects
+        .title.is-5.has-text-grey Topics / Subjects
         p.is-size-6.block Topics are subjects that you can use to narrow down a group of people in your team.
         p.is-size-6.block Team members subscribe to topics to receive documents shared on those subjects
-        .subtitle.is-5.mb-1 Create a new topic
+
+        .title.is-5.has-text-grey.mb-2 Create a new topic
         .control.has-icons-left
           input.input#team_name(type="string" placeholder="New Topic" name="topic" hx-post="{{url_for('create_topic_htx', team_name=team.name)}}")
           span.icon.is-left
