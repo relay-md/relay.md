@@ -20,7 +20,6 @@
 body {
     background: var(--background);
     color: var(--textDark);
-    font-family: inter-regular, lato-regular, Roboto, Helvetica, Arial, sans-serif;
     font-weight: 400;
 }
 
@@ -30,7 +29,23 @@ body {
 // Just uncomment the following block to see the result.
 
 @import "bulma/sass/utilities/initial-variables";
-// customize bulma here
+
+// Add a serif family
+$family-serif: inter-regular, lato-regular, Roboto, Helvetica, Arial, sans-serif;
+
+// Use the new pink as the primary color
+$primary: darken($purple, 20%);
+$secondary: $purple;
+$link: lighten($purple, 10%);
+$info: lighten($purple, 20%);
+// $success: $green;
+$warning: mix($purple, $yellow, 90%);
+// $danger: $red;
+// $dark: $grey-darker;
+// $text: $grey-dark;
+
+// Use the new serif family
+$family-primary: $family-serif;
 
 @import "bulma/sass/utilities/_all.sass";
 @import "bulma/sass/base/_all.sass";

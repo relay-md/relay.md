@@ -5,17 +5,18 @@
   .columns.is-8.is-variable
     .column.is-two-thirds.has-text-left
       .block
-        h1.title.is-1 One-click Configuration for Obsidian
-        p.is-size-4.block To everyones advantage, Obsidian allows services like relay.md to send configurations from our website to your Vault. We have configured our plugin to handle this accordingly.
-        p.is-size-4.block.has-text-centered.mb-0
-          a.button.is-link.is-large(href="{{redirect_url}}")
+        h1.title.is-2.has-text-primary.has-text-weight-bold One-click Configuration for Obsidian
+        p.is-size-5.block.has-text-grey To everyones advantage, Obsidian allows services like relay.md to send configurations from our website to your Vault. We have configured our plugin to handle this accordingly.
+        p.is-size-5.block.has-text-centered.mb-0
+          a.button.is-primary.is-large(href="{{redirect_url}}")
             span.icon
               i.fas.fa-link
             span Link your Vault
         p.has-text-centered.help.m-0.p-0 The link opens automatically after 2 seconds.
-      .block
-        .title.is-3 Didn't work?
-        p.block If Obsidian does not open, you can configure Obsidian manually with the following parameters:
+
+      .block.mt-6
+        .title.is-3.has-text-primary Didn't work?
+        p.is-size-5.block.has-text-grey If Obsidian does not open, you can configure Obsidian manually with the following parameters:
           table.table.is-compact.ml-5
             tr
               th(colspan=2) Advanced Settings
@@ -29,10 +30,10 @@
               td API Username
               td.is-family-monospace {{user.username}}
     .column.is-one-third.has-text-left
-      .title How this works
+      .title.has-text-primary How this works
       .block.content
         ol
-          li Relay.md provides a
+          li Relay.md provides a 
            strong 🔗 special link
           li The link opens Obsidian with ⚙️ configuration details
           li The Relay.md Plugin stores the details in your Vault
