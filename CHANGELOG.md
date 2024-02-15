@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.15.0 (2024-02-15)
+### Feature
+* Boiler plates for social media login ([`d1eb215`](https://github.com/knowledgemd/backend/commit/d1eb2150df3adf786d4dc93e2c7d41dcc034a360))
+* **brand:** Clarify brand colour ([`c9c3471`](https://github.com/knowledgemd/backend/commit/c9c34718899983007fa1839cbeb2df434f8d818c))
+
+### Fix
+* Background body ([`edff0e1`](https://github.com/knowledgemd/backend/commit/edff0e18c3f3c27fb508852d13d3f2019746c267))
+
 ## v1.14.0 (2024-02-15)
 ### Feature
 * Deal with tax properly ([`8ee6fe4`](https://github.com/knowledgemd/backend/commit/8ee6fe473bc3d9ac90d2fbe97306dca0413cd673))
