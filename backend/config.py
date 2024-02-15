@@ -78,6 +78,7 @@ class Settings(BaseSettings):
 
     PRICING_TEAM_YEARLY: float = 30.0
     PRICING_TEAM_MONTHLY: float = 3.0
+    PRICING_MEMBERS_INCLUDED_IN_FREE: int = 5
 
     NEW_USER_SUBSCRIBE_TO: List[str] = ["news@relay.md"]
     RELAY_NEWS_TEAM_TOPIC_ID: Optional[UUID] = None

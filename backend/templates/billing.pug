@@ -13,7 +13,30 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
    .column.is-11
     .field.is-horizontal
       .field-label.is-normal
+        label.label
+      .field-body
+        .level
+         div
+          strong Person 
+         .field.ml-5.mr-5
+          input#is_biz.switch.is-small.is-rounded.is-success(type="checkbox" name="is_business" onclick="flipBusiness()")
+          label(for='is_biz')
+         div
+          strong Business
+    .field.is-horizontal
+      .field-label.is-normal
+        label.label Billing Name
+         sup.has-text-danger *
+      .field-body
+        .field
+          p.control.is-expanded.has-icons-left
+           input.input(type='text' name="name" value="{{user.name}}")
+           span.icon.is-small.is-left
+             i.fas.fa-user
+    .field.is-horizontal
+      .field-label.is-normal
         label.label Address
+         sup.has-text-danger *
       .field-body
         .field
           p.control.is-expanded.has-icons-left
@@ -31,14 +54,14 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
       .field-body
         .field
           p.control.is-expanded.has-icons-left
-           input.input(type='text' placeholder='City' name="city" value="{{customer.city if customer}}")
-           span.icon.is-small.is-left
-            i.fas.fa-city
-        .field
-          p.control.is-expanded.has-icons-left
            input.input(type='text' placeholder='Zip code' name="zip" value="{{customer.zip if customer}}")
            span.icon.is-small.is-left
             i.fas.fa-map-pin
+        .field
+          p.control.is-expanded.has-icons-left
+           input.input(type='text' placeholder='City' name="city" value="{{customer.city if customer}}")
+           span.icon.is-small.is-left
+            i.fas.fa-city
         .field
           p.control.is-expanded.has-icons-left
            input.input(type='text' placeholder='State' name='state' value="{{customer.state if customer}}")
@@ -47,6 +70,7 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
     .field.is-horizontal
       .field-label.is-normal
         label.label Country
+         sup.has-text-danger *
       .field-body
         .field
           p.control.is-expanded.has-icons-left
@@ -497,6 +521,21 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
              input.input(type='tel' name="phone" placeholder='Your phone number' value="{{customer.phone_number if customer}}")
           p.help Do not enter the first zero
 
+    // .field.is-horizontal#vat
+    //   .field-label.is-normal
+    //     label.label VAT ID
+    //   .field-body
+    //     .field
+    //       p.control.is-expanded.has-icons-left
+    //        input.input(type='text' name="vatid" value="" placeholder="LLNNNNNNNN")
+    //        span.icon.is-small.is-left
+    //          i.fas.fa-user
+
+
+    .field.is-horizontal
+       sup.has-text-danger *
+       | required
+
  .hero.is-info
   .hero-body
    .title Product Details
@@ -507,20 +546,25 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
   .columns
    .column.is-9.is-offset-1.box
     .block
+     .level.mb-2
+      div
+        .title.is-5 Team Subscription
+        .subtitle.is-6.has-text-weight-semibold {{seats}} Seats
+      .sub-title.is-5 {{unit_price}} € / seat / {{price_interval}}
+
+     hr.m-2
+
      .level
-      .title.is-5 Team Subscription
-      .title.is-5 {{price_total}} € / {{price_interval}}
+      .level-left
+      .level-right
+       .level-item
+        .title.is-5  {{price_total}} €
 
      .field.is-grouped.is-grouped-multiline
        .control
         .tags.has-addons
          .tag.is-medium.is-dark Name
          .tag.is-medium.is-link {{team.name}}
-
-       .control
-        .tags.has-addons
-         .tag.is-medium.is-dark Type
-         .tag.is-medium.is-info private
 
        .control
         .tags.has-addons
@@ -556,5 +600,13 @@ script
   var options = document.querySelectorAll('option[value="' + phone_country_code + '"]');
   options[0].selected = true;
  }
+
+
+// function flipBusiness() {
+//  var box = document.getElementById('is_biz');
+//  var vat = document.getElementById('vat');
+//  vat.style.display = (box.checked) ? "" : "none";
+// }
+// flipBusiness();
 
 {% endblock %}

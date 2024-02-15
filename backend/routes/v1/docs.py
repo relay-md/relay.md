@@ -6,12 +6,13 @@ from typing import List
 import frontmatter
 from fastapi import Depends, Request, Security
 from fastapi.responses import PlainTextResponse
-from backend.repos.team_topic import TeamTopicRepo
 
+from backend.repos.team_topic import TeamTopicRepo
 from backend.repos.user_team_topic import UserTeamTopicRepo
 
 from ... import __version__, exceptions
 from ...database import Session, get_session
+from ...models.access_token import AccessToken
 from ...models.document import Document
 from ...models.user import User
 from ...repos.document import DocumentRepo
@@ -246,7 +247,7 @@ async def get_docs(
     size: int = 50,
     user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
-    access_token: str = Security(get_access_token),
+    access_token: AccessToken = Security(get_access_token),
 ):
     document_repo = DocumentRepo(db)
     if type == "mine":
@@ -256,9 +257,7 @@ async def get_docs(
             access_token,
             page,
             size,
-            DocumentShareType.PUBLIC
-            | DocumentShareType.SHARED_WITH_USER
-            | DocumentShareType.SUBSCRIBED_TEAM,
+            DocumentShareType.SHARED_WITH_USER | DocumentShareType.SUBSCRIBED_TEAM,
         )
     ret = list()
     for document in documents:

@@ -56,28 +56,6 @@ async def payment_error(
 
 
 @router.get(
-    "/invoice/{invoice_id}",
-    response_class=HTMLResponse,
-    tags=["web"],
-)
-async def payment_invoice(
-    invoice_id: UUID,
-    request: Request,
-    db: Session = Depends(get_session),
-    user: User = Depends(get_optional_user),
-):
-    invoice_repo = InvoiceRepo(db)
-    invoice = invoice_repo.get_by_id(invoice_id)
-    if not invoice:
-        raise BadRequest("Invalid invoice ID")
-    if invoice.paid_at is None:
-        return RedirectResponse(
-            url=request.url_for("stripe_session_for_invoice", invoice_id=invoice_id)
-        )
-    return "paid"
-
-
-@router.get(
     "/stripe/session/{invoice_id}",
     tags=["web"],
 )

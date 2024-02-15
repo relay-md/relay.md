@@ -33,6 +33,7 @@ class Subscription(Base):
     name: Mapped[str] = mapped_column(String(64))
     # E.g. Name
     description: Mapped[str] = mapped_column(String(64))
+
     # e.g. number of team members!
     quantity: Mapped[int] = mapped_column()
     price: Mapped[int] = mapped_column()
@@ -93,6 +94,9 @@ class PersonalInformation(Base):
     # Phone
     phone_country_code: Mapped[str] = mapped_column(String(6), default="")
     phone_number: Mapped[str] = mapped_column(String(128), default="")
+
+    vat_id: Mapped[str] = mapped_column(String(128), nullable=True)
+    is_business: Mapped[bool] = mapped_column(default=False)
 
     stripe: Mapped["StripeCustomer"] = relationship()  # noqa
 

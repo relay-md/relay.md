@@ -4,7 +4,14 @@ from unittest.mock import patch
 import pytest
 
 from backend.exceptions import NotAllowed
-from backend.models.team import DEFAULT_PUBLIC_PERMISSIONS, Permissions
+from backend.models.permissions import Permissions
+
+READ_POST_PERMISSIONS = (
+    Permissions.can_post
+    + Permissions.can_read
+    + Permissions.can_join
+    + Permissions.can_create_topics
+)
 
 
 @patch(
@@ -20,12 +27,10 @@ def test_public_create_team_topic(
     patch_document_body_create,
     patch_document_body_update,
 ):
-    team = create_team(
-        "public-test", public_permissions=DEFAULT_PUBLIC_PERMISSIONS.value
-    )
+    team = create_team("public-test", public_permissions=READ_POST_PERMISSIONS)
     create_team_topic("testing@public-test", eve)
 
-    team.public_permissions = DEFAULT_PUBLIC_PERMISSIONS - Permissions.can_create_topics
+    team.public_permissions = READ_POST_PERMISSIONS - Permissions.can_create_topics
     dbsession.commit()
 
     with pytest.raises(NotAllowed):
@@ -46,13 +51,11 @@ def test_public_post(
     patch_document_body_create,
     patch_document_body_update,
 ):
-    team = create_team(
-        "public-test", public_permissions=DEFAULT_PUBLIC_PERMISSIONS.value
-    )
+    team = create_team("public-test", public_permissions=READ_POST_PERMISSIONS)
     upload_document("foobar", auth_header, "testing@public-test")
     upload_document("foobar", eve_auth_header, "testing@public-test")
 
-    team.public_permissions = DEFAULT_PUBLIC_PERMISSIONS - Permissions.can_post
+    team.public_permissions = READ_POST_PERMISSIONS - Permissions.can_post
     dbsession.commit()
 
     upload_document("foobar", auth_header, "testing@public-test")
@@ -79,7 +82,7 @@ def test_public_modify(
 ):
     team = create_team(
         "public-test",
-        public_permissions=(DEFAULT_PUBLIC_PERMISSIONS | Permissions.can_modify).value,
+        public_permissions=(READ_POST_PERMISSIONS | Permissions.can_modify).value,
     )
     document = upload_document("foobar", eve_auth_header, "testing@public-test")
 
@@ -97,7 +100,7 @@ def test_public_modify(
     assert exc.value.args[0] == 403
     assert exc.value.args[1].startswith("Updating someone else document is not allowed")
 
-    team.public_permissions = DEFAULT_PUBLIC_PERMISSIONS
+    team.public_permissions = READ_POST_PERMISSIONS
     dbsession.commit()
 
     # fails now
