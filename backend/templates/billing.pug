@@ -1,6 +1,6 @@
 {% extends 'layout.pug' %} {% block title %}{{ name }} {% endblock %}
 {% block content %}
-.hero.is-link
+.hero.is-primary
  .hero-body
   .title Billing Details
   .subtitle.is-6 We Only Store These for Billing Purposes
@@ -570,14 +570,14 @@ form(action="{{ url_for('team_billing_payment') }}" method="POST")
         .tags.has-addons
          .tag.is-medium.is-dark Payment
          {% if yearly %}
-         .tag.is-medium.is-danger yearly
+         .tag.is-medium.is-link yearly
          {% else %}
-         .tag.is-medium.is-danger montly
+         .tag.is-medium.is-link montly
          {% endif %}
 
     .block
      .control
-      button.button.is-danger.is-light.is-fullwidth.icon-text.is-medium
+      button.button.is-primary.is-fullwidth.icon-text.is-medium
        .span.icon
         i.fas.fa-money-bill
        .span Proceed to Payment

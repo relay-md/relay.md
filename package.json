@@ -13,6 +13,7 @@
     "bulma": "^0.9.4",
     "bulma-extensions": "^6.2.7",
     "bulma-list": "^1.2.0",
+    "bulma-social": "^2.1.0",
     "esbuild": "^0.19.11",
     "esbuild-sass-plugin": "^2.16.1",
     "handlebars": "^4.7.8",

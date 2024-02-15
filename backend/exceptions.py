@@ -144,11 +144,14 @@ async def redirect_to_login(
     exc: LoginRequiredException,
     user: User = Depends(get_optional_user),
 ):
+    from .utils.url import add_next_url
+
     url = str(request.url_for("login"))
     if exc.next_url:
         parsed = list(urllib.parse.urlparse(url))
         parsed[4] = urllib.parse.urlencode(dict(next=str(exc.next_url)))
         url = urllib.parse.urlunparse(parsed)
+        add_next_url(request, url)
     return RedirectResponse(url=url)
 
 
