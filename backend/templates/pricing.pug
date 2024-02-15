@@ -5,7 +5,7 @@
  .columns
   .column.has-text-centered.is-10.is-offset-1
    h1.title Team Name
-   {% if not team %}
+   {% if not team_name %}
    h3.subtitle Choose your Team Name
    .block.box
     .field
@@ -18,7 +18,7 @@
    h3.subtitle Your Team Name
    .block.box.p-5
     .title
-     tt {{team.name}}
+     tt {{team_name}}
    {% endif %}
  {% endif %}
 
@@ -184,9 +184,9 @@
 {% block javascript %}
 script
 .
- {% if team %}
+ {% if team_name %}
  document.querySelectorAll('[id=input_team_name]').forEach((tag) => {
-  tag.setAttribute("value", "{{team.name}}")
+  tag.setAttribute("value", "{{team_name}}")
  })
  {% else %}
  function store_team_name(e) {
@@ -209,7 +209,7 @@ script
    var team_choose = document.getElementById('team_choose');
    var free_choose = document.getElementById('free_choose');
 
-   {% if team and user %}
+   {% if team_name and user %}
    team_choose.setAttribute("value", "Choose");
    free_choose.setAttribute("value", "Choose");
    // Set all team_name hidden tags
