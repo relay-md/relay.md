@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v1.14.0 (2024-02-15)
+### Feature
+* Deal with tax properly ([`8ee6fe4`](https://github.com/knowledgemd/backend/commit/8ee6fe473bc3d9ac90d2fbe97306dca0413cd673))
+
+### Fix
+* Unittests ([`118fa9b`](https://github.com/knowledgemd/backend/commit/118fa9ba69a533b35cbbc6020e2d4ac1ec06839d))
+* Less open default values for teams ([`e2d14ba`](https://github.com/knowledgemd/backend/commit/e2d14ba77fc05abd698911730ce57c4db75e5c1c))
+* Do not offer every public document ([`0890f04`](https://github.com/knowledgemd/backend/commit/0890f0449e6a8d51b2fd491a9d05e33bcd3fdc5c))
+* Nicer internal email ([`2e7a342`](https://github.com/knowledgemd/backend/commit/2e7a342beec92cb9689d18ac48ca31709d233721))
+* Linting ([`a1555fe`](https://github.com/knowledgemd/backend/commit/a1555fe4ddf71db66051807c8257cec9d07c7cb2))
+* Subscription now working again ([`169c98c`](https://github.com/knowledgemd/backend/commit/169c98cd023393ac3b2d4785d47c7d4bd08c24f5))
+
 ## v1.13.0 (2024-02-13)
 ### Feature
 * Additional api to obtain user info of access-key ([`a973cba`](https://github.com/knowledgemd/backend/commit/a973cbac4b36093a41d44fb0119d80652303527a))
