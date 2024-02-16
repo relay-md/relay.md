@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.16.1 (2024-02-16)
+### Fix
+* Typo whitespace ([`fecb15b`](https://github.com/knowledgemd/backend/commit/fecb15b9e80aa9e47a307696c430b9f53ee8c83d))
+
 ## v1.16.0 (2024-02-16)
 ### Feature
 * Boiler plates for social media login ([`2944b1d`](https://github.com/knowledgemd/backend/commit/2944b1d6d16bd267a564c11775496c0fcd23f578))
