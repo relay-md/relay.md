@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v1.16.0 (2024-02-16)
+### Feature
+* Boiler plates for social media login ([`2944b1d`](https://github.com/knowledgemd/backend/commit/2944b1d6d16bd267a564c11775496c0fcd23f578))
+* **brand:** Clarify brand colour ([`daebfb0`](https://github.com/knowledgemd/backend/commit/daebfb0e4f879e925379ab7c5e19065faa606989))
+
+### Fix
+* Add illustration to the landing page ([`16aba5f`](https://github.com/knowledgemd/backend/commit/16aba5f86cc0bf7c8b7dabbbf3cd7365962ab2f6))
+* **logo:** Do not use class ([`cc315c5`](https://github.com/knowledgemd/backend/commit/cc315c52605fe7713d7e7bc2a410a6e9156df850))
+* **logo:** Crop image ([`38008d0`](https://github.com/knowledgemd/backend/commit/38008d04ca85fa191358bf289b31dc5be0845c21))
+* Typo ([`e866f2a`](https://github.com/knowledgemd/backend/commit/e866f2aa0fb3ec0a9077a2ed3ba3f76a95d4661e))
+
 ## v1.15.0 (2024-02-15)
 ### Feature
 * Boiler plates for social media login ([`d1eb215`](https://github.com/knowledgemd/backend/commit/d1eb2150df3adf786d4dc93e2c7d41dcc034a360))
