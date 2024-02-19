@@ -11,8 +11,9 @@
          i.fas.fa-plus
        span Create a new team
 
-   .title.is-4.mb-0 Selected Teams
-   p.block
+   .title.is-4.mb-0 Selected &amp; joined Teams
+   p Only selected and joined teams are listed below. If you are looking for a specific team, use the search!
+   p.mt-2
     .level
      .level-left
       span.text-icon
@@ -26,7 +27,7 @@
      .level-right
       .field
        p.control.has-icons-left
-         input.input(type="text" name="name" placeholder="Search" hx-post="{{url_for('search_team')}}" hx-trigger="input changed delay:500ms, search" hx-target="#team-search-results")
+         input.input.is-small(type="text" name="name" placeholder="Search" hx-post="{{url_for('search_team')}}" hx-trigger="input changed delay:500ms, search" hx-target="#team-search-results")
          span.icon.is-small.is-left
            i.fas.fa-search
    #team-search-results
