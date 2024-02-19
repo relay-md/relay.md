@@ -179,8 +179,8 @@ async def get_doc(
         return Response(result=ret_document).model_dump(by_alias=True)
     elif content_type == "text/markdown":
         # Add document id to frontmatter
-        body = document_body_repo.get_by_id(document.id)
-        body = body.decode("utf-8")
+        body_raw = document_body_repo.get_by_id(document.id)
+        body = body_raw.decode("utf-8")
         front = frontmatter.loads(body)
         front["relay-document"] = str(document.id)
         body = frontmatter.dumps(front)
