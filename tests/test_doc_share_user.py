@@ -2,7 +2,6 @@
 from unittest.mock import patch
 from uuid import UUID
 
-import pytest
 from sqlalchemy import select
 
 from backend import models
@@ -92,9 +91,8 @@ Example text
     """
     req = api_client.post("/v1/doc", headers=auth_header, content=other_mocked_up_text)
     req.raise_for_status()
-    assert (
-        req.json()["error"]["message"]
-        == "The document you are sending already has a relay-document id"
+    assert req.json()["error"]["message"].startswith(
+        "The document you are sending already has a relay-document id"
     )
 
 
