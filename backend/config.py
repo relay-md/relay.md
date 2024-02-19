@@ -21,8 +21,6 @@ class SQLAlchemyEngineOptions(BaseSettings):
 class Settings(BaseSettings):
     """General Settings"""
 
-    SECRET_KEY: str = "asfafgrzlihdgssdgn"
-
     # SQL Settings
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///default.db"
     SQLALCHEMY_ENGINE_OPTIONS: Optional[
@@ -33,6 +31,10 @@ class Settings(BaseSettings):
 
     # Admins
     ADMIN_USER_IDS: List[str] = []
+
+    # Session
+    SESSION_REDIS_URI: Optional[str] = None
+    SECRET_KEY: str = "asfafgrzlihdgssdgn"
 
     # Limit API access by means of CORS
     API_ALLOWED_ORIGINS: List[str] = ["*"]

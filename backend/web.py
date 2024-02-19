@@ -6,11 +6,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
-from starlette.middleware.sessions import SessionMiddleware
 
 from . import exceptions
 from .config import get_config
-from .database import Base, engine
 from .routes import (
     admin,
     contact,
@@ -40,10 +38,23 @@ if get_config().SENTRY_DSN:
     )
 
 # Create all tables
-Base.metadata.create_all(engine)
+
 
 app = FastAPI(openapi_url=None)
-app.add_middleware(SessionMiddleware, secret_key=get_config().SECRET_KEY)
+if get_config().SESSION_REDIS_URI:
+    from redis.asyncio import Redis
+    from redsession import ServerSessionMiddleware
+    from redsession.backend import RedisBackend
+
+    redis = Redis.from_url(get_config().SESSION_REDIS_URI)
+    app.add_middleware(
+        ServerSessionMiddleware, backend=RedisBackend(redis), secret_key="secret"
+    )
+else:
+    # In ram sessions
+    from starlette.middleware.sessions import SessionMiddleware
+
+    app.add_middleware(SessionMiddleware, secret_key=get_config().SECRET_KEY)
 
 app.mount(
     "/static",
