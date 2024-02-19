@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.16.2 (2024-02-19)
+### Fix
+* Unittests ([`fea9fc4`](https://github.com/knowledgemd/backend/commit/fea9fc449b1a28c9294d7edbce6dceb18920c2ed))
+* Catch exceptions for validation error ([`b7cd94b`](https://github.com/knowledgemd/backend/commit/b7cd94b11129429ebdb4227e4a2768a58f777316))
+* Problem with relay-to, relay_to and string, vs list ([`84d72fb`](https://github.com/knowledgemd/backend/commit/84d72fb5cefb9d1a828e9dd8e05e609b0a7c0a6a))
+* Issue when variables are empty, pull over headline ([`c0a50e8`](https://github.com/knowledgemd/backend/commit/c0a50e8fe742b689f46b28e1482ca4df2652f928))
+
 ## v1.16.1 (2024-02-16)
 ### Fix
 * Typo whitespace ([`fecb15b`](https://github.com/knowledgemd/backend/commit/fecb15b9e80aa9e47a307696c430b9f53ee8c83d))
