@@ -61,13 +61,22 @@ td.has-text-light
    .block
     .title.is-3 Team Settings
     .field.is-horizontal
-      .field-label.is-normal Description/Headline
+      .field-label.is-normal Headline
       .field-body
         .control.has-icons-left
-          input.input#team_name(type="string" placeholder="Description" name="headline" hx-post="{{url_for('update_team_headline', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#updated_team_headline")
+          input.input(type="string" placeholder="Tagline" name="headline" hx-post="{{url_for('update_team_headline', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#updated_team_headline" value="{{team.headline}}")
           span.icon.is-left
            i.fas.fa-expand
         span(id="updated_team_headline")
+     form(hx-post="{{url_for('update_team_description', team_name=team.name)}}" hx-target="#updated_team_description")
+     .field.is-horizontal
+       .field-label.is-normal Description
+       .field-body
+         .control
+           textarea.textarea(type="string" placeholder="Description" name="description") {{team.description}}
+           small.helper Markdown supported
+           span#updated_team_description
+           button.button.is-block.is-link.is-fullwidth.is-normal.m-0 Subscribe
 
     // .field.is-horizontal
     //  .field-label.is-normal Hide Team

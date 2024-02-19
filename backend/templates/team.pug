@@ -4,8 +4,11 @@
  .columns
   .column.is-8.is-offset-2
    .block
-    .title.is-1 {{team.name}}
-    .subtitle.is-5.text-icon
+    .columns
+     .column.is-half
+      .title.is-1 {{team.name}}
+      .subtitle.is-5.text-icon {{team.headline}}
+     .column.is-half.has-text-right
       {% if team.is_paid %}
       span.icon-text
         span.icon
@@ -17,40 +20,36 @@
           i.fas.fa-globe
         span Team
       {% endif %}
+      .block
+       {% if user_repo.is_member(user, team) %}
+       a(href="{{url_for('leave', team_name=team.name)}}").button.is-small
+         span.icon.is-small
+           i.fas.fa-signature
+         span Leave
+       {% else %}
+       {% if team.can(Permissions.can_join, user, membership) %}
+       a(href="{{url_for('join', team_name=team.name)}}").button.is-small
+         span.icon.is-small
+           i.fas.fa-signature
+         span Join Team
+       {% else %}
+       p.notification.is-warning.is-light You cannot join this team. You must be invited.
+       {% endif %}
+       {% endif %}
 
+       {% if user and team.user_id == user.id %}
+       a(href="{{url_for('settings', team_name=team.name)}}").button.is-warning.is-small
+        span.icon-text
+         span.icon.is-small
+          i.fas.fa-edit
+         span Admin Setting
+       {% endif %}
+
+   {% if team.description %}
    .block
-    {% if user_repo.is_member(user, team) %}
-    a(href="{{url_for('leave', team_name=team.name)}}").button
-      span.icon.is-small
-        i.fas.fa-signature
-      span Leave
-    {% else %}
-    {% if team.can(Permissions.can_join, user, membership) %}
-    a(href="{{url_for('join', team_name=team.name)}}").button
-      span.icon.is-small
-        i.fas.fa-signature
-      span Join Team
-    {% else %}
-    p.notification.is-warning.is-light You cannot join this team. You must be invited.
-    {% endif %}
-    {% endif %}
-
-    {% if user and team.user_id == user.id %}
-    a(href="{{url_for('settings', team_name=team.name)}}").button.is-warning
-     span.icon-text
-      span.icon.is-small
-       i.fas.fa-edit
-      span Admin Setting
-    {% endif %}
-
-   .block
-    .title.is-3 Description
-    .box
-     {% if team.headline %}
-     p {{team.headline}}
-     {% else %}
-     p.is-italic no description provided
-     {% endif %}
+    .box.content.p-2.m-0
+     p {{team.description | markdown | safe}}
+   {% endif %}
 
    .block
     .title.is-3 Topics

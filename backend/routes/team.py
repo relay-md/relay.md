@@ -270,6 +270,25 @@ async def update_team_headline(
     )
 
 
+@router.post("/{team_name}/description", response_class=PlainTextResponse)
+async def update_team_description(
+    request: Request,
+    description: str = Form(default=""),
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    team_repo = TeamRepo(db)
+    if not team.user_id == user.id:
+        return """<p id="validate-team-name" class="help is-danger">You cannot update the description!</p>"""
+    if len(description) > 63:
+        return (
+            """<p id="validate-team-name" class="help is-danger">Max length 63!</p>"""
+        )
+    team_repo.update(team, description=description)
+    return """<p id="validate-team-name" class="help is-success">description updated!</p>"""
+
+
 @router.post("/{team_name}/toggle/hide", response_class=PlainTextResponse)
 async def update_team_hide(
     request: Request,

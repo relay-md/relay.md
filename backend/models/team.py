@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
@@ -50,6 +50,8 @@ class Team(Base):
     )
     name: Mapped[str] = mapped_column(String(32))
     headline: Mapped[str] = mapped_column(String(64), default="", nullable=True)
+    # markdown description
+    description: Mapped[str] = mapped_column(Text, default="", nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     owner_permissions: Mapped[int] = mapped_column(
