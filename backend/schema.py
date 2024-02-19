@@ -20,6 +20,7 @@ class Error(BaseModel):
 
     code: Optional[int] = None
     type: Optional[str] = None
+    fields: Optional[List[str]] = None
     detail: Optional[dict] = None
     message: str
 

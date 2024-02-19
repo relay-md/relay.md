@@ -7,6 +7,7 @@ import urllib
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.responses import RedirectResponse
@@ -94,6 +95,17 @@ async def handle_http_exception(request: Request, exc: HTTPException):
     return JSONResponse(content=content.model_dump(exclude_none=True), status_code=200)
 
 
+async def handle_validation_error(request: Request, exc: ValidationError):
+    from .schema import Response
+
+    error = dict(
+        message=str(exc.errors()[0]["msg"]),
+        fields=[x["loc"][0] for x in exc.errors() if "loc" in x],
+    )
+    content: Response = Response(error=error)
+    return JSONResponse(content=content.model_dump(exclude_none=True), status_code=200)
+
+
 async def handle_basegateway_exception(request: Request, exc: HTTPException):
     from .schema import Response
 
@@ -158,6 +170,7 @@ async def redirect_to_login(
 def include_app(app):
     app.add_exception_handler(BaseAPIException, handle_exception)
     app.add_exception_handler(HTTPException, handle_http_exception)
+    app.add_exception_handler(ValidationError, handle_validation_error)
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     app.add_exception_handler(Exception, unhandled_exception)
 
