@@ -50,11 +50,14 @@ app.add_middleware(
 )
 
 # Rate limitations
-limiter = Limiter(
+limiter_args = dict(
     key_func=get_remote_address,
     default_limits=[get_config().RATE_LIMITS_DEFAULT],
     storage_uri=get_config().RATE_LIMITS_REDIS,
 )
+if get_config().SESSION_REDIS_URI:
+    limiter_args["storage_uri"] = get_config().SESSION_REDIS_URI
+limiter = Limiter(**limiter_args)
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 
