@@ -7,11 +7,13 @@ from starlette.responses import RedirectResponse
 
 from ...config import Settings, get_config
 from ...database import Session, get_session
-from ...exceptions import BadRequest
+from ...exceptions import BadRequest, NotAllowed
 from ...models.user import OauthProvider
 from ...repos.access_token import AccessTokenRepo
 from ...repos.newsletter import NewsletterRepo
+from ...repos.team_topic import TeamTopicRepo
 from ...repos.user import UserRepo
+from ...repos.user_team_topic import UserTeamTopicRepo
 from ...templates import templates
 from ...utils.url import get_next_url
 from . import oauth
@@ -75,6 +77,7 @@ async def onboarding_github_post(
     accept_tos: bool = Form(default=False),
     accept_privacy: bool = Form(default=False),
     accept_newsletter: bool = Form(default=False),
+    join_news_team: bool = Form(default=False),
     db: Session = Depends(get_session),
 ):
     if not accept_tos or not accept_privacy:
@@ -92,7 +95,6 @@ async def onboarding_github_post(
         email = next(filter(lambda x: x["primary"] is True, emails))
         email = email["email"]
     user_repo = UserRepo(db)
-    access_token_repo = AccessTokenRepo(db)
     user = user_repo.create_from_kwargs(
         username=username,
         email=email.lower(),
@@ -100,19 +102,43 @@ async def onboarding_github_post(
         oauth_provider=OauthProvider.GITHUB,
         profile_picture_url=github_user["avatar_url"],
     )
+
+    # Generate access token for the user session
+    access_token_repo = AccessTokenRepo(db)
     access_token = access_token_repo.get_by_kwargs(user_id=user.id)
     if not access_token:
         access_token = access_token_repo.create_from_kwargs(user_id=user.id)
+
+    # Accept newsletter
     if accept_newsletter:
         newsletter_repo = NewsletterRepo()
         try:
             newsletter_repo.subscribe(email, first_name, last_name, status="subscribed")
         except Exception:
             pass
+
+    # Automatically subscribe to some team topics
+    if join_news_team:
+        team_topic_repo = TeamTopicRepo(db)
+        user_team_topic_repo = UserTeamTopicRepo(db)
+        for subscribe_to in get_config().NEW_USER_SUBSCRIBE_TO:
+            try:
+                team_topic = team_topic_repo.from_string(subscribe_to, user)
+                user_team_topic_repo.create_from_kwargs(
+                    user_id=user.id, team_topic_id=team_topic.id
+                )
+            except (BadRequest, NotAllowed):
+                # may fail if the team topic does not exist
+                # or creation of topic is not allowed
+                pass
+
+    # Store stuff in the user session
     request.session["user_id"] = str(user.id)
     request.session["access_token"] = str(access_token.token)
+
     # Remove token from session, we don't need it anymore
     request.session.pop("token")
+
     return RedirectResponse(
         url=get_next_url(request) or "/", status_code=status.HTTP_302_FOUND
     )
