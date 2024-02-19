@@ -27,7 +27,17 @@ script
       var metadata_html = "";
 
       // iterate over relay_to
-      for (var to of metadata["relay-to"]) {
+      let relay_to = [];
+      if ("relay-to" in metadata)
+        relay_to = metadata["relay-to"];
+      else if ("relay_to" in metadata)
+        relay_to = metadata["relay_to"];
+      // TODO: ideally we would want to be sure the backend returns a list here!
+      // Users could use a string here, we need to capture that case
+      if (typeof relay_to === "string")
+        relay_to = [relay_to];
+
+      for (var to of relay_to) {
        metadata_html += `<div class="control">
           <div class="tags has-addons">
            <span class="tag is-dark">to</span>

@@ -77,7 +77,22 @@ async def post_doc(
 
     # Parse frontmatter
     front_matter = frontmatter.loads(body)
+
+    # reformat frontmatter
     front = DocumentFrontMatter(**front_matter)
+
+    """
+    # TODO: this code would make things cleaner but breaks the plugin!
+    # Add the front mattter attributes the way they should be
+    for k, v in front.model_dump(by_alias=True).items():
+        if v:
+            front_matter[k] = v
+    # Remove the version that shouldn't be used
+    for k in front.model_dump(by_alias=False):
+        front_matter.metadata.pop(k, None)
+    # store the updated body
+    body = frontmatter.dumps(front_matter)
+    """
 
     if not filename and not front.relay_filename:
         raise exceptions.BadRequest("Missing filename or relay-filename property!")
@@ -97,7 +112,7 @@ async def post_doc(
     # if the document already has an id, let's raise
     if front.relay_document:
         raise exceptions.BadRequest(
-            "The document you are sending already has a relay-document id"
+            "The document you are sending already has a relay-document id, use PUT instead"
         )
 
     # Checksum
