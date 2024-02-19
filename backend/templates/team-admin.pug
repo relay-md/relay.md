@@ -73,7 +73,7 @@ td.has-text-light
        .field-label.is-normal Description
        .field-body
          .control
-           textarea.textarea(type="string" placeholder="Description" name="description") {{team.description}}
+           textarea.textarea(type="string" placeholder="Description" name="description") {{team.description or ""}}
            small.helper Markdown supported
            span#updated_team_description
            button.button.is-block.is-link.is-fullwidth.is-normal.m-0 Subscribe
