@@ -25,7 +25,9 @@ def test_public_create_team_topic(
     )
     create_team_topic("testing@public-test", eve)
 
-    team.public_permissions = DEFAULT_PUBLIC_PERMISSIONS - Permissions.can_create_topics
+    team.public_permissions = (
+        DEFAULT_PUBLIC_PERMISSIONS & ~Permissions.can_create_topics
+    )
     dbsession.commit()
 
     with pytest.raises(NotAllowed):
@@ -47,19 +49,20 @@ def test_public_post(
     patch_document_body_update,
 ):
     team = create_team(
-        "public-test", public_permissions=DEFAULT_PUBLIC_PERMISSIONS.value
+        "public-test",
+        public_permissions=DEFAULT_PUBLIC_PERMISSIONS & Permissions.can_post,
     )
     upload_document("foobar", auth_header, "testing@public-test")
     upload_document("foobar", eve_auth_header, "testing@public-test")
 
-    team.public_permissions = DEFAULT_PUBLIC_PERMISSIONS - Permissions.can_post
+    team.public_permissions = DEFAULT_PUBLIC_PERMISSIONS & ~Permissions.can_post
     dbsession.commit()
 
     upload_document("foobar", auth_header, "testing@public-test")
     with pytest.raises(ValueError) as exc:
         upload_document("foobar", eve_auth_header, "testing@public-test")
     assert exc.value.args[0] == 403
-    assert exc.value.args[1].startswith("You are not allowed to post to")
+    assert exc.value.args[1].startswith("You are not allowed!")
 
 
 @patch(
@@ -69,6 +72,7 @@ def test_public_post(
 def test_public_modify(
     mock,
     dbsession,
+    other_account,
     eve_auth_header,
     auth_header,
     create_team,
@@ -77,9 +81,10 @@ def test_public_modify(
     patch_document_body_create,
     patch_document_body_update,
 ):
-    team = create_team(
+    create_team(
         "public-test",
-        public_permissions=(DEFAULT_PUBLIC_PERMISSIONS | Permissions.can_modify).value,
+        public_permissions=(DEFAULT_PUBLIC_PERMISSIONS & ~Permissions.can_modify),
+        user_id=other_account.id,
     )
     document = upload_document("foobar", eve_auth_header, "testing@public-test")
 
@@ -95,18 +100,6 @@ def test_public_modify(
             "testing@public-test",
         )
     assert exc.value.args[0] == 403
-    assert exc.value.args[1].startswith("Updating someone else document is not allowed")
-
-    team.public_permissions = DEFAULT_PUBLIC_PERMISSIONS
-    dbsession.commit()
-
-    # fails now
-    with pytest.raises(ValueError) as exc:
-        update_document(
-            document["relay-document"],
-            "foobar3",
-            eve_auth_header,
-            "testing@public-test",
-        )
-    assert exc.value.args[0] == 403
-    assert exc.value.args[1].startswith("You are not allowed to modify posts in")
+    assert exc.value.args[1].startswith(
+        "You are not allowed to do what you are trying to do!"
+    )

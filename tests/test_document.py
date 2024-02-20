@@ -2,7 +2,6 @@
 from unittest.mock import patch
 from uuid import UUID
 
-import pytest
 from sqlalchemy import select
 
 from backend import models
@@ -99,52 +98,3 @@ Example text
         req.json()["error"]["message"]
         == "The document you are sending already has a relay-document id"
     )
-
-
-def test_document_put(
-    other_auth_header,
-    auth_header,
-    api_client,
-    patch_document_body_update,
-    patch_document_body_create,
-):
-    original_doc = """---
-relay-filename: example.md
-relay-to:
- - mytopic@myteam
----
-
-Example text
-"""
-    req = api_client.post("/v1/doc", headers=auth_header, content=original_doc)
-    ret = req.json()
-    doc_id = ret["result"]["relay-document"]
-
-    # lets add the id to the doc
-    original_doc_pars = original_doc.split("\n")
-    updated_doc = "\n".join(
-        [
-            original_doc_pars[0],
-            f"relay-document: {doc_id}",
-            *original_doc_pars[1:],
-            "Additional text",
-        ]
-    )
-
-    # Now trying to put as wrong user
-    req = api_client.put(
-        f"/v1/doc/{doc_id}", headers=other_auth_header, content=updated_doc
-    )
-    req.raise_for_status()
-    assert (
-        req.json()["error"]["message"]
-        == "Updating someone else document is not allowed currently!"
-    )
-
-    # Now trying to put as correct user
-    req = api_client.put(f"/v1/doc/{doc_id}", headers=auth_header, content=updated_doc)
-    req.raise_for_status()
-    assert req.json()["result"]["relay-document"] == doc_id
-    assert req.json()["result"]["relay-title"] == "Example text"
-
-    assert "Additional text" in patch_document_body_update.call_args.args[1]

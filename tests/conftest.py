@@ -19,11 +19,6 @@ Settings.model_config = SettingsConfigDict(  # noqa
 # noqa
 from backend import database, models, repos  # noqa
 from backend.api import app as api_app
-from backend.repos.document import DocumentRepo
-from backend.repos.team import TeamRepo
-from backend.repos.team_topic import TeamTopicRepo
-from backend.repos.user import UserRepo
-from backend.repos.user_team_topic import UserTeamTopicRepo
 from backend.web import app as web_app
 
 
@@ -183,27 +178,32 @@ def default_team_topics(dbsession, account):
 
 @pytest.fixture()
 def document_repo(dbsession):
-    return DocumentRepo(dbsession)
+    return repos.DocumentRepo(dbsession)
 
 
 @pytest.fixture()
 def user_repo(dbsession):
-    return UserRepo(dbsession)
+    return repos.UserRepo(dbsession)
 
 
 @pytest.fixture()
 def team_repo(dbsession):
-    return TeamRepo(dbsession)
+    return repos.TeamRepo(dbsession)
 
 
 @pytest.fixture()
 def team_topic_repo(dbsession):
-    return TeamTopicRepo(dbsession)
+    return repos.TeamTopicRepo(dbsession)
 
 
 @pytest.fixture
 def user_team_topic_repo(dbsession):
-    return UserTeamTopicRepo(dbsession)
+    return repos.UserTeamTopicRepo(dbsession)
+
+
+@pytest.fixture
+def user_team_repo(dbsession):
+    return repos.UserTeamRepo(dbsession)
 
 
 @pytest.fixture
@@ -246,7 +246,9 @@ def subscribe_to_team_topic(account, team_topic_repo, user_team_topic_repo):
 @pytest.fixture
 def create_team(team_repo, account):
     def func(name: str, **kwargs):
-        return team_repo.create_from_kwargs(name=name, user_id=account.id, **kwargs)
+        if "user_id" not in kwargs:
+            kwargs["user_id"] = account.id
+        return team_repo.create_from_kwargs(name=name, **kwargs)
 
     return func
 
@@ -255,6 +257,16 @@ def create_team(team_repo, account):
 def create_team_topic(team_topic_repo, account):
     def func(name: str, from_account=account):
         return team_topic_repo.from_string(name, from_account)
+
+    return func
+
+
+@pytest.fixture
+def join_team(user_team_repo):
+    def func(team: models.Team, user: models.User, **kwargs):
+        return user_team_repo.create_from_kwargs(
+            team_id=team.id, user_id=user.id, **kwargs
+        )
 
     return func
 

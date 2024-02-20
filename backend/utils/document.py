@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
 from collections import namedtuple
-from typing import List
 
 from .. import exceptions
 from ..database import Session
 from ..models.permissions import Permissions
-from ..models.team_topic import TeamTopic
 from ..models.user import User
 from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
@@ -34,44 +32,6 @@ def get_title_from_body(body: str) -> str:
         return next(filter(line_allowed_for_headline, lines))
     except StopIteration:
         return "unknown"
-
-
-def check_document_read_permissions(
-    db: Session, user: User, team_topics: List[TeamTopic]
-):
-    user_repo = UserRepo(db)
-    for team_topic in team_topics:
-        team = team_topic.team
-        membership = user_repo.is_member(user, team_topic.team)
-
-        if not team.can(Permissions.can_post, user, membership):
-            raise exceptions.NotAllowed(
-                f"You are not allowed to read from {team_topic.team}!"
-            )
-
-
-def check_document_post_permissions(db: Session, user: User, shareables: Shareables):
-    user_repo = UserRepo(db)
-    for team_topic in shareables.team_topics:
-        team = team_topic.team
-        membership = user_repo.is_member(user, team_topic.team)
-
-        if not team.can(Permissions.can_post, user, membership):
-            raise exceptions.NotAllowed(
-                f"You are not allowed to post to {team_topic.team}!"
-            )
-
-
-def check_document_modify_permissions(db: Session, user: User, shareables: Shareables):
-    user_repo = UserRepo(db)
-    for team_topic in shareables.team_topics:
-        team = team_topic.team
-        membership = user_repo.is_member(user, team_topic.team)
-
-        if not team.can(Permissions.can_modify, user, membership):
-            raise exceptions.NotAllowed(
-                f"You are not allowed to modify posts in {team_topic.team}!"
-            )
 
 
 def get_shareables(db: Session, front: DocumentFrontMatter, user: User) -> Shareables:

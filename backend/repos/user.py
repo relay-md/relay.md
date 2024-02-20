@@ -56,14 +56,17 @@ class UserRepo(DatabaseAbstractRepository):
             ).filter(TeamTopic.team_id == team.id)
         )
 
-    def has_subscribed_to_topic_in_team(self, user: User, team_topic: TeamTopic):
+    def has_subscribed_to_topic_in_team(
+        self, user: User, team_topic: TeamTopic
+    ) -> UserTeamTopic:
         return self._db.scalar(
             select(
+                UserTeamTopic,
                 exists().where(
                     and_(
                         UserTeamTopic.id == team_topic.id,
                         UserTeamTopic.user_id == user.id,
                     )
-                )
+                ),
             )
         )

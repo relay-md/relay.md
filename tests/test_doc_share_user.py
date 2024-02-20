@@ -2,7 +2,6 @@
 from unittest.mock import patch
 from uuid import UUID
 
-import pytest
 from sqlalchemy import select
 
 from backend import models
@@ -44,6 +43,7 @@ def test_document_upload(
 
     req = api_client.get(f"/v1/doc/{doc_id}", headers=auth_header)
     req.raise_for_status(), req.text
+    assert "error" not in req.json()
 
     # check doc has been access
     assert dbsession.scalar(
@@ -135,7 +135,7 @@ Example text
     req.raise_for_status()
     assert (
         req.json()["error"]["message"]
-        == "Updating someone else document is not allowed currently!"
+        == "You are not allowed to do what you are trying to do!"
     )
 
     # Now trying to put as correct user

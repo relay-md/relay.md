@@ -6,8 +6,8 @@ from typing import List
 import frontmatter
 from fastapi import Depends, Request, Security
 from fastapi.responses import PlainTextResponse
-from backend.repos.team_topic import TeamTopicRepo
 
+from backend.repos.team_topic import TeamTopicRepo
 from backend.repos.user_team_topic import UserTeamTopicRepo
 
 from ... import __version__, exceptions
@@ -17,7 +17,6 @@ from ...models.user import User
 from ...repos.document import DocumentRepo
 from ...repos.document_access import DocumentAccessRepo
 from ...repos.document_body import DocumentBodyRepo
-from ...repos.user import UserRepo
 from ...schema import (
     DocumentFrontMatter,
     DocumentIdentifierResponse,
@@ -25,19 +24,16 @@ from ...schema import (
     DocumentResponse,
     DocumentShareType,
     Response,
+    SuccessResponse,
     VersionResponse,
 )
-from ...utils.document import (
-    check_document_modify_permissions,
-    check_document_post_permissions,
-    check_document_read_permissions,
-    get_shareables,
-    get_title_from_body,
-)
+from ...utils.document import get_shareables, get_title_from_body
 from . import (
+    check_document_post_permissions,
     get_access_token,
     get_user_owned_document,
-    get_user_shared_document,
+    get_user_shared_document_for_modify,
+    get_user_shared_document_for_read,
     optional_authenticated_user,
     require_authenticated_user,
     router,
@@ -135,12 +131,10 @@ async def post_doc(
 )
 async def get_doc(
     request: Request,
-    document: Document = Depends(get_user_shared_document),
+    document: Document = Depends(get_user_shared_document_for_read),
     db: Session = Depends(get_session),
     user: User = Depends(optional_authenticated_user),
 ):
-    if not document.is_public:
-        check_document_read_permissions(db, user, document.team_topics)
     document_body_repo = DocumentBodyRepo()
     document_access_repo = DocumentAccessRepo(db)
 
@@ -160,7 +154,9 @@ async def get_doc(
             filesize=document.filesize,
             embeds=document.embeds,
         )
-        return Response(result=ret_document).model_dump(by_alias=True)
+        return Response(result=ret_document).model_dump(
+            by_alias=True, exclude_none=True
+        )
     elif content_type == "text/markdown":
         # Add document id to frontmatter
         body = document_body_repo.get_by_id(document.id)
@@ -176,16 +172,21 @@ async def get_doc(
         raise exceptions.BadRequest(f"Unsupported content-type: {content_type}")
 
 
-@router.put("/doc/{id}", tags=["v1"])
+@router.put(
+    "/doc/{id}",
+    tags=["v1"],
+    response_model=Response[DocumentResponse],
+    response_model_exclude_unset=True,
+    response_model_by_alias=True,
+)
 async def put_doc(
     request: Request,
-    document: Document = Depends(get_user_owned_document),
+    document: Document = Depends(get_user_shared_document_for_modify),
     user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
 ):
     document_repo = DocumentRepo(db)
     document_body_repo = DocumentBodyRepo()
-    UserRepo(db)
 
     body_raw = await request.body()
     body = body_raw.decode("utf-8")
@@ -200,7 +201,6 @@ async def put_doc(
 
     # Parse relay_to as team_topics
     shareables = get_shareables(db, front, user)
-    check_document_modify_permissions(db, user, shareables)
 
     # Checksum
     hashing_obj = hashlib.sha256()
@@ -231,6 +231,16 @@ async def put_doc(
         filesize=document.filesize,
     )
     return dict(result=ret_document)
+
+
+@router.delete("/doc/{id}", tags=["v1"], response_model=Response[SuccessResponse])
+async def delete_doc(
+    document: Document = Depends(get_user_owned_document),
+    db: Session = Depends(get_session),
+):
+    document_repo = DocumentRepo(db)
+    document_repo.delete(document)
+    return dict(result=dict(success=True))
 
 
 @router.get(

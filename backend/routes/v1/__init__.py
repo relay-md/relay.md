@@ -8,10 +8,13 @@ from fastapi.security import APIKeyHeader
 from ... import exceptions
 from ...database import Session, get_session
 from ...models.document import Document
+from ...models.permissions import Permissions
 from ...models.user import User
 from ...repos.access_token import AccessToken, AccessTokenRepo
 from ...repos.document import DocumentRepo
 from ...repos.user import UserRepo
+from ...repos.user_team import UserTeamRepo
+from ...utils.document import Shareables
 
 router = APIRouter(prefix="/v1")
 
@@ -46,7 +49,7 @@ async def get_optional_access_token(
         pass
     # We need this optional autentication to be able to share documents
     # without requiring a login
-    return
+    return None
 
 
 async def require_authenticated_user(
@@ -75,22 +78,47 @@ async def get_document(id: UUID, db: Session = Depends(get_session)) -> Document
 
 async def get_user_shared_document(
     id: UUID,
+    permission: Permissions,
+    db: Session,
+    user: User,
+    document: Document,
+) -> Document:
+    # Lets go through the team/topics and check perms individually
+    UserRepo(db)
+    if user and document.user_id == user.id:
+        return document
+    user_team_repo = UserTeamRepo(db)
+    for team_topic in document.team_topics:
+        membership = user_team_repo.get_by_kwargs(
+            user_id=user.id, team_id=team_topic.team_id
+        )
+        if team_topic.team.can(permission, user, membership):
+            return document
+    raise exceptions.NotAllowed("You are not allowed to do what you are trying to do!")
+
+
+async def get_user_shared_document_for_read(
+    id: UUID,
     db: Session = Depends(get_session),
     user: User = Depends(optional_authenticated_user),
     document: Document = Depends(get_document),
 ) -> Document:
+    # Everyone can read public documents
     if document.is_public:
         return document
-    user_repo = UserRepo(db)
-    for team_topic in document.team_topics:
-        # TODO: invetigate if we can avoid the loop by a more powerful query
-        if user_repo.has_subscribed_to_topic_in_team(user, team_topic):
-            return document
-    if not user or document.user_id != user.id:
-        raise exceptions.NotAllowed(
-            "Updating someone else document is not allowed currently!"
-        )
-    return document
+
+    return await get_user_shared_document(id, Permissions.can_read, db, user, document)
+
+
+async def get_user_shared_document_for_modify(
+    id: UUID,
+    db: Session = Depends(get_session),
+    user: User = Depends(optional_authenticated_user),
+    document: Document = Depends(get_document),
+) -> Document:
+    return await get_user_shared_document(
+        id, Permissions.can_modify, db, user, document
+    )
 
 
 async def get_user_owned_document(
@@ -101,6 +129,19 @@ async def get_user_owned_document(
 ) -> Document:
     if document.user_id != user.id:
         raise exceptions.NotAllowed(
-            "Updating someone else document is not allowed currently!"
+            "Deleting someone else's document is not allowed currently!"
         )
     return document
+
+
+def check_document_post_permissions(db: Session, user: User, shareables: Shareables):
+    user_repo = UserRepo(db)
+    for team_topic in shareables.team_topics:
+        team = team_topic.team
+        membership = user_repo.is_member(user, team_topic.team)
+
+        if team.can(Permissions.can_post, user, membership):
+            return
+    # If we have team_topics and we get to this point, we need to raise
+    if shareables.team_topics:
+        raise exceptions.NotAllowed("You are not allowed!")
