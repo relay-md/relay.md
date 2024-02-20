@@ -42,3 +42,10 @@ stripe>=7.9.0,<7.10
 
 sentry-sdk[fastapi]
 xmltodict==0.13.0
+
+pycountry
+
+# Celery
+redis>=4.4.0rc4
+celery==5.2.2
+flower==1.2.0

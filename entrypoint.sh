@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# fail script when command fails and print the commands and arguments
+set -xe
+
 export APP_RUN=${APP_RUN:=api}
 export LOG_LEVEL=${APP_LOGLEVEL:=critical}
 

@@ -18,6 +18,23 @@ class SQLAlchemyEngineOptions(BaseSettings):
     max_overflow: Optional[int] = 64
 
 
+class CelerySettings(BaseSettings):
+    """Celery Configurations
+
+    Allows to specify the BROKER_URL and RESULT_BACKEND
+    """
+
+    broker_url: str = "redis://localhost:6379"
+    result_backend: str = "redis://localhost:6379"
+
+    beat_schedule: dict = {
+        # "check": {
+        #     "task": "backend.tasks.regular",
+        #     "schedule": 60 * 60 * 24,  # ever day once
+        # },
+    }
+
+
 class Settings(BaseSettings):
     """General Settings"""
 
@@ -28,6 +45,9 @@ class Settings(BaseSettings):
     ] = SQLAlchemyEngineOptions()
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ECHO: bool = False
+
+    # Celery
+    CELERY_CONF: CelerySettings = CelerySettings()
 
     # Admins
     ADMIN_USER_IDS: List[str] = []

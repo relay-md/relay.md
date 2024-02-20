@@ -19,6 +19,7 @@ clis = [
     "backend.cli.document_body",
     "backend.cli.access_token",
     "backend.cli.asset",
+    "backend.cli.worker",
 ]
 
 for cli in clis:
