@@ -24,20 +24,14 @@ def get_session() -> Iterator[Session]:
     if _db is not None:
         yield _db
     else:
-        db = scoped_session(SessionLocal)
-        try:
-            yield db  # type: ignore
-        finally:
-            db.close()
+        with scoped_session(SessionLocal)() as session:
+            yield session
 
 
 engine_kwargs = {}
-if get_config().SQLALCHEMY_ENGINE_OPTIONS:
-    engine_kwargs = {
-        k: v
-        for k, v in get_config().SQLALCHEMY_ENGINE_OPTIONS.model_dump().items()
-        if v
-    }
+engine_options = get_config().SQLALCHEMY_ENGINE_OPTIONS
+if engine_options:
+    engine_kwargs = {k: v for k, v in engine_options.model_dump().items() if v}
 
     # Fine tune for sqlite which is used primarily in unittests
     if "sqlite" in get_config().SQLALCHEMY_DATABASE_URI:
