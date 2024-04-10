@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  redis:
+    image: redis
+    environment:
+  minio:
+    image: minio
+    environment:
+  mariadb:
+    image: mariadb
+    environment:
+  api:
+    build: .
+    environment:
+      - "5001:5000"
+  web:
+    build: .
+    environment:
+    ports:
+      - "5000:5000"
