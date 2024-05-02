@@ -4,12 +4,14 @@ from typing import Optional
 from fastapi import Depends, Request
 
 from ..database import Session, get_session
-from ..repos.user import User, UserRepo
+from ..repos.user import User
 
 
 def get_optional_user(
     request: Request, db: Session = Depends(get_session)
 ) -> Optional[User]:
+    from ..repos.user import UserRepo
+
     user_id = request.session.get("user_id")
     if not user_id:
         return None
@@ -21,6 +23,7 @@ def require_user(
     request: Request, db: Session = Depends(get_session)
 ) -> Optional[User]:
     from ..exceptions import LoginRequiredException
+    from ..repos.user import UserRepo
 
     user_id = request.session.get("user_id")
     if not user_id:

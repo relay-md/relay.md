@@ -4,15 +4,20 @@
  .columns
   .column.is-8.is-offset-2
    section.m-3
-    h1.title.is-1 Installing the relay.md Obisidan plugin
-    p.subtitle You can install this plugin from the community plugins, manually,
+    .title.has-text-primary.has-text-weight-bold Installing the relay.md Obisidan plugin
+    .subtitle.has-text-grey You can install this plugin from the community plugins, manually,
      | or using the BRAT plugin. Please note that in order to use the plugin, you
      | need an account on relay.md and have to obtain your access key from the
      | profile page.
 
+    .has-text-centered
+      a(href="https://github.com/relay-md/relay-md-obsidian-plugin")
+        img(src="https://gh-card.dev/repos/relay-md/relay-md-obsidian-plugin.svg")
+
    .card.block
     .card-header
-     .card-header-title Installing from community plugins
+      .card-header-title Installing from community Plugins
+       strong.has-text-danger   (recommended)
     .card-content
      p.block The
       span.tag.is-light relay.md
@@ -20,7 +25,7 @@
       | either search for it in Obsidian, or simply click the button below to
       | have the plugin screen opened and relay.md pre-selected.
      p.has-text-centered.block
-      a.button.is-info.is-medium.is-rounded(href="obsidian://show-plugin?id=relay-md") Relay.md Plugin in Obsidian
+      a.button.is-primary.is-medium.is-rounded(href="obsidian://show-plugin?id=relay-md") Relay.md Plugin in Obsidian
 
    .card.block
     .card-header
@@ -45,21 +50,19 @@
       .list-item
        .list-item-image
         .tag.is-dark 3.
-       | Click the&nbsp;
-       tt.is-light.button(disabled) Add Plugin
-       |&nbsp; button
-      .list-item
-       .list-item-image
-        .tag.is-dark 4.
-       | Navigate to Community Plugins in Obsidian settings, click the &nbsp;
-       span.icon-text.is-small
-        span.icon
-         i.fas.fa-sync
-        span Refresh
-       | &nbsp;button, find
-       span.tag.is-light
-        tt relay.md
-       |, and enable it.
+       div
+        | Navigate to Community Plugins in Obsidian settings, click the 
+        span.icon-text.is-small
+         span.icon
+          i.fas.fa-sync
+         span Refresh
+        |  button, find
+        span.tag.is-light
+         tt relay.md
+        |, and enable it.
+        span.tag.is-light
+         tt relay.md
+        |, and enable it.
 
    .card.block
     .card-header
@@ -74,13 +77,13 @@
       .list-item
        .list-item-image
         .tag.is-dark 2.
-       | Find the folder named&nbsp;
+       | Find the folder named 
        tt.tag.is-light .obsidian/plugins
-       | &nbsp;in your vault and open it.
+       |  in your vault and open it.
       .list-item
        .list-item-image
         .tag.is-dark 3.
-       | In that folder, create a new folder named&nbsp;
+       | In that folder, create a new folder named 
        tt.tag.is-light relay-md
       .list-item
        .list-item-image
@@ -90,12 +93,12 @@
        .list-item-image
         .tag.is-dark 5.
        div
-        | Navigate to Community Plugins in Obsidian settings, click the&nbsp;
+        | Navigate to Community Plugins in Obsidian settings, click the 
         span.icon-text.is-small
          span.icon
           i.fas.fa-sync
          span Refresh
-        | &nbsp;button, find
+        |  button, find
         span.tag.is-light
          tt relay.md
         |, and enable it.

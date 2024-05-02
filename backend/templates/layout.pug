@@ -11,20 +11,22 @@ html
   meta(name="description" content="Relay.md revolutionizes team collaboration by seamlessly merging the power of Obsidian, the markdown-based knowledge platform, with effortless document sharing. Our platform empowers Obsidian users to communicate and share markdown documents with members of their teams. By integrating with third-party platforms, Relay.md expands the reach beyond the Obsidian user base, ensuring wider accessibility for shared documents. Real-time collaboration and editing functionalities elevate the experience, making Relay.md the ultimate solution for team collaboration on markdown files.")
 
   meta(property='og:title' content='Relay.md: Share your markdown documents')
+  meta(property='og:type' content='website')
   meta(property='og:description' content='Simple collaboration with markdown. Obsidian plugin included')
-  meta(property='og:image' content="{{ url_for('static', path='img/logo-navbar.svg') }}")
+  meta(property='og:image' content="{{ url_for('static', path='img/illustration-social.png') }}")
   meta(property='og:url' content='https://relay.md')
+  meta(property='og:site_name' content='Relay.md')
 
-  // TODO: as soon as we have a Twitter account
-  // meta(name='twitter:title' content='Add title here')
-  // meta(name='twitter:description' content='Add description here')
-  // meta(name='twitter:url' content='https://your-website.com/twitter-image.png')
-  // meta(name='twitter:card' content='summary')
+  meta(name='twitter:title' content='Relay.md: Share your markdown documents')
+  meta(name='twitter:description' content='Simple collaboration with markdown. Obsidian plugin included')
+  meta(name='twitter:url' content='https://relay.md')
+  meta(name='twitter:card' content='summary')
+  meta(name='twitter:image' content="{{ url_for('static', path='img/illustration-social.png') }}")
 
   link#favicon(rel='icon' type='image/x-icon' href='/static/img/favicon.ico')
   link(href="{{ url_for('static', path='css/main.css') }}" rel='stylesheet')
 
-  title simple, efficient communication using markdown
+  title Multiplayer Obsidian 🎉
 
  body
   {% include "navbar.pug" %}
@@ -32,18 +34,16 @@ html
   {% include "footer.pug" %}
 
  script(src="{{ url_for('static', path='js/main.js') }}")
- {% if config.MATOMO_URI and config.MATOMO_SITE_ID %}
- script.
-  var _paq = window._paq = window._paq || [];
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="{{config.MATOMO_URI}}";
-    _paq.push(['setTrackerUrl', u+'matomo.php']);
-    _paq.push(['setSiteId', '{{config.MATOMO_SITE_ID}}']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-  })();
+ {% if config.PLAUSIBLE_URI and config.PLAUSIBLE_DATA_DOMAIN %}
+ script(defer='', data-domain='{{config.PLAUSIBLE_DATA_DOMAIN}}', src='{{config.PLAUSIBLE_URI}}')
  {% endif %}
+ script.
+  {% if config.MAUTIC_URL %}
+  (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
+      w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
+      m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','{{config.MAUTIC_URL}}','mt');
+  mt('send', 'pageview');
+  {% endif %}
 {% block javascript %}
 {% endblock %}

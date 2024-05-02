@@ -31,5 +31,7 @@ class Asset(Base):
     filesize: Mapped[int] = mapped_column(BigInteger())
     checksum_sha256: Mapped[str] = mapped_column(String(length=64), nullable=True)
 
+    deleted_at: Mapped[datetime] = mapped_column(nullable=True)
+
     def __repr__(self):
         return f"<{self.__class__.__name__}: {self.filename}>"

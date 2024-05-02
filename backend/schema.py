@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 import enum
+from datetime import datetime
 from typing import Generic, List, Optional, TypeVar, Union
 from uuid import UUID
 
@@ -20,6 +20,7 @@ class Error(BaseModel):
 
     code: Optional[int] = None
     type: Optional[str] = None
+    fields: Optional[List[str]] = None
     detail: Optional[dict] = None
     message: str
 
@@ -134,3 +135,10 @@ class AssetReponse(BaseModel):
     checksum_sha256: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserResponse(BaseModel):
+    id: UUID
+    username: str
+    name: str
+    email: str

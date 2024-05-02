@@ -11,12 +11,11 @@ from ..config import Settings, get_config
 from ..database import Session, get_session
 from ..models.permissions import Permissions
 from ..repos.team import Team, TeamRepo
-from ..repos.team_topic import TeamTopicRepo
 from ..repos.user import UserRepo
 from ..repos.user_team import UserTeamRepo
 from ..templates import templates
 from ..utils.team import get_team
-from ..utils.user import User, require_user
+from ..utils.user import User, get_optional_user, require_user
 
 router = APIRouter(prefix="/team")
 
@@ -44,10 +43,10 @@ async def join(
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
-    repo = UserTeamRepo(db)
+    user_team_repo = UserTeamRepo(db)
     if not team.can(Permissions.can_join, user):
         raise exceptions.NotAllowed(f"You are not allowed to join team {team_name}!")
-    repo.add_member(user_id=user.id, team_id=team.id)
+    user_team_repo.add_member(user=user, team=team)
     return RedirectResponse(url=request.url_for("show_team", team_name=team_name))
 
 
@@ -84,11 +83,9 @@ async def invite_user(
             f"You are not allowed to invite to team {team_name}!"
         )
     user_team_repo = UserTeamRepo(db)
-    if user_team_repo.count(team_id=team.id) >= team.seats:
-        raise exceptions.NotAllowed("No seats left.")
     # only add if not already added
     if not user_team_repo.get_by_kwargs(user_id=new_user.id, team_id=team.id):
-        user_team_repo.add_member(user_id=new_user.id, team_id=team.id)
+        user_team_repo.add_member(user=new_user, team=team)
     return RedirectResponse(url=request.url_for("settings", team_name=team_name))
 
 
@@ -237,7 +234,7 @@ async def settings_user_search(
 async def team_create_validate_team_name(
     request: Request,
     team_name: str = Form(default=""),
-    user: User = Depends(require_user),
+    user: User = Depends(get_optional_user),
     db: Session = Depends(get_session),
 ):
     team_repo = TeamRepo(db)
@@ -304,48 +301,33 @@ async def update_team_hide(
     return """<p id="validate-team-name" class="help is-success">Team updated!</p>"""
 
 
-@router.post("/{team_name}/topic/create", response_class=PlainTextResponse)
-async def create_topic_htx(
+@router.post("/{team_name}/seats", response_class=PlainTextResponse)
+async def update_team_seats(
     request: Request,
-    topic: str = Form(default=False),
+    seats: int = Form(default=0),
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
-    TeamRepo(db)
-    if not team.user_id == user.id:
-        return """<p id="validate-team-name" class="help is-danger">You cannot update the headline!</p>"""
-    team_topic_repo = TeamTopicRepo(db)
-    try:
-        team_topic_repo.from_string(f"{topic}@{team.name}", user)
-    except exceptions.BaseAPIException as exc:
-        return f"""<p id="validate-team-name" class="help is-danger">{exc}!</p>"""
-    return """<p id="validate-team-name" class="help is-success">Topic Created!</p>"""
+    raise NotImplementedError("This endpoint is unavailable in open source version")
 
 
-@router.get("/{team_name}/api/topic/list")
-async def api_list_topics_in_team(
+@router.get("/{team_name}/billing")
+async def team_billing(
+    request: Request,
+    team_name: str,
+    team: Team = Depends(get_team),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_session),
+):
+    raise NotImplementedError("This endpoint is unavailable in open source version")
+
+
+@router.get("/{team_name}/billing/subscription/cancel")
+async def cancel_subscription(
     request: Request,
     team: Team = Depends(get_team),
     user: User = Depends(require_user),
     db: Session = Depends(get_session),
 ):
-    user_repo = UserRepo(db)
-    topics = user_repo.get_subscriptions(user=user, team=team)
-    ret = list()
-    for topic_with_subscription in topics:
-        topic = topic_with_subscription[0]
-        subscribed = topic_with_subscription[1]
-        if subscribed:
-            toggle_link = request.url_for("unsubscribe", team_topic_name=topic.name)
-        else:
-            toggle_link = request.url_for("subscribe", team_topic_name=topic.name)
-        ret.append(
-            dict(
-                name=topic.name,
-                id=topic.id,
-                subscribed=subscribed,
-                toggle_url=str(toggle_link),
-            )
-        )
-    return ret
+    raise NotImplementedError("This endpoint is unavailable in open source version")

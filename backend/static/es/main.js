@@ -196,7 +196,9 @@ function hasNativeDarkPrefersColorScheme() {
 async function get_document(id) {
     let base_url = "https://api.relay.md/v1/doc/";
     // For development purpose only:
-    // base_url = "http://localhost:5001/v1/doc/";
+    if (window.location.hostname === "localhost") {
+        base_url = "http://localhost:5001/v1/doc/";
+    }
     // access token is stored in the document itself, not the static file
     let access_token = document.getElementById("access_token").innerHTML;
     const response = await fetch(base_url + id, {

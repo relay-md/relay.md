@@ -13,6 +13,7 @@ from ...exceptions import BadRequest, NotAllowed, NotFound
 from ...models.document import Document
 from ...models.user import User
 from ...repos.asset import AssetContentRepo, AssetRepo
+from ...repos.team import TeamRepo
 from ...repos.user import UserRepo
 from ...schema import AssetReponse, Response, SuccessResponse
 from . import get_document, require_authenticated_user, router
@@ -32,6 +33,8 @@ async def post_asset(
     user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
 ):
+    """The id references the document id so the asset is linked to the document
+    that uses it!"""
     content_type = request.headers.get("content-type", "application/octet-stream")
     if content_type != "application/octet-stream":
         raise BadRequest("Unsupported content-type! Requires application/octet-stream")
@@ -53,23 +56,28 @@ async def post_asset(
     asset = asset_repo.get_by_kwargs(
         document_id=document.id,
         filename=filename,
+        deleted_at=None,
     )
-    if not asset:
-        asset = asset_repo.create_from_kwargs(
-            user_id=user.id,
-            document_id=document.id,
-            filename=filename,
-            filesize=len(body),
-            checksum_sha256=sha256,
+    if asset:
+        raise BadRequest(
+            "An asset witht hat filename is already tied to the document. Please use PUT instead to update the asset"
         )
-        asset_content_repo = AssetContentRepo()
-        asset_content_repo.create(asset.id, body)
-    else:
-        if asset.checksum_sha256 != sha256:
-            # file has changed, updated it
-            asset_content_repo = AssetContentRepo()
-            asset_content_repo.create(asset.id, body)
-            asset = asset_repo.update(asset, filesize=len(body), checksum_sha256=sha256)
+
+    # add size to teams
+    team_repo = TeamRepo(db)
+    for team_topic in document.team_topics:
+        team_repo.add_used_storage(team_topic.team, len(body))
+
+    asset = asset_repo.create_from_kwargs(
+        user_id=user.id,
+        document_id=document.id,
+        filename=filename,
+        filesize=len(body),
+        checksum_sha256=sha256,
+    )
+    asset_content_repo = AssetContentRepo()
+    asset_content_repo.create(asset.id, body)
+
     return dict(result=AssetReponse.from_orm(asset))
 
 
@@ -99,10 +107,18 @@ async def put_asset(
     asset_repo = AssetRepo(db)
     asset = asset_repo.get_by_kwargs(
         id=id,
+        deleted_at=None,
     )
     if not asset:
-        raise NotFound()
+        raise NotFound("Asset not found")
     if asset.checksum_sha256 != sha256:
+        delta_size = len(body) - asset.filesize
+
+        # FIXME: this gets messy if team_topics get fewer
+        team_repo = TeamRepo(db)
+        for team_topic in asset.document.team_topics:
+            team_repo.add_used_storage(team_topic.team, delta_size)
+
         # file has changed, updated it
         asset_content_repo = AssetContentRepo()
         asset_content_repo.create(asset.id, body)
@@ -112,6 +128,7 @@ async def put_asset(
             checksum_sha256=sha256,
             last_updated_at=datetime.utcnow(),
         )
+
     return dict(result=AssetReponse.from_orm(asset))
 
 
@@ -124,8 +141,8 @@ async def get_asset(
 ):
     asset_repo = AssetRepo(db)
     asset = asset_repo.get_by_kwargs(id=id)
-    if not asset:
-        raise NotFound()
+    if not asset or asset.deleted_at:
+        raise NotFound("Asset not found")
     if asset.user_id != user.id:
         user_repo = UserRepo(db)
         # TODO: find a more efficient way to query all team topics in document
@@ -162,10 +179,14 @@ async def delete_asset(
     asset_repo = AssetRepo(db)
     asset = asset_repo.get_by_kwargs(id=id)
     if not asset:
-        raise NotFound()
+        raise NotFound("Asset not found")
     if asset.user_id != user.id:
         raise NotAllowed("Not your asset")
-    asset_repo.delete(asset)
-    asset_content_repo = AssetContentRepo()
-    asset_content_repo.delete(id)
+    asset_repo.update(asset, deleted_at=datetime.utcnow())
+
+    # remove size from teams
+    team_repo = TeamRepo(db)
+    for team_topic in asset.document.team_topics:
+        team_repo.add_used_storage(team_topic.team, -asset.filesize)
+
     return dict(result=dict(success=True))

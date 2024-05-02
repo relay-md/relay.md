@@ -56,15 +56,15 @@ td.has-text-light
  .columns
   .column.is-8.is-offset-2
    .block
-    .title.is-1 {{team.name}}
+    .title.is-1.has-text-primary.has-text-weight-bold {{team.name}}
 
    .block
-    .title.is-3 Team Settings
+    .title.is-3.has-text-primary.has-text-weight-bold Team Settings
     .field.is-horizontal
       .field-label.is-normal Headline
       .field-body
         .control.has-icons-left
-          input.input(type="string" placeholder="Tagline" name="headline" hx-post="{{url_for('update_team_headline', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#updated_team_headline" value="{{team.headline}}")
+          input.input#team_name(type="string" value="{{team.headline}}" placeholder="Description" name="headline" hx-post="{{url_for('update_team_headline', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#updated_team_headline")
           span.icon.is-left
            i.fas.fa-expand
         span(id="updated_team_headline")
@@ -74,7 +74,7 @@ td.has-text-light
        .field-body
          .control
            textarea.textarea(type="string" placeholder="Description" name="description") {{team.description or ""}}
-           small.helper Markdown supported
+           small.help Markdown supported
            span#updated_team_description
            button.button.is-block.is-link.is-fullwidth.is-normal.m-0 Subscribe
 
@@ -91,8 +91,8 @@ td.has-text-light
     //    span(id="updated_team_hide")
 
    .block
-    .title.is-3 Permissions
-    .subtitle.is-5 Customize Team Permissions
+    .title.is-3.has-text-primary.has-text-weight-bold Permissions
+    .subtitle.is-5.has-text-grey Customize Team Permissions
     p.block Click the check marks/crosses to flip the corresponding permission.
     table.table.block
      tr
@@ -107,13 +107,10 @@ td.has-text-light
          i.fa.fa-shield
         span Member
       th
-       .level
-        .level-item
-         .icon-text
-          .span.icon
-           i.fa.fa-globe
-          span Public
-        .level-item
+       .icon-text
+        .span.icon
+         i.fa.fa-globe
+        span Public
      tr
       td
        {{permissions("owner", team.owner_permissions)}}
@@ -123,8 +120,8 @@ td.has-text-light
        {{permissions("public", team.public_permissions)}}
 
    .block
-    .title.is-3 Members
-    .subtitle.is-5 List of users subscribed to your team
+    .title.is-3.has-text-primary.has-text-weight-bold Members
+    .subtitle.is-5.has-text-grey List of users subscribed to your team
     p.block
      |Customize your members permissions. By default,&nbsp;
      span.is-underlined Member/Group permissions apply!
@@ -174,15 +171,63 @@ td.has-text-light
     {% endif %}
 
    .block
-    .title.is-3 Invite Users
-    .subtitle.is-5.mb-0 Add others to your team
-    .subtitle.is-7 You have&nbsp;
-     strong {{team.seats}}
-     |&nbsp;in your subscription
+    .title.is-5.has-text-primary.has-text-weight-bold Invite Users
+    .subtitle.is-6.mb-3.has-text-grey Add others to your team
     .control.has-icons-left
      input.input(type="tags" id="invite-users" name="name" hx-post="{{url_for('settings_user_search', team_name=team.name)}}" hx-trigger="input changed delay:500ms, search" hx-target="#users")
      span.icon.is-left
       i.fas.fa-search
     div(id="users")
+
+   {% if team.active_subscription %}
+   .block.box
+    .title.is-3.has-text-primary.has-text-weight-bold Subscription
+    .subtitle.is-7.has-text-grey *Adding seats to your team will result in additional costs!
+    form(hx-post="{{url_for('update_team_seats', team_name=team.name)}}" hx-target="#updated_team_seats")
+     .field.has-addons
+      .field-label.is-normal No. Seats
+      .field-body
+       .control
+        input.input(id="seats_team" value="{{team.seats | default(0)}}" type="number" name="seats")
+        label(for="seats_team")
+       .control
+        button.button.is-primary Ok
+       span(id="updated_team_seats")
+
+    .subtitle.is-5.has-text-grey
+    table.table.mb-0
+     thead
+      tr
+       th Active
+       th Date
+       th Schedule
+       th Quantity
+       th Price
+       th Ends by
+     tbody
+      {% for sub in team.subscriptions %}
+      tr.is-success
+       td
+        {% if sub.active %}
+        span.icon.has-text-success
+          i.fas.fa-check
+        {% else %}
+        span.icon.has-text-danger
+          i.fas.fa-times
+        {% endif %}
+        td 
+          {% if sub.created_at %}{{sub.created_at.strftime("%Y-%m-%d") }}{% endif %}
+        td {{ "yearly" if sub.is_yearly else "monthly" }}
+        td {{sub.quantity }}
+        td {{sub.quantity * sub.price / 100}} €
+        td {% if sub.period_ends_at %}{{sub.period_ends_at.strftime("%Y-%m-%d")}}{% endif %}
+      {% endfor %}
+    p.help.block Find out more by logging into the&nbsp;
+     a(href=config.STRIPE_CUSTOMER_PORTAL_URL) Customer Portal.
+    a.block.button.is-medium.is-danger.is-outlined(href="{{ url_for('cancel_subscription', team_name=team.name) }}")
+     span.icon.is-medium
+      i.fas.fa-skull
+     span Cancel Subscription
+   {% endif %}
 
 {% endblock %}

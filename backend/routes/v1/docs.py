@@ -12,11 +12,13 @@ from backend.repos.user_team_topic import UserTeamTopicRepo
 
 from ... import __version__, exceptions
 from ...database import Session, get_session
+from ...models.access_token import AccessToken
 from ...models.document import Document
 from ...models.user import User
 from ...repos.document import DocumentRepo
 from ...repos.document_access import DocumentAccessRepo
 from ...repos.document_body import DocumentBodyRepo
+from ...repos.team import TeamRepo
 from ...schema import (
     DocumentFrontMatter,
     DocumentIdentifierResponse,
@@ -72,7 +74,22 @@ async def post_doc(
 
     # Parse frontmatter
     front_matter = frontmatter.loads(body)
+
+    # reformat frontmatter
     front = DocumentFrontMatter(**front_matter)
+
+    """
+    # TODO: this code would make things cleaner but breaks the plugin!
+    # Add the front mattter attributes the way they should be
+    for k, v in front.model_dump(by_alias=True).items():
+        if v:
+            front_matter[k] = v
+    # Remove the version that shouldn't be used
+    for k in front.model_dump(by_alias=False):
+        front_matter.metadata.pop(k, None)
+    # store the updated body
+    body = frontmatter.dumps(front_matter)
+    """
 
     if not filename and not front.relay_filename:
         raise exceptions.BadRequest("Missing filename or relay-filename property!")
@@ -92,8 +109,13 @@ async def post_doc(
     # if the document already has an id, let's raise
     if front.relay_document:
         raise exceptions.BadRequest(
-            "The document you are sending already has a relay-document id"
+            "The document you are sending already has a relay-document id, use PUT instead"
         )
+
+    # add size to teams
+    team_repo = TeamRepo(db)
+    for team_topic in shareables.team_topics:
+        team_repo.add_used_storage(team_topic.team, len(body))
 
     # Checksum
     hashing_obj = hashlib.sha256()
@@ -114,6 +136,7 @@ async def post_doc(
 
     # Update document content in DocumentBodyRepo
     document_body_repo.create(document.id, body)
+
     ret_document = DocumentResponse(
         relay_document=document.id,
         relay_title=document.title,
@@ -159,8 +182,8 @@ async def get_doc(
         )
     elif content_type == "text/markdown":
         # Add document id to frontmatter
-        body = document_body_repo.get_by_id(document.id)
-        body = body.decode("utf-8")
+        body_raw = document_body_repo.get_by_id(document.id)
+        body = body_raw.decode("utf-8")
         front = frontmatter.loads(body)
         front["relay-document"] = str(document.id)
         body = frontmatter.dumps(front)
@@ -208,6 +231,14 @@ async def put_doc(
     sha256 = hashing_obj.hexdigest()
 
     if sha256 != document.checksum_sha256:
+        size_delta = len(body) - (document.filesize or 0)
+
+        # add size to teams
+        # FIXME: this gets messy when the team topics get smaller
+        team_repo = TeamRepo(db)
+        for team_topic in shareables.team_topics:
+            team_repo.add_used_storage(team_topic.team, size_delta)
+
         # We skip the update when the doucment hasn't changed!
         document = document_repo.update(
             document,
@@ -239,7 +270,11 @@ async def delete_doc(
     db: Session = Depends(get_session),
 ):
     document_repo = DocumentRepo(db)
-    document_repo.delete(document)
+    document_repo.update(document, deleted_at=datetime.utcnow())
+    # add size to teams
+    team_repo = TeamRepo(db)
+    for team_topic in document.team_topics:
+        team_repo.add_used_storage(team_topic.team, -document.filesize)
     return dict(result=dict(success=True))
 
 
@@ -256,7 +291,7 @@ async def get_docs(
     size: int = 50,
     user: User = Depends(require_authenticated_user),
     db: Session = Depends(get_session),
-    access_token: str = Security(get_access_token),
+    access_token: AccessToken = Security(get_access_token),
 ):
     document_repo = DocumentRepo(db)
     if type == "mine":
@@ -266,9 +301,7 @@ async def get_docs(
             access_token,
             page,
             size,
-            DocumentShareType.PUBLIC
-            | DocumentShareType.SHARED_WITH_USER
-            | DocumentShareType.SUBSCRIBED_TEAM,
+            DocumentShareType.SHARED_WITH_USER | DocumentShareType.SUBSCRIBED_TEAM,
         )
     ret = list()
     for document in documents:

@@ -47,6 +47,8 @@ class Document(Base):
     # 128bit password hash, as bytes TODO: needs implementation
     read_password_hash: Mapped[bytes] = mapped_column(CHAR(32), default=b"")
 
+    deleted_at: Mapped[datetime] = mapped_column(nullable=True)
+
     def __repr__(self):
         return f"<{self.__class__.__name__}@{self.user.username}>"
 

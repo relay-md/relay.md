@@ -15,6 +15,7 @@ from .routes.v1 import assets as v1_assets
 from .routes.v1 import docs as v1_docs
 from .routes.v1 import teams as v1_teams
 from .routes.v1 import topics as v1_topics
+from .routes.v1 import user as v1_user
 
 # Setup sentry for alerting in case of exceptions
 if get_config().SENTRY_DSN:
@@ -38,6 +39,7 @@ app.include_router(v1_docs.router)
 app.include_router(v1_assets.router)
 app.include_router(v1_teams.router)
 app.include_router(v1_topics.router)
+app.include_router(v1_user.router)
 
 # Set all CORS enabled origins
 app.add_middleware(
