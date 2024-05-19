@@ -2,6 +2,13 @@
 
 
 
+## v1.19.3 (2024-05-19)
+
+### Fix
+
+* fix: use pat when releasing tag ([`2138c1e`](https://github.com/relay-md/relay.md/commit/2138c1e304e2ab6c2b785cc01efdca5b1f3c2874))
+
+
 ## v1.19.2 (2024-05-19)
 
 ### Ci
