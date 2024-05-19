@@ -94,7 +94,7 @@ Example text
     req.raise_for_status()
     assert (
         req.json()["error"]["message"]
-        == "The document you are sending already has a relay-document id"
+        == "The document you are sending already has a relay-document id, use PUT instead"
     )
 
 

@@ -82,6 +82,15 @@ docker_publish:
 .PHONY: release
 release:
 	git diff-index --quiet HEAD || { echo "untracked files! Aborting"; exit 1; }
+	git checkout develop
+	git checkout -b release/$(shell date +'%Y%m%d%H%m')
+	git push github release/$(shell date +'%Y%m%d%H%m')
+	git checkout develop
+
+
+.PHONY: release-relay.md
+release-relay.md:
+	git diff-index --quiet HEAD || { echo "untracked files! Aborting"; exit 1; }
 	git checkout relay.md/develop
 	git checkout -b release/$(shell date +'%Y%m%d%H%m')
 	git push origin release/$(shell date +'%Y%m%d%H%m')
