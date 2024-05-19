@@ -23,7 +23,7 @@ name: Build and deploy for develop
 
 trigger:
   branch:
-    - develop
+    - relay.md/develop
   status:
     # Only runs if the first pipeline was fully successful
     - success
@@ -83,7 +83,7 @@ name: semantic-version
 depends_on:
   - run_tests
 trigger:
-  branch: master
+  branch: relay.md/master
   event: push
   status:
     # Only runs if the first pipeline was fully successful
@@ -92,7 +92,7 @@ steps:
   - name: semver
     image: python:3.8
     commands:
-      - pip3 install python-semantic-release==7.28.0
+      - pip3 install -U python-semantic-release
       - semantic-release publish
 
 ---
