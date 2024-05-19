@@ -24,12 +24,3 @@ jobs:
       uses: python-semantic-release/python-semantic-release@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
-  build:
-    uses: ./.github/workflows/build.yaml
-    secrets: inherit
-    needs: test
-    with:
-      version: "${{ github.ref_name }}"
-      registry: ghcr.io
-      image: relay-md/relay.md
