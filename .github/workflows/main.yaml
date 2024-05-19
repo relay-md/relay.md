@@ -1,0 +1,20 @@
+name: Test, build and deploy for Test
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+
+  test:
+    uses: ./.github/workflows/test.yaml
+
+  build:
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+    needs: test
+    with:
+      version: "${{ github.ref_name }}"
+      registry: ghcr.io
+      image: relay-md/relay.md
