@@ -2,9 +2,34 @@
 
 
 
+## v1.19.2 (2024-05-19)
+
+### Ci
+
+* ci: also build release docker image - try 2 ([`2c607de`](https://github.com/relay-md/relay.md/commit/2c607de657565f2e6561ca515662b02c0022b351))
+
+### Fix
+
+* fix: trigger new release ([`7ad6926`](https://github.com/relay-md/relay.md/commit/7ad69262ceedc2ee9ff6de77c5963cb2eec77b6b))
+
+### Unknown
+
+* Merge branch &#39;develop&#39; ([`b781895`](https://github.com/relay-md/relay.md/commit/b7818954cec9098b61c541b239609e98a9941c51))
+
+* Merge pull request #4 from relay-md/release/202405191605
+
+ci: also build release docker image - try 2 ([`afa0d62`](https://github.com/relay-md/relay.md/commit/afa0d62aad47178d01e878112822c4e9fe2cdc43))
+
+* Merge pull request #3 from relay-md/release/202405191605
+
+ci: also build release docker image ([`c4f0820`](https://github.com/relay-md/relay.md/commit/c4f082049a346eec554aa162be44416a008936e3))
+
+
 ## v1.19.1 (2024-05-19)
 
 ### Ci
+
+* ci: also build release docker image ([`2ff71cf`](https://github.com/relay-md/relay.md/commit/2ff71cf9ebf8102a865aa3b9ed10e055eab23b36))
 
 * ci: also build release from main ([`83f5082`](https://github.com/relay-md/relay.md/commit/83f508291081ad9793e8d2f8861ed80027209b1c))
 
