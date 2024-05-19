@@ -113,9 +113,7 @@ async def post_doc(
         )
 
     # add size to teams
-    team_repo = TeamRepo(db)
-    for team_topic in shareables.team_topics:
-        team_repo.add_used_storage(team_topic.team, len(body))
+    TeamRepo(db)
 
     # Checksum
     hashing_obj = hashlib.sha256()
@@ -231,13 +229,11 @@ async def put_doc(
     sha256 = hashing_obj.hexdigest()
 
     if sha256 != document.checksum_sha256:
-        size_delta = len(body) - (document.filesize or 0)
+        len(body) - (document.filesize or 0)
 
         # add size to teams
         # FIXME: this gets messy when the team topics get smaller
-        team_repo = TeamRepo(db)
-        for team_topic in shareables.team_topics:
-            team_repo.add_used_storage(team_topic.team, size_delta)
+        TeamRepo(db)
 
         # We skip the update when the doucment hasn't changed!
         document = document_repo.update(
@@ -272,9 +268,7 @@ async def delete_doc(
     document_repo = DocumentRepo(db)
     document_repo.update(document, deleted_at=datetime.utcnow())
     # add size to teams
-    team_repo = TeamRepo(db)
-    for team_topic in document.team_topics:
-        team_repo.add_used_storage(team_topic.team, -document.filesize)
+    TeamRepo(db)
     return dict(result=dict(success=True))
 
 

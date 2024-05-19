@@ -64,9 +64,7 @@ async def post_asset(
         )
 
     # add size to teams
-    team_repo = TeamRepo(db)
-    for team_topic in document.team_topics:
-        team_repo.add_used_storage(team_topic.team, len(body))
+    TeamRepo(db)
 
     asset = asset_repo.create_from_kwargs(
         user_id=user.id,
@@ -112,12 +110,10 @@ async def put_asset(
     if not asset:
         raise NotFound("Asset not found")
     if asset.checksum_sha256 != sha256:
-        delta_size = len(body) - asset.filesize
+        len(body) - asset.filesize
 
         # FIXME: this gets messy if team_topics get fewer
-        team_repo = TeamRepo(db)
-        for team_topic in asset.document.team_topics:
-            team_repo.add_used_storage(team_topic.team, delta_size)
+        TeamRepo(db)
 
         # file has changed, updated it
         asset_content_repo = AssetContentRepo()
@@ -185,8 +181,6 @@ async def delete_asset(
     asset_repo.update(asset, deleted_at=datetime.utcnow())
 
     # remove size from teams
-    team_repo = TeamRepo(db)
-    for team_topic in asset.document.team_topics:
-        team_repo.add_used_storage(team_topic.team, -asset.filesize)
+    TeamRepo(db)
 
     return dict(result=dict(success=True))
